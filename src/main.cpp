@@ -1,21 +1,11 @@
 #include <iostream>
-
-struct Array {
-    int* data;
-    int size;
-
-    Array(int s) {
-        size = s;
-        data = new int[size];
-    }
-
-    ~Array() {
-        delete[] data;
-    }
-};
+#include "structures/Array.h"
 
 int main() {
+    // create a table of size 5
     Array arr(5);
+
+    // wwrie a number of the table
     arr.data[0] = 10;
     arr.data[1] = 20;
     arr.data[2] = 30;
