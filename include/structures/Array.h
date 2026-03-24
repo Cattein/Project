@@ -7,16 +7,26 @@
 
 
 #pragma once
+
 //opis funkcji klasy(nazwa klasy, jakie zmienne, funkcje zawiera)
 
 // dynamic array
-struct Array {
+class Array {
+private:
     int* data;   // pointer to the array
     int size;    // number of array elements
-
+public:
     Array(int size);  // constructor – creates arrays
     ~Array();      // destructor – frees memory
+    // Czyli class Array potrafi tworzyc sie i usuwac
+
+    int getSize() const { // Returns array size
+        return size;
+    };
+
+    int& setId(int index){// Returns element at given index
+    return data[index];
+}
 };
-// Czyli class Array ma rozmiar pointer do tablicy i potrafi tworzyc sie i usuwac(aby nie bylo
 
 #endif //PROJECT_ARRAY_H

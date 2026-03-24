@@ -13,8 +13,9 @@ Array::Array(int s) {
     data = new int[size];
 }
 
-// Destructor – removes arrays from memory
+// Destructor – removes arrays from memory, aby nie było memory leaks
 Array::~Array() {
     delete[] data;
 }
+
 

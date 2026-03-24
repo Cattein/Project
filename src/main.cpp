@@ -6,14 +6,14 @@ int main() {
     Array arr(5);
 
     // wwrie a number of the table
-    arr.data[0] = 10;
-    arr.data[1] = 20;
-    arr.data[2] = 30;
-    arr.data[3] = 40;
-    arr.data[4] = 50;
+    arr.setId(0) = 10;
+    arr.setId(1) = 20;
+    arr.setId(2) = 30;
+    arr.setId(3) = 40;
+    arr.setId(4) = 50;
 
-    for (int i = 0; i < arr.size; ++i) {
-        std::cout << arr.data[i] << " ";
+    for (int i = 0; i < arr.getSize(); ++i) {
+        std::cout << arr.setId(i) << " ";
     }
 
     std::cout << "\n";
