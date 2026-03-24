@@ -17,11 +17,5 @@ Array::Array(int s) {
 Array::~Array() {
     delete[] data;
 }
-int Array::getSize() const { // Returns array size
-    return size;
-}
 
-int& Array::id(int index) { // Returns element at given index
-    return data[index];
-}
 
