@@ -15,6 +15,8 @@ add_executable(Project
         ${PROG_SRC}/structures/Array.cpp
         ${PROG_SRC}/structures/Singlelist.cpp
         ${PROG_LIBS}/parameters/Parameters.cpp
+        include/structures/DoubleList.h
+        src/structures/DoubleList.cpp
 )
 
 target_include_directories(Project PUBLIC
