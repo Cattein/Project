@@ -1,21 +1,37 @@
 #include <iostream>
-#include "structures/Array.h"
 
-int main() {
-    // create a table of size 5
-    Array arr(5);
+#include "Parameters.h"
 
-    // wwrie a number of the table
-    arr.setId(0) = 10;
-    arr.setId(1) = 20;
-    arr.setId(2) = 30;
-    arr.setId(3) = 40;
-    arr.setId(4) = 50;
-
-    for (int i = 0; i < arr.getSize(); ++i) {
-        std::cout << arr.setId(i) << " ";
+int main(int argc, char** argv)
+{
+    // Wczytanie argumentów programu.
+    // Przekazujemy argc - 1 i argv + 1, ponieważ biblioteka oczekuje parametrów bez nazwy programu
+    if (Parameters::readParameters(argc - 1, argv + 1) != 0) {
+        std::cerr << "ERROR! Failed to read parameters.\n";
+        Parameters::help();
+        return 1;
     }
 
-    std::cout << "\n";
-    return 0;
+    // Tryb pomocy.
+    if (Parameters::runMode == Parameters::RunModes::help) {
+        Parameters::help();
+        return 0;
+    }
+
+    // Tryb pojedynczego pliku.
+    if (Parameters::runMode == Parameters::RunModes::singleFile) {
+        std::cout << "singleFile mode selected\n";
+        return 0;
+    }
+
+    // Tryb badań.
+    if (Parameters::runMode == Parameters::RunModes::benchmark) {
+        std::cout << "benchmark mode selected\n";
+        return 0;
+    }
+
+    // Jeśli nie wybrano poprawnego trybu - błąd i help.
+    std::cerr << "ERROR! Run mode is not set.\n";
+    Parameters::help();
+    return 1;
 }
