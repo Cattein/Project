@@ -18,6 +18,8 @@ add_executable(Project
         lib/parameters/Parameters.cpp
         include/file/FileHandler.h
         src/file/FileHandler.cpp
+        src/algorytmsSorting/QuickSort.cpp
+        include/algorytmsSorting/QuickSort.h
 )
 
 target_include_directories(Project PUBLIC
