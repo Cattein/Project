@@ -46,7 +46,7 @@ namespace Parameters
         typeDouble,
         typeChar,
         typeString,
-        tyleUnsignedInt,
+        typeUnsignedInt,
         typeUnsignedLong,
         typeUnsignedChar,
 
