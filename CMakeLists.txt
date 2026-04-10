@@ -13,10 +13,9 @@ set(PROG_LIBS "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 add_executable(Project
         ${PROG_SRC}/main.cpp
         ${PROG_SRC}/structures/Array.cpp
-        ${PROG_SRC}/structures/Singlelist.cpp
+        ${PROG_SRC}/structures/SingleList.cpp
+        ${PROG_SRC}/structures/DoubleList.cpp
         ${PROG_LIBS}/parameters/Parameters.cpp
-        include/structures/DoubleList.h
-        src/structures/DoubleList.cpp
 )
 
 target_include_directories(Project PUBLIC

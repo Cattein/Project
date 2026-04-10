@@ -4,9 +4,6 @@
 
 #ifndef PROJECT_ARRAY_H
 #define PROJECT_ARRAY_H
-
-#pragma once
-
 // Dynamic array
 class Array {
 private:

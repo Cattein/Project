@@ -1,7 +1,7 @@
 //
 // Created by MashaGuzhva on 04/04/2026.
 //
-#include "structures/Doublelist.h"
+#include "structures/DoubleList.h"
 #include <new>
 // Potrzebne do std::nothrow.
 

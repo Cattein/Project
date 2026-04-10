@@ -1,4 +1,4 @@
-#include "structures/Singlelist.h"
+#include "structures/SingleList.h"
 #include <new> // std::nothrow
 
 // set wartosc wezla, next = nullptr, bo nowy wezel teraz nie ma nastepnego

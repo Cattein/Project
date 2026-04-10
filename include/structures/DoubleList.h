@@ -4,7 +4,6 @@
 
 #ifndef PROJECT_DOUBLELIST_H
 #define PROJECT_DOUBLELIST_H
-#include <queue>
 
 class DoubleList {
 private:
