@@ -20,6 +20,8 @@ add_executable(Project
         src/file/FileHandler.cpp
         src/algorytmsSorting/QuickSort.cpp
         include/algorytmsSorting/QuickSort.h
+        src/checking/sortingCheck.cpp
+        include/checking/sortingCheck.h
 )
 
 target_include_directories(Project PUBLIC

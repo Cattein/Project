@@ -8,9 +8,10 @@
 #include "structures/Array.h"
 
 
-class QuickSort {
-    void sort(Array& array);
-};
 
+class QuickSort {
+public:
+    static void sort(Array& array);
+};
 
 #endif //PROJECT_QUICKSORT_H

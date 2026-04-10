@@ -30,6 +30,9 @@ public:
         return data[index];
     }
 
+    Array(const Array&) = delete;
+    Array& operator=(const Array&) = delete;
+
     bool get(int index, int& value) const; // Reads value from given index
     bool set(int index, int value);        // Sets value at given index
     void clear();                          // Clears whole array

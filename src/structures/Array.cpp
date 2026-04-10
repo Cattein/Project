@@ -8,7 +8,6 @@
 Array::Array(int s) {
     size = s;
     if (size > 0) {    // jeśli rozmiar jest większy od zera, tworzymy tablicę w pamięci dynamicznej
-
         data = new int[size];
     } else {
         // dla pustej tablicy ustawiamy wskaźnik na nullptr
