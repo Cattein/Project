@@ -11,11 +11,14 @@ set(PROG_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(PROG_LIBS "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
 add_executable(Project
-        ${PROG_SRC}/main.cpp
-        ${PROG_SRC}/structures/Array.cpp
-        ${PROG_SRC}/structures/SingleList.cpp
-        ${PROG_SRC}/structures/DoubleList.cpp
-        ${PROG_LIBS}/parameters/Parameters.cpp
+        src/main.cpp
+        src/structures/Array.cpp
+        src/structures/SingleList.cpp
+        src/structures/DoubleList.cpp
+        src/parameters/Parameters.cpp
+        include/file/FileHandler.h
+        src/file/FileHandler.cpp
+        src/file/FileHandler.cpp
 )
 
 target_include_directories(Project PUBLIC
