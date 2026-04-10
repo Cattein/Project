@@ -1,37 +1,39 @@
 #include <iostream>
 
-#include "Parameters.h"
+#include "file/FileHandler.h"
 
-int main(int argc, char** argv)
-{
-    // Wczytanie argumentów programu.
-    // Przekazujemy argc - 1 i argv + 1, ponieważ biblioteka oczekuje parametrów bez nazwy programu
-    if (Parameters::readParameters(argc - 1, argv + 1) != 0) {
-        std::cerr << "ERROR! Failed to read parameters.\n";
-        Parameters::help();
+int main() {
+    Array* array = FileHandler::loadArrayFromFile("file.txt");
+
+    if (array == nullptr) {
+        std::cerr << "ERROR! Failed to load file.\n";
         return 1;
     }
 
-    // Tryb pomocy.
-    if (Parameters::runMode == Parameters::RunModes::help) {
-        Parameters::help();
-        return 0;
+    std::cout << "Loaded values:\n";
+
+    for (int i = 0; i < array->getSize(); ++i) {
+        int value = 0;
+
+        if (!array->get(i, value)) {
+            std::cerr << "ERROR! Failed to read value from array.\n";
+            delete array;
+            return 1;
+        }
+
+        std::cout << value << " ";
     }
 
-    // Tryb pojedynczego pliku.
-    if (Parameters::runMode == Parameters::RunModes::singleFile) {
-        std::cout << "singleFile mode selected\n";
-        return 0;
+    std::cout << "\n";
+
+    if (!FileHandler::saveArrayToFile(*array, "output.txt")) {
+        std::cerr << "ERROR! Failed to save file.\n";
+        delete array;
+        return 1;
     }
 
-    // Tryb badań.
-    if (Parameters::runMode == Parameters::RunModes::benchmark) {
-        std::cout << "benchmark mode selected\n";
-        return 0;
-    }
+    std::cout << "Data saved to output.txt\n";
 
-    // Jeśli nie wybrano poprawnego trybu - błąd i help.
-    std::cerr << "ERROR! Run mode is not set.\n";
-    Parameters::help();
-    return 1;
+    delete array;
+    return 0;
 }

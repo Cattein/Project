@@ -5,8 +5,14 @@
 #ifndef PROJECT_FILEHANDLER_H
 #define PROJECT_FILEHANDLER_H
 
+#include <string>
+#include "structures/Array.h"
 
+namespace FileHandler {
 
+    Array* loadArrayFromFile(const std::string& filename);
+    bool saveArrayToFile(const Array& array, const std::string& filename);
+}
 
 
 

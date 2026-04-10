@@ -15,9 +15,8 @@ add_executable(Project
         src/structures/Array.cpp
         src/structures/SingleList.cpp
         src/structures/DoubleList.cpp
-        src/parameters/Parameters.cpp
+        lib/parameters/Parameters.cpp
         include/file/FileHandler.h
-        src/file/FileHandler.cpp
         src/file/FileHandler.cpp
 )
 
