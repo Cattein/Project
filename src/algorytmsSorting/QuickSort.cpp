@@ -2,7 +2,7 @@
 // Created by MashaGuzhva on 10/04/2026.
 //
 
-#include "../../include/algorytmsSorting/QuickSort.h"
+#include "algorytmsSorting/QuickSort.h"
 
 // swap two numbers
 static void swapValues(int& first, int& second) {

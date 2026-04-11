@@ -19,6 +19,7 @@ add_executable(Project
         src/file/FileHandler.cpp
         src/algorytmsSorting/QuickSort.cpp
         src/checking/sortingCheck.cpp
+        src/algorytmsSorting/ShellSort.cpp
 )
 
 target_include_directories(Project PUBLIC
