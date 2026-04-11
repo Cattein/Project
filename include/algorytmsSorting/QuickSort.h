@@ -8,9 +8,14 @@
 #include "structures/Array.h"
 
 
-class QuickSort {
-    void sort(Array& array);
-};
 
+class QuickSort {
+public:
+    //static - metoda jest niezależna od obiektu
+    //nie ma potrzeby tworzenia obiektu QuickSort
+    //funkcja została po prostu umieszczona w klasie
+    // Array& - referencja na oryginalne tablice
+    static void sort(Array& array);
+};
 
 #endif //PROJECT_QUICKSORT_H

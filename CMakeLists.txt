@@ -16,10 +16,9 @@ add_executable(Project
         src/structures/SingleList.cpp
         src/structures/DoubleList.cpp
         lib/parameters/Parameters.cpp
-        include/file/FileHandler.h
         src/file/FileHandler.cpp
         src/algorytmsSorting/QuickSort.cpp
-        include/algorytmsSorting/QuickSort.h
+        src/checking/sortingCheck.cpp
 )
 
 target_include_directories(Project PUBLIC
