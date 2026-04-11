@@ -47,10 +47,10 @@ int main(int argc, char** argv){
             QuickSort::sort(*array);
         }
         else if (Parameters::algorithm == Parameters::Algorithms::shell) {
-            ShellSort::sort(*array);
+            ShellSort::sort(*array, Parameters::shellParameter);
         }
         else {
-            std::cerr << "ERROR!\n";
+            std::cerr << "ERROR! Selected algorithm is not implemented yet.\n";
             delete array;
             return 1;
         }
