@@ -44,21 +44,26 @@ int main(int argc, char** argv){
         }
 
         // *array oznacza, że przekazujemy sam obiekt, a nie wskaźnik
+
         if (Parameters::algorithm == Parameters::Algorithms::quick) {
             QuickSort::sort(*array);
         }
         else if (Parameters::algorithm == Parameters::Algorithms::shell) {
+            if (Parameters::shellParameter == Parameters::ShellParameters::option3 ||
+                Parameters::shellParameter == Parameters::ShellParameters::option4) {
+                std::cerr << "ERROR! Only shell parameters option1 and option2 are supported now.\n";
+                delete array;
+                return 1;
+                }
+
             ShellSort::sort(*array, Parameters::shellParameter);
         }
         else if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-            BucketSort::sort(*array) ;
-        }
-        else {
-            std::cerr << "ERROR! Selected algorithm is not implemented yet.\n";
-            delete array;
-            return 1;
-        }
-
+            if (!BucketSort::sort(*array)) {
+                std::cerr << "ERROR! Bucket sort failed.\n";
+                delete array;
+                return 1;
+            }
         // po sortowaniu sprawdzamy, czy tablica jest rosnąca
         if (!SortingCheck::SortedAscend(*array)) {
             std::cerr << "ERROR! Array is not sorted correctly :=)\n";
