@@ -26,7 +26,7 @@ int main() {
 
     QuickSort::sort(*array);
 
-    if (!SortingCheck::isSortedAscending(*array)) {
+    if (!SortingCheck::SortedAscend(*array)) {
         std::cerr << "ERROR! Array is not sorted correctly.\n";
         delete array;
         return 1;

@@ -8,7 +8,7 @@
 
 class SortingCheck {
 public:
-     static bool isSortedAscending(const Array& array);
+     static bool SortedAscend(const Array& array);
 };
 
 

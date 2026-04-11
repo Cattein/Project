@@ -3,7 +3,7 @@
 //
 #include "checking/SortingCheck.h"
 
-bool SortingCheck::isSortedAscending(const Array& array) {
+bool SortingCheck::SortedAscend(const Array& array) {
     for (int i = 1; i < array.getSize(); ++i) {
         int previous = 0;
         int current = 0;
