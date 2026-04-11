@@ -5,6 +5,7 @@
 #include "algorytmsSorting/QuickSort.h"
 #include "algorytmsSorting/ShellSort.h"
 #include "checking/SortingCheck.h"
+#include "algorytmsSorting/BucketSort.h"
 
 int main(int argc, char** argv){
     // argc - ile w sumie przekazano wierszy
@@ -48,6 +49,9 @@ int main(int argc, char** argv){
         }
         else if (Parameters::algorithm == Parameters::Algorithms::shell) {
             ShellSort::sort(*array, Parameters::shellParameter);
+        }
+        else if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+            BucketSort::sort(*array) ;
         }
         else {
             std::cerr << "ERROR! Selected algorithm is not implemented yet.\n";
