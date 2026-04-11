@@ -8,6 +8,11 @@
 
 class SortingCheck {
 public:
+     //static - metoda jest niezależna od obiektu
+     //nie ma potrzeby tworzenia obiektu QuickSort
+     //funkcja została po prostu umieszczona w klasie
+     // bool - funkcja zwraca true albo false
+     // Array& - referencja na oryginalne tablice
      static bool SortedAscend(const Array& array);
 };
 

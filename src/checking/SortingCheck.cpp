@@ -4,18 +4,20 @@
 #include "checking/SortingCheck.h"
 
 bool SortingCheck::SortedAscend(const Array& array) {
+    // przechodzimy po tablicy od drugiego elementu
     for (int i = 1; i < array.getSize(); ++i) {
-        int previous = 0;
-        int current = 0;
+        int last = 0;        // poprzedni element
+        int current = 0;     // aktualny element
 
-        if (!array.get(i - 1, previous) || !array.get(i, current)) {
+        // jeśli odczyt się nie uda, zwracamy false
+        if (!array.get(i - 1, last) || !array.get(i, current)) {
             return false;
         }
 
-        if (current < previous) {
+        // jeśli aktualny element jest mniejszy od poprzedniego - tablica nie jest posortowana rosnąco
+        if (current < last) {
             return false;
         }
     }
-
     return true;
 }
