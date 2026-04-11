@@ -3,6 +3,7 @@
 #include "Parameters.h"
 #include "file/FileHandler.h"
 #include "algorytmsSorting/QuickSort.h"
+#include "algorytmsSorting/ShellSort.h"
 #include "checking/SortingCheck.h"
 
 int main(int argc, char** argv){
@@ -25,24 +26,6 @@ int main(int argc, char** argv){
     //  singleFile - sortowanie danych z jednego pliku
     if (Parameters::runMode == Parameters::RunModes::singleFile) {
 
-        // quick sort
-        if (Parameters::algorithm != Parameters::Algorithms::quick) {
-            std::cerr << "ERROR! Only quick sort is supported now.\n";
-            return 1;
-        }
-
-        // struktura array
-        if (Parameters::structure != Parameters::Structures::array) {
-            std::cerr << "ERROR! Only array structure is supported now\n";
-            return 1;
-        }
-
-        // typ int
-        if (Parameters::dataType != Parameters::DataTypes::typeInt) {
-            std::cerr << "ERROR! Only int type is supported\n";
-            return 1;
-        }
-
         // bez pliku wejściowego nie mamy czego wczytać
         if (Parameters::inputFile.empty()) {
             std::cerr << "ERROR! Input file is not set :-X \n";
@@ -60,7 +43,17 @@ int main(int argc, char** argv){
         }
 
         // *array oznacza, że przekazujemy sam obiekt, a nie wskaźnik
-        QuickSort::sort(*array);
+        if (Parameters::algorithm == Parameters::Algorithms::quick) {
+            QuickSort::sort(*array);
+        }
+        else if (Parameters::algorithm == Parameters::Algorithms::shell) {
+            ShellSort::sort(*array);
+        }
+        else {
+            std::cerr << "ERROR!\n";
+            delete array;
+            return 1;
+        }
 
         // po sortowaniu sprawdzamy, czy tablica jest rosnąca
         if (!SortingCheck::SortedAscend(*array)) {
