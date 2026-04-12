@@ -23,7 +23,7 @@ bool RandomArrayGenerator::fillRandom(Array& array) {
     // przechodzimy po całej tablicy i wpisujemy do niej liczby losowe
     for (int i = 0; i < array.getSize(); ++i) {
 
-        if (!array.set(i, std::srand())) {
+        if (!array.set(i, std::rand())) {
             return false;    // jeśli nie uda się zapisać wartości do tablicy, zwracamy false
 
         }
