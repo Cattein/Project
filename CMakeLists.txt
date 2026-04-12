@@ -24,7 +24,6 @@ add_executable(Project
         include/benchmark/BenchmarkStats.h
         src/benchmark/RandomArrayGenerator.cpp
         src/benchmark/BenchmarkStats.cpp
-        include/benchmark/RandomArrayGenerator.h
 )
 
 target_include_directories(Project PUBLIC
