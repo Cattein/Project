@@ -6,6 +6,11 @@
 #include "algorytmsSorting/ShellSort.h"
 #include "checking/SortingCheck.h"
 #include "algorytmsSorting/BucketSort.h"
+#include <chrono>
+#include <limits>
+#include "benchmark/RandomArrayGenerator.h"
+
+
 
 int main(int argc, char** argv) {
     // argc - ile w sumie przekazano wierszy
@@ -91,9 +96,24 @@ int main(int argc, char** argv) {
         }
 
         // ten tryb jest przewidziany, ale jeszcze nie został zrobiony
-        if (Parameters::runMode == Parameters::RunModes::benchmark) {
-            return 0;
+    if (Parameters::runMode == Parameters::RunModes::benchmark) {
+        if (Parameters::structureSize <= 0) {
+            std::cerr << "ERROR! structureSize must be greater than 0.\n";
+            return 1;
         }
+
+        if (Parameters::iterations <= 0) {
+            std::cerr << "ERROR! iterations must be greater than 0.\n";
+            return 1;
+        }
+
+        Array source(Parameters::structureSize);
+
+        if (!RandomArrayGenerator::fillRandom(source)) {
+            std::cerr << "ERROR! Failed to generate random data.\n";
+            return 1;
+        }
+
 
         // jeśli nie ustawiono poprawnego trybu, pokazujemy błąd i pomoc
         std::cerr << "ERROR! Run mode is not set.\n";

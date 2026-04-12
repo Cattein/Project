@@ -21,6 +21,10 @@ add_executable(Project
         src/checking/sortingCheck.cpp
         src/algorytmsSorting/ShellSort.cpp
         src/algorytmsSorting/BucketSort.cpp
+        include/benchmark/BenchmarkStats.h
+        src/benchmark/RandomArrayGenerator.cpp
+        src/benchmark/BenchmarkStats.cpp
+        include/benchmark/RandomArrayGenerator.h
 )
 
 target_include_directories(Project PUBLIC

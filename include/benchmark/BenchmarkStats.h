@@ -1,0 +1,8 @@
+//
+// Created by MashaGuzhva on 12/04/2026.
+//
+
+#ifndef PROJECT_BENCHMARKSTATS_H
+#define PROJECT_BENCHMARKSTATS_H
+
+#endif //PROJECT_BENCHMARKSTATS_H
