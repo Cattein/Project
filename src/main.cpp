@@ -1,11 +1,11 @@
 #include <iostream>
 
 #include "Parameters.h"
-#include "file/FileHandler.h"
-#include "algorytmsSorting/QuickSort.h"
-#include "algorytmsSorting/ShellSort.h"
-#include "checking/SortingCheck.h"
-#include "algorytmsSorting/BucketSort.h"
+
+#include "benchmark/BenchmarkRunner.h"
+#include "benchmark/BenchmarkStats.h"
+#include "singleFile/SingleFileRunner.h"
+#include "benchmark/BenchmarkCsvWriter.h"
 
 int main(int argc, char** argv) {
     // argc - ile w sumie przekazano wierszy
@@ -26,74 +26,38 @@ int main(int argc, char** argv) {
 
     //  singleFile - sortowanie danych z jednego pliku
     if (Parameters::runMode == Parameters::RunModes::singleFile) {
-
-        // bez pliku wejściowego nie mamy czego wczytać
-        if (Parameters::inputFile.empty()) {
-            std::cerr << "ERROR! Input file is not set :-X \n";
+        if (!SingleFileRunner::run()) {
             return 1;
         }
 
-        // wczytujemy tablicę z pliku
-        // Array* oznacza wskaźnik na obiekt utworzony dynamicznie
-        Array* array = FileHandler::loadArrayFromFile(Parameters::inputFile);
+        std::cout << "Sorting completed :)\n";
+        return 0;
+    }
 
-        // jeśli nie udało się wczytać danych
-        if (array == nullptr) {
-            std::cerr << "ERROR! Failed to load input file :о) \n";
+    if (Parameters::runMode == Parameters::RunModes::benchmark) {
+        if (Parameters::resultsFile.empty()) {
+            std::cerr << "ERROR! resultsFile must be set in benchmark mode.\n";
             return 1;
         }
 
-        // *array oznacza, że przekazujemy sam obiekt, a nie wskaźnik
+        BenchmarkStats stats{};
 
-        if (Parameters::algorithm == Parameters::Algorithms::quick) {
-            QuickSort::sort(*array, Parameters::pivot);
-        }
-        else if (Parameters::algorithm == Parameters::Algorithms::shell) {
-            if (Parameters::shellParameter == Parameters::ShellParameters::option3 ||
-                Parameters::shellParameter == Parameters::ShellParameters::option4) {
-                std::cerr << "ERROR! Only shell parameters option1 and option2 are supported\n";
-                delete array;
-                return 1;
-                }
-
-            ShellSort::sort(*array, Parameters::shellParameter);
-        }
-        else if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-            if (!BucketSort::sort(*array)) {
-                std::cerr << "ERROR! Bucket sort failed\n";
-                delete array;
-                return 1;
-            }
-            // po sortowaniu sprawdzamy, czy tablica jest rosnąca
-            if (!SortingCheck::SortedAscend(*array)) {
-                std::cerr << "ERROR! Array is not sorted correctly :=)\n";
-                delete array;
-                return 1;
-            }
-        }        else {
-            std::cerr << "ERROR! Selected algorithm is not implemented yet.\n";
-            delete array;
+        if (!BenchmarkRunner::run(stats)) {
             return 1;
         }
 
-            // jeśli użytkownik podał plik wyjściowy, zapisujemy wynik
-        if (!Parameters::outputFile.empty()) {
-            if (!FileHandler::saveArrayToFile(*array, Parameters::outputFile)) {
-                std::cerr << "ERROR! Failed to save output file :-C\n";
-                delete array;
-                return 1;
-            }
+        if (!BenchmarkCsvWriter::appendResult(Parameters::resultsFile, stats)) {
+            std::cerr << "ERROR! Failed to save benchmark results to CSV.\n";
+            return 1;
         }
 
-            delete array;   // zwalniamy pamięć po zakończeniu pracy
-            std::cout << "Sorting completed :)\n";
-            return 0;
-        }
-
-        // ten tryb jest przewidziany, ale jeszcze nie został zrobiony
-        if (Parameters::runMode == Parameters::RunModes::benchmark) {
-            return 0;
-        }
+        std::cout << "Benchmark completed :)\n";
+        std::cout << "min [us] = " << stats.minTimeFinal << "\n";
+        std::cout << "max [us] = " << stats.maxTimeFinal << "\n";
+        std::cout << "avg [us] = " << stats.averageTimeFinal << "\n";
+        std::cout << "Results saved to: " << Parameters::resultsFile << "\n";
+        return 0;
+    }
 
         // jeśli nie ustawiono poprawnego trybu, pokazujemy błąd i pomoc
         std::cerr << "ERROR! Run mode is not set.\n";
