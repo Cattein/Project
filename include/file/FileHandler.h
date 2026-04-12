@@ -24,6 +24,16 @@ namespace FileHandler {
 
     // zapisuje listę jednokierunkową do pliku
     bool saveSingleListToFile(const SingleList& list, const std::string& filename);
+
+    // DoubleList* - wskaźnik na obiekt listy dwukierunkowej - tworzy nową listę na podstawie danych z pliku
+    // const std::string& - nazwa pliku jest przekazywana bez kopiowania
+    DoubleList* loadDoubleListFromFile(const std::string& filename);
+
+    // const DoubleList& - funkcja tylko odczytuje listę i jej nie zmienia
+    // zapisuje listę dwukierunkową do pliku
+    bool saveDoubleListToFile(const DoubleList& list, const std::string& filename);
+
+
 }
 
 #endif //PROJECT_FILEHANDLER_H

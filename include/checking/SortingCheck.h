@@ -5,6 +5,8 @@
 #ifndef PROJECT_SORTINGCHECK_H
 #define PROJECT_SORTINGCHECK_H
 #include "structures/Array.h"
+#include "structures/DoubleList.h"
+#include "structures/SingleList.h"
 
 class SortingCheck {
 public:
@@ -14,6 +16,9 @@ public:
      // bool - funkcja zwraca true albo false
      // Array& - referencja na oryginalne tablice
      static bool SortedAscend(const Array& array);
+     static bool SortedAscend(const DoubleList& list);
+     static bool SortedAscend(const SingleList& list);
+
 };
 
 
