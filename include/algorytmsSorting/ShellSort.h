@@ -6,6 +6,8 @@
 #define PROJECT_SHELLSORT_H
 #include "structures/Array.h"
 #include "Parameters.h"
+#include "structures/DoubleList.h"
+#include "structures/SingleList.h"
 
 class ShellSort {
 public:
@@ -14,6 +16,11 @@ public:
     //funkcja została po prostu umieszczona w klasie
     // Array& - referencja na oryginalne tablice
     static void sort(Array& array,  Parameters::ShellParameters parameter);
+    static void sort(SingleList& list,  Parameters::ShellParameters parameter);
+    static void sort(DoubleList& list,  Parameters::ShellParameters parameter);
+
+
+
 };
 
 

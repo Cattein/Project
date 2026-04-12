@@ -11,6 +11,7 @@
 
 #include "Parameters.h"
 
+// zamienia enum algorytmu na tekst do pliku csv
 static std::string algorithmToString(Parameters::Algorithms algorithm) {
     if (algorithm == Parameters::Algorithms::quick) {
         return "quick";
@@ -22,9 +23,11 @@ static std::string algorithmToString(Parameters::Algorithms algorithm) {
         return "bucket";
     }
 
+    // jeśli wartość nie pasuje do żadnego znanego algorytmu
     return "undefined";
 }
 
+// zamienia enum struktury na tekst do pliku csv
 static std::string structureToString(Parameters::Structures structure) {
     if (structure == Parameters::Structures::array) {
         return "array";
@@ -45,9 +48,11 @@ static std::string structureToString(Parameters::Structures structure) {
         return "binaryTree";
     }
 
+    // jeśli wartość nie pasuje do żadnej znanej struktury
     return "undefined";
 }
 
+// zamienia enum typu danych na tekst do pliku csv
 static std::string dataTypeToString(Parameters::DataTypes dataType) {
     if (dataType == Parameters::DataTypes::typeInt) {
         return "int";
@@ -74,9 +79,11 @@ static std::string dataTypeToString(Parameters::DataTypes dataType) {
         return "unsignedChar";
     }
 
+    // jeśli wartość nie pasuje do żadnego znanego typu
     return "undefined";
 }
 
+// zamienia typ pivota na tekst do pliku csv
 static std::string pivotToString(Parameters::Pivots pivot) {
     if (pivot == Parameters::Pivots::random) {
         return "random";
@@ -88,9 +95,11 @@ static std::string pivotToString(Parameters::Pivots pivot) {
         return "edge";
     }
 
+    // jeśli pivot nie został poprawnie ustawiony
     return "undefined";
 }
 
+// zamienia parametr shella na tekst do pliku csv
 static std::string shellParameterToString(Parameters::ShellParameters parameter) {
     if (parameter == Parameters::ShellParameters::option1) {
         return "option1";
@@ -98,34 +107,48 @@ static std::string shellParameterToString(Parameters::ShellParameters parameter)
     if (parameter == Parameters::ShellParameters::option2) {
         return "option2";
     }
+
+    // jeśli parametr nie pasuje do obsługiwanych opcji
     return "undefined";
 }
 
 bool BenchmarkCsvWriter::appendResult(const std::string& filename, const BenchmarkStats& stats) {
+    // jeśli nazwa pliku jest pusta, nie mamy gdzie zapisać wyniku
     if (filename.empty()) {
         return false;
     }
 
     bool writeHeader = false;
+    // ta zmienna mówi, czy trzeba dopisać nagłówek kolumn
 
     {
         std::ifstream checkFile(filename);
+        // sprawdzamy, czy plik już istnieje i czy nie jest pusty
+
         if (!checkFile.good() || checkFile.peek() == std::ifstream::traits_type::eof()) {
             writeHeader = true;
         }
+        // jeśli plik nie istnieje albo jest pusty, trzeba najpierw zapisać nagłówek
     }
 
     std::ofstream file(filename, std::ios::app);
+    // otwieramy plik w trybie dopisywania na koniec
+
     if (!file) {
         return false;
     }
+    // jeśli nie udało się otworzyć pliku, kończymy błędem
 
     if (writeHeader) {
         file << "timestamp,algorithm,structure,dataType,size,iterations,pivot,shellParameter,min_us,max_us,avg_us\n";
     }
+    // zapisujemy nazwy kolumn tylko przy pierwszym zapisie do pliku
 
     const auto now = std::chrono::system_clock::now();
+    // pobieramy aktualny czas systemowy
+
     const std::time_t nowTime = std::chrono::system_clock::to_time_t(now);
+    // zamieniamy czas na format, który można wypisać jako datę i godzinę
 
     file << std::put_time(std::localtime(&nowTime), "%Y-%m-%d %H:%M:%S") << ","
          << algorithmToString(Parameters::algorithm) << ","
@@ -139,9 +162,8 @@ bool BenchmarkCsvWriter::appendResult(const std::string& filename, const Benchma
          << stats.maxTimeFinal << ","
          << std::fixed << std::setprecision(2) << stats.averageTimeFinal
          << "\n";
+    // zapisujemy jeden pełny wiersz z wynikiem benchmarku
+    // std::fixed i std::setprecision(2) ustawiają zapis średniej z dwoma miejscami po przecinku
 
     return true;
 }
-
-
-

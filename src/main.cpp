@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
             return 1;
         }
 
-        std::cout << "Benchmark completed :)\n";
+        std::cout << "\nBenchmark completed :)\n\n";
         std::cout << "min [us] = " << stats.minTimeFinal << "\n";
         std::cout << "max [us] = " << stats.maxTimeFinal << "\n";
         std::cout << "avg [us] = " << stats.averageTimeFinal << "\n";
