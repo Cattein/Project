@@ -1,6 +1,7 @@
 //
 // Created by MashaGuzhva on 12/04/2026.
 //
+
 #include "singleFile/SingleFileRunner.h"
 
 #include <iostream>
@@ -37,7 +38,6 @@ static bool sortArray(Array& array) {
     }
 
     if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-        // bucket sort zwraca bool, więc sprawdzamy czy sortowanie się udało
         if (!BucketSort::sort(array)) {
             std::cerr << "ERROR! Bucket sort failed.\n";
             return false;
@@ -69,6 +69,15 @@ static bool sortSingleList(SingleList& list) {
         return true;
     }
 
+    if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+        if (!BucketSort::sort(list)) {
+            std::cerr << "ERROR! Bucket sort failed.\n";
+            return false;
+        }
+
+        return true;
+    }
+
     // pozostałe algorytmy nie są jeszcze gotowe dla singlelist
     std::cerr << "ERROR! This algorithm is not implemented for SingleList yet.\n";
     return false;
@@ -89,6 +98,15 @@ static bool sortDoubleList(DoubleList& list) {
         }
 
         ShellSort::sort(list, Parameters::shellParameter);
+        return true;
+    }
+
+    if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+        if (!BucketSort::sort(list)) {
+            std::cerr << "ERROR! Bucket sort failed.\n";
+            return false;
+        }
+
         return true;
     }
 
@@ -237,4 +255,4 @@ bool SingleFileRunner::run() {
     // jeśli wybrana struktura nie jest jeszcze gotowa, kończymy z błędem
     std::cerr << "ERROR! This structure is not implemented yet.\n";
     return false;
-}}
+}

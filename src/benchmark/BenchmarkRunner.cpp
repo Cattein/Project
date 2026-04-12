@@ -186,6 +186,13 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
 
                 ShellSort::sort(*testList, Parameters::shellParameter);
             }
+            else if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+                if (!BucketSort::sort(*testList)) {
+                    std::cerr << "ERROR! Bucket sort failed.\n";
+                    delete testList;
+                    return false;
+                }
+            }
             else {
                 // pozostałe algorytmy nie są jeszcze gotowe dla singlelist
                 std::cerr << "ERROR! This algorithm is not implemented for SingleList yet.\n";
@@ -284,6 +291,13 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
                 }
 
                 ShellSort::sort(*testList, Parameters::shellParameter);
+            }
+            else if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+                if (!BucketSort::sort(*testList)) {
+                    std::cerr << "ERROR! Bucket sort failed.\n";
+                    delete testList;
+                    return false;
+                }
             }
             else {
                 // pozostałe algorytmy nie są jeszcze gotowe dla doublelist
