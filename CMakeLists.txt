@@ -20,6 +20,7 @@ add_executable(Project
         src/algorytmsSorting/QuickSort.cpp
         src/checking/sortingCheck.cpp
         src/algorytmsSorting/ShellSort.cpp
+        src/algorytmsSorting/BucketSort.cpp
 )
 
 target_include_directories(Project PUBLIC
