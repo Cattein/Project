@@ -5,8 +5,7 @@
 #include "benchmark/BenchmarkRunner.h"
 #include "benchmark/BenchmarkStats.h"
 #include "singleFile/SingleFileRunner.h"
-
-
+#include "benchmark/BenchmarkCsvWriter.h"
 
 int main(int argc, char** argv) {
     // argc - ile w sumie przekazano wierszy
@@ -36,19 +35,27 @@ int main(int argc, char** argv) {
     }
 
     if (Parameters::runMode == Parameters::RunModes::benchmark) {
+        if (Parameters::resultsFile.empty()) {
+            std::cerr << "ERROR! resultsFile must be set in benchmark mode.\n";
+            return 1;
+        }
+
         BenchmarkStats stats{};
 
         if (!BenchmarkRunner::run(stats)) {
             return 1;
         }
 
-        // jeśli wszystkie iteracje zakończyły się poprawnie, wypisujemy komunikat
-        std::cout << "Benchmark completed :) \n";
+        if (!BenchmarkCsvWriter::appendResult(Parameters::resultsFile, stats)) {
+            std::cerr << "ERROR! Failed to save benchmark results to CSV.\n";
+            return 1;
+        }
 
-        // wypisujemy najmniejszy zmierzony czas ze wszystkich iteracji
+        std::cout << "Benchmark completed :)\n";
         std::cout << "min [us] = " << stats.minTimeFinal << "\n";
-        std::cout << "max [us] = " << stats.maxTimeFinal<< "\n";
+        std::cout << "max [us] = " << stats.maxTimeFinal << "\n";
         std::cout << "avg [us] = " << stats.averageTimeFinal << "\n";
+        std::cout << "Results saved to: " << Parameters::resultsFile << "\n";
         return 0;
     }
 
