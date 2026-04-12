@@ -1,63 +1,128 @@
-//
-// Created by MashaGuzhva on 11/04/2026.
-//
-
 #include "algorytmsSorting/ShellSort.h"
 
-// static - funkcja widoczna tylko w tym pliku
-static void insertion(Array& array, int gap) {
+namespace { //  widoczne tylko w tym pliku
 
-    // zaczynamy od elementu o indeksie gap
-    for (int i = gap; i < array.getSize(); ++i) {
-        const int temp = array.setId(i);    // zapamiętujemy wartość bieżącego elementu
-        int j = i;   // od tej pozycji zaczynamy szukać miejsca, gdzie trzeba wstawić temp
+    // odczytuje wartość spod danego indeksu w tablicy
+    int readAt(const Array& array, int index) {
+        // const Array& - tablica  przekazywana bez kopiowania
+        // const - tej tablicy nie można tutaj zmieniać
+        return array.setId(index);
+    }
 
-        // porównujemy elementy oddalone o gap
-        while (j >= gap && array.setId(j - gap) > temp) {
-            array.setId(j) = array.setId(j - gap);    // jeśli wcześniejszy element jest większy, przesuwamy go w prawo
-            j -= gap;
+    // zapisuje wartość pod danym indeksem w tablicy
+    void writeAt(Array& array, int index, int value) {
+        // Array& - pracujemy na oryginalnej tablicy
+        array.setId(index) = value;
+    }
+    
+    // odczytuje wartość spod danego indeksu w liście jednokierunkowej
+    int readAt(const SingleList& list, int index) {
+        int value = 0;    // value chwilowo przechowuje odczytaną liczbę
+        list.get(index, value);// get wpisuje wartość spod danego indeksu do zmiennej value
+        return value;
+    }
+
+    // zapisuje wartość pod danym indeksem w liście jednokierunkowej
+    void writeAt(SingleList& list, int index, int value) {
+        list.set(index, value);    // set podmienia wartość na wskazanej pozycji
+
+    }
+    
+    // odczytuje wartość spod danego indeksu w liście dwukierunkowej
+    int readAt(const DoubleList& list, int index) {
+        int value = 0;    // value chwilowo przechowuje odczytaną liczbę
+
+        list.get(index, value);    // get wpisuje wartość spod danego indeksu do zmiennej value
+        return value;
+    }
+
+    // zapisuje wartość pod danym indeksem w liście dwukierunkowej
+    void writeAt(DoubleList& list, int index, int value) {
+        list.set(index, value);    // set podmienia wartość na wskazanej pozycji
+
+    }
+
+
+    // template napisać jedną funkcję dla różnych struktur
+    // Structure będzie tutaj zastąpione prawdziwym typem
+    template <typename Structure>
+    void insertion(Structure& structure, int gap) {
+        // przechodzimy po strukturze od indeksu gap do końca
+        for (int i = gap; i < structure.getSize(); ++i) {
+            const int temp = readAt(structure, i);
+            // zapamiętujemy bieżący element, żeby nie zgubić go podczas przesuwania innych
+
+            int j = i;// od tej pozycji zaczynamy szukać miejsca dla temp
+
+            // dopóki element oddalony o gap  większy od temp
+            // przesuwamy go w prawo
+            while (j >= gap && readAt(structure, j - gap) > temp) {
+                writeAt(structure, j, readAt(structure, j - gap));
+                j -= gap;
+            }
+
+            writeAt(structure, j, temp);// wstawiamy temp na właściwe miejsce
         }
-        // wstawiamy zapamiętaną wartość tam, gdzie już pasuje
-        array.setId(j) = temp;
     }
+
+    // 1 wariant shella
+    // odstęp zmniejszamy przez 2
+    template <typename Structure>
+    void shellHalfGaps(Structure& structure) {
+        for (int gap = structure.getSize() / 2; gap > 0; gap /= 2) {
+            insertion(structure, gap);
+        }
+    }
+
+    // 2 wariant shella
+    // używamy odstępów knutha
+    template <typename Structure>
+    void shellKnuthGaps(Structure& structure) {
+        int gap = 1;
+
+        // wyznaczamy największy odstęp knutha, który jeszcze pasuje do rozmiaru struktury
+        while (gap < structure.getSize() / 3) {
+            gap = 3 * gap + 1;
+        }
+
+        // sortujemy dla kolejnych coraz mniejszych odstępów
+        while (gap >= 1) {
+            insertion(structure, gap);
+            gap = (gap - 1) / 3;
+        }
+    }
+
+    // wspólna funkcja wybierająca wariant shellsorta
+    template <typename Structure>
+    void shellSortImpl(Structure& structure, Parameters::ShellParameters parameter) {
+        // jeśli struktura ma 0 lub 1 element, nie trzeba nic sortować
+        if (structure.getSize() <= 1) {
+            return;
+        }
+
+        // option2 oznacza wariant z odstępami knutha
+        if (parameter == Parameters::ShellParameters::option2) {
+            shellKnuthGaps(structure);
+            return;
+        }
+
+        // w przeciwnym razie używamy prostszego dzielenia odstępu przez 2
+        shellHalfGaps(structure);
+    }
+
 }
 
-//zmniejsza odstęp o połowę
-static void shellHalfGaps(Array& array) {
-    for (int gap = array.getSize() / 2; gap > 0; gap /= 2) {
-        insertion(array, gap);
-    }
-}
-
-// wzor 3 * gap + 1
-static void shellKnuthGaps(Array& array) {
-    int gap = 1;
-
-    // szukamy największego odstępu knutha, który jeszcze mieści się w tablicy
-    while (gap < array.getSize() / 3) {
-        gap = 3 * gap + 1;
-    }
-
-    // sortujemy dla kolejnych mniejszych odstępów
-    // na końcu gap będzie równe 1 -> działa jak zwykły insertion sort
-    while (gap >= 1) {
-        insertion(array, gap);
-        gap = (gap - 1) / 3;
-    }
-}
-
-// główna metoda klasy shellsort
+// uruchamia shellsort dla tablicy
 void ShellSort::sort(Array& array, Parameters::ShellParameters parameter) {
-    if (array.getSize() <= 1) { // jeśli tablica ma 0 lub 1 element, nie trzeba nic robić
-        return;
-    }
+    shellSortImpl(array, parameter);
+}
 
-    // option2 oznacza, że wybieramy wariant z odstępami knutha
-    if (parameter == Parameters::ShellParameters::option2) {
-        shellKnuthGaps(array);
-        return;
-    }
+// uruchamia shellsort dla listy jednokierunkowej
+void ShellSort::sort(SingleList& list, Parameters::ShellParameters parameter) {
+    shellSortImpl(list, parameter);
+}
 
-    shellHalfGaps(array);    // w przeciwnym razie używamy prostszego dzielenia odstępu przez 2
-
+// uruchamia shellsort dla listy dwukierunkowej
+void ShellSort::sort(DoubleList& list, Parameters::ShellParameters parameter) {
+    shellSortImpl(list, parameter);
 }

@@ -104,6 +104,16 @@ bool SingleFileRunner::run() {
         if (Parameters::algorithm == Parameters::Algorithms::quick) {
             QuickSort::sort(*list, Parameters::pivot);
         }
+        else if (Parameters::algorithm == Parameters::Algorithms::shell) {
+            if (Parameters::shellParameter == Parameters::ShellParameters::option3 ||
+                Parameters::shellParameter == Parameters::ShellParameters::option4) {
+                std::cerr << "ERROR! Only shell parameters option1 and option2 supported\n";
+                delete list;
+                return false;
+                }
+
+            ShellSort::sort(*list, Parameters::shellParameter);
+        }
         else {
             std::cerr << "ERROR! This algorithm is not implemented for SingleList yet.\n";
             delete list;
