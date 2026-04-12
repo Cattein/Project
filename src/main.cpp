@@ -95,7 +95,6 @@ int main(int argc, char** argv) {
             return 0;
         }
 
-        // ten tryb jest przewidziany, ale jeszcze nie został zrobiony
     if (Parameters::runMode == Parameters::RunModes::benchmark) {
 
         // rozmiar tablicy do testu musi być większy od 0
@@ -110,7 +109,7 @@ int main(int argc, char** argv) {
             return 1;
         }
 
-        // tablicę źródłową
+        // tablica źródłową
         Array source(Parameters::structureSize);
 
         // wypełniamy tablicę losowymi liczbami
@@ -118,6 +117,9 @@ int main(int argc, char** argv) {
             std::cerr << "ERROR! Failed to generate random data.\n";
             return 1;
         }
+
+        // ustawiamy minTime na max możliwą wartość - 1 prawdziwy pomiar na pewno będzie mniejszy
+        auto minTime = std::chrono::microseconds::max();
 
         // wykonujemy benchmark tyle razy, ile podano w iterations
         for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
@@ -178,14 +180,24 @@ int main(int argc, char** argv) {
             // czas działania jednej iteracji w mikrosekundach
             auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
+            // jeśli aktualny czas jest mniejszy niż dotychczasowe minimum
+            // zapisujemy go jako nowy najlepszy wynik
+            if (elapsed < minTime) {
+                minTime = elapsed;
+            }
+
             // wypisujemy czas dla aktualnej iteracji
             std::cout << "iteration " << (iteration + 1) << " [us] = " << elapsed.count() << "\n";
-            delete testArray;     // po zakończeniu iteracji usuwamy kopię tablicy z pamięci
+
+            delete testArray;    // po zakończeniu iteracji usuwamy kopię tablicy z pamięci
 
         }
 
         // jeśli wszystkie iteracje zakończyły się poprawnie, wypisujemy komunikat
-        std::cout << "Benchmark completed successfully.\n";
+        std::cout << "Benchmark completed :) \n";
+
+        // wypisujemy najmniejszy zmierzony czas ze wszystkich iteracji
+        std::cout << "min [us] = " << minTime.count() << "\n";
         return 0;
     }
 
