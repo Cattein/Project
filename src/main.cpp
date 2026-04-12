@@ -122,7 +122,8 @@ int main(int argc, char** argv) {
         auto minTime = std::chrono::microseconds::max();
         // ustawiamy maxTime na 0
         auto maxTime = std::chrono::microseconds::zero();
-
+        //suma dla średniej
+        auto sumTime = std::chrono::microseconds::zero();
 
         // wykonujemy benchmark tyle razy, ile podano w iterations
         for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
@@ -191,6 +192,7 @@ int main(int argc, char** argv) {
             if (elapsed > maxTime) {
                 maxTime = elapsed;
             }
+            sumTime += elapsed;
 
             // wypisujemy czas dla aktualnej iteracji
             std::cout << "iteration " << (iteration + 1) << " [us] = " << elapsed.count() << "\n";
@@ -198,6 +200,7 @@ int main(int argc, char** argv) {
             delete testArray;    // po zakończeniu iteracji usuwamy kopię tablicy z pamięci
 
         }
+        double averageTime = static_cast<double>(sumTime.count()) / static_cast<double>(Parameters::iterations);
 
         // jeśli wszystkie iteracje zakończyły się poprawnie, wypisujemy komunikat
         std::cout << "Benchmark completed :) \n";
@@ -205,6 +208,7 @@ int main(int argc, char** argv) {
         // wypisujemy najmniejszy zmierzony czas ze wszystkich iteracji
         std::cout << "min [us] = " << minTime.count() << "\n";
         std::cout << "max [us] = " << maxTime.count() << "\n";
+        std::cout << "avg [us] = " << averageTime << "\n";
         return 0;
     }
 
