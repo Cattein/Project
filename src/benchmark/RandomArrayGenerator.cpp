@@ -16,14 +16,14 @@ bool RandomArrayGenerator::fillRandom(Array& array) {
 
     // jeśli generator jeszcze nie był ustawiony, ustawiamy go aktualnym czasem
     if (!seeded) {
-        std::srand(static_cast<unsigned int>(std::time(nullptr)));
+        std::srand(12345);
         seeded = true;
     }
 
     // przechodzimy po całej tablicy i wpisujemy do niej liczby losowe
     for (int i = 0; i < array.getSize(); ++i) {
 
-        if (!array.set(i, std::rand())) {
+        if (!array.set(i, std::srand())) {
             return false;    // jeśli nie uda się zapisać wartości do tablicy, zwracamy false
 
         }
