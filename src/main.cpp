@@ -51,7 +51,7 @@ int main(int argc, char** argv){
         else if (Parameters::algorithm == Parameters::Algorithms::shell) {
             if (Parameters::shellParameter == Parameters::ShellParameters::option3 ||
                 Parameters::shellParameter == Parameters::ShellParameters::option4) {
-                std::cerr << "ERROR! Only shell parameters option1 and option2 are supported now.\n";
+                std::cerr << "ERROR! Only shell parameters option1 and option2 are supported\n";
                 delete array;
                 return 1;
                 }
@@ -60,7 +60,7 @@ int main(int argc, char** argv){
         }
         else if (Parameters::algorithm == Parameters::Algorithms::bucket) {
             if (!BucketSort::sort(*array)) {
-                std::cerr << "ERROR! Bucket sort failed.\n";
+                std::cerr << "ERROR! Bucket sort failed\n";
                 delete array;
                 return 1;
             }
@@ -89,7 +89,6 @@ int main(int argc, char** argv){
 
     // ten tryb jest przewidziany, ale jeszcze nie został zrobiony
     if (Parameters::runMode == Parameters::RunModes::benchmark) {
-        std::cout << "Benchmark mode is not implemented yet.\n";
         return 0;
     }
 
