@@ -7,7 +7,7 @@
 #include "checking/SortingCheck.h"
 #include "algorytmsSorting/BucketSort.h"
 
-int main(int argc, char** argv){
+int main(int argc, char** argv) {
     // argc - ile w sumie przekazano wierszy
     // char** argv -tablica argumentów (argv[0] = "Project.exe")
 
@@ -64,14 +64,19 @@ int main(int argc, char** argv){
                 delete array;
                 return 1;
             }
-        // po sortowaniu sprawdzamy, czy tablica jest rosnąca
-        if (!SortingCheck::SortedAscend(*array)) {
-            std::cerr << "ERROR! Array is not sorted correctly :=)\n";
+            // po sortowaniu sprawdzamy, czy tablica jest rosnąca
+            if (!SortingCheck::SortedAscend(*array)) {
+                std::cerr << "ERROR! Array is not sorted correctly :=)\n";
+                delete array;
+                return 1;
+            }
+        }        else {
+            std::cerr << "ERROR! Selected algorithm is not implemented yet.\n";
             delete array;
             return 1;
         }
 
-        // jeśli użytkownik podał plik wyjściowy, zapisujemy wynik
+            // jeśli użytkownik podał plik wyjściowy, zapisujemy wynik
         if (!Parameters::outputFile.empty()) {
             if (!FileHandler::saveArrayToFile(*array, Parameters::outputFile)) {
                 std::cerr << "ERROR! Failed to save output file :-C\n";
@@ -80,20 +85,18 @@ int main(int argc, char** argv){
             }
         }
 
-        delete array;   // zwalniamy pamięć po zakończeniu pracy
+            delete array;   // zwalniamy pamięć po zakończeniu pracy
+            std::cout << "Sorting completed :)\n";
+            return 0;
+        }
 
+        // ten tryb jest przewidziany, ale jeszcze nie został zrobiony
+        if (Parameters::runMode == Parameters::RunModes::benchmark) {
+            return 0;
+        }
 
-        std::cout << "Sorting completed :)\n";
-        return 0;
+        // jeśli nie ustawiono poprawnego trybu, pokazujemy błąd i pomoc
+        std::cerr << "ERROR! Run mode is not set.\n";
+        Parameters::help();
+        return 1;
     }
-
-    // ten tryb jest przewidziany, ale jeszcze nie został zrobiony
-    if (Parameters::runMode == Parameters::RunModes::benchmark) {
-        return 0;
-    }
-
-    // jeśli nie ustawiono poprawnego trybu, pokazujemy błąd i pomoc
-    std::cerr << "ERROR! Run mode is not set.\n";
-    Parameters::help();
-    return 1;
-}
