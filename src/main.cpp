@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
         // *array oznacza, że przekazujemy sam obiekt, a nie wskaźnik
 
         if (Parameters::algorithm == Parameters::Algorithms::quick) {
-            QuickSort::sort(*array);
+            QuickSort::sort(*array, Parameters::pivot);
         }
         else if (Parameters::algorithm == Parameters::Algorithms::shell) {
             if (Parameters::shellParameter == Parameters::ShellParameters::option3 ||
