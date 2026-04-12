@@ -1,7 +1,3 @@
-//
-// Created by MashaGuzhva on 12/04/2026.
-//
-
 #include "singleFile/SingleFileRunner.h"
 
 #include <iostream>
@@ -14,6 +10,11 @@
 #include "checking/SortingCheck.h"
 
 bool SingleFileRunner::run() {
+    // na razie cały projekt działa tylko dla int
+    if (Parameters::dataType != Parameters::DataTypes::typeInt) {
+        std::cerr << "ERROR! Only int type is supported now.\n";
+        return false;
+    }
 
     // bez pliku wejściowego nie mamy czego wczytać
     if (Parameters::inputFile.empty()) {
@@ -21,9 +22,9 @@ bool SingleFileRunner::run() {
         return false;
     }
 
-    // jeśli wybrano strukturę array
+    // ===== array =====
+    // jeśli użytkownik wybrał strukturę array
     if (Parameters::structure == Parameters::Structures::array) {
-
         // wczytujemy tablicę z pliku
         // Array* oznacza wskaźnik na obiekt utworzony dynamicznie
         Array* array = FileHandler::loadArrayFromFile(Parameters::inputFile);
@@ -40,7 +41,6 @@ bool SingleFileRunner::run() {
             QuickSort::sort(*array, Parameters::pivot);
         }
         else if (Parameters::algorithm == Parameters::Algorithms::shell) {
-
             // na razie obsługiwane są tylko option1 i option2
             if (Parameters::shellParameter == Parameters::ShellParameters::option3 ||
                 Parameters::shellParameter == Parameters::ShellParameters::option4) {
@@ -52,7 +52,6 @@ bool SingleFileRunner::run() {
             ShellSort::sort(*array, Parameters::shellParameter);
         }
         else if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-
             // bucket sort zwraca bool, więc sprawdzamy czy sortowanie się udało
             if (!BucketSort::sort(*array)) {
                 std::cerr << "ERROR! Bucket sort failed.\n";
@@ -88,10 +87,10 @@ bool SingleFileRunner::run() {
         return true;
     }
 
-    // jeśli wybrano strukturę singlelist
+    // ===== single list =====
+    // jeśli użytkownik wybrał listę jednokierunkową
     if (Parameters::structure == Parameters::Structures::singleList) {
-
-        // wczytujemy listę jednokierunkową z pliku
+        // wczytujemy listę z pliku
         // SingleList* oznacza wskaźnik na obiekt utworzony dynamicznie
         SingleList* list = FileHandler::loadSingleListFromFile(Parameters::inputFile);
 
@@ -111,7 +110,7 @@ bool SingleFileRunner::run() {
             return false;
         }
 
-        // po sortowaniu sprawdzamy, czy lista jest naprawdę rosnąca
+        // sprawdzamy, czy lista po sortowaniu jest rosnąca
         if (!SortingCheck::SortedAscend(*list)) {
             std::cerr << "ERROR! SingleList is not sorted correctly.\n";
             delete list;
@@ -121,6 +120,50 @@ bool SingleFileRunner::run() {
         // jeśli użytkownik podał plik wyjściowy, zapisujemy wynik
         if (!Parameters::outputFile.empty()) {
             if (!FileHandler::saveSingleListToFile(*list, Parameters::outputFile)) {
+                std::cerr << "ERROR! Failed to save output file.\n";
+                delete list;
+                return false;
+            }
+        }
+
+        // zwalniamy pamięć po zakończeniu pracy
+        delete list;
+        return true;
+    }
+
+    // ===== double list =====
+    // jeśli użytkownik wybrał listę dwukierunkową
+    if (Parameters::structure == Parameters::Structures::doubleList) {
+        // wczytujemy listę z pliku
+        // DoubleList* oznacza wskaźnik na obiekt utworzony dynamicznie
+        DoubleList* list = FileHandler::loadDoubleListFromFile(Parameters::inputFile);
+
+        // jeśli nie udało się wczytać danych
+        if (list == nullptr) {
+            std::cerr << "ERROR! Failed to load input file.\n";
+            return false;
+        }
+
+        // na razie dla doublelist działa tylko quicksort
+        if (Parameters::algorithm == Parameters::Algorithms::quick) {
+            QuickSort::sort(*list, Parameters::pivot);
+        }
+        else {
+            std::cerr << "ERROR! This algorithm is not implemented for DoubleList yet.\n";
+            delete list;
+            return false;
+        }
+
+        // sprawdzamy, czy lista po sortowaniu jest rosnąca
+        if (!SortingCheck::SortedAscend(*list)) {
+            std::cerr << "ERROR! DoubleList is not sorted correctly.\n";
+            delete list;
+            return false;
+        }
+
+        // jeśli użytkownik podał plik wyjściowy, zapisujemy wynik
+        if (!Parameters::outputFile.empty()) {
+            if (!FileHandler::saveDoubleListToFile(*list, Parameters::outputFile)) {
                 std::cerr << "ERROR! Failed to save output file.\n";
                 delete list;
                 return false;
