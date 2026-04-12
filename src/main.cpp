@@ -120,6 +120,9 @@ int main(int argc, char** argv) {
 
         // ustawiamy minTime na max możliwą wartość - 1 prawdziwy pomiar na pewno będzie mniejszy
         auto minTime = std::chrono::microseconds::max();
+        // ustawiamy maxTime na 0
+        auto maxTime = std::chrono::microseconds::zero();
+
 
         // wykonujemy benchmark tyle razy, ile podano w iterations
         for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
@@ -185,6 +188,9 @@ int main(int argc, char** argv) {
             if (elapsed < minTime) {
                 minTime = elapsed;
             }
+            if (elapsed > maxTime) {
+                maxTime = elapsed;
+            }
 
             // wypisujemy czas dla aktualnej iteracji
             std::cout << "iteration " << (iteration + 1) << " [us] = " << elapsed.count() << "\n";
@@ -198,6 +204,7 @@ int main(int argc, char** argv) {
 
         // wypisujemy najmniejszy zmierzony czas ze wszystkich iteracji
         std::cout << "min [us] = " << minTime.count() << "\n";
+        std::cout << "max [us] = " << maxTime.count() << "\n";
         return 0;
     }
 
