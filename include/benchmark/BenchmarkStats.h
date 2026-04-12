@@ -6,9 +6,9 @@
 #define PROJECT_BENCHMARKSTATS_H
 
 struct BenchmarkStats {
-    long long minTime;
-    long long maxTime;
-    double averageTime;
+    long long minTimeFinal;
+    long long maxTimeFinal;
+    double averageTimeFinal;
 };
 
 #endif //PROJECT_BENCHMARKSTATS_H

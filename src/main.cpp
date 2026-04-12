@@ -1,14 +1,10 @@
 #include <iostream>
 
 #include "Parameters.h"
-#include "file/FileHandler.h"
-#include "algorytmsSorting/QuickSort.h"
-#include "algorytmsSorting/ShellSort.h"
-#include "checking/SortingCheck.h"
-#include "algorytmsSorting/BucketSort.h"
-#include <chrono>
-#include <limits>
-#include "benchmark/RandomArrayGenerator.h"
+
+#include "benchmark/BenchmarkRunner.h"
+#include "benchmark/BenchmarkStats.h"
+#include "singleFile/SingleFileRunner.h"
 
 
 
@@ -31,184 +27,28 @@ int main(int argc, char** argv) {
 
     //  singleFile - sortowanie danych z jednego pliku
     if (Parameters::runMode == Parameters::RunModes::singleFile) {
-
-        // bez pliku wejściowego nie mamy czego wczytać
-        if (Parameters::inputFile.empty()) {
-            std::cerr << "ERROR! Input file is not set :-X \n";
+        if (!SingleFileRunner::run()) {
             return 1;
         }
 
-        // wczytujemy tablicę z pliku
-        // Array* oznacza wskaźnik na obiekt utworzony dynamicznie
-        Array* array = FileHandler::loadArrayFromFile(Parameters::inputFile);
-
-        // jeśli nie udało się wczytać danych
-        if (array == nullptr) {
-            std::cerr << "ERROR! Failed to load input file :о) \n";
-            return 1;
-        }
-
-        // *array oznacza, że przekazujemy sam obiekt, a nie wskaźnik
-
-        if (Parameters::algorithm == Parameters::Algorithms::quick) {
-            QuickSort::sort(*array, Parameters::pivot);
-        }
-        else if (Parameters::algorithm == Parameters::Algorithms::shell) {
-            if (Parameters::shellParameter == Parameters::ShellParameters::option3 ||
-                Parameters::shellParameter == Parameters::ShellParameters::option4) {
-                std::cerr << "ERROR! Only shell parameters option1 and option2 are supported\n";
-                delete array;
-                return 1;
-                }
-
-            ShellSort::sort(*array, Parameters::shellParameter);
-        }
-        else if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-            if (!BucketSort::sort(*array)) {
-                std::cerr << "ERROR! Bucket sort failed\n";
-                delete array;
-                return 1;
-            }
-            // po sortowaniu sprawdzamy, czy tablica jest rosnąca
-            if (!SortingCheck::SortedAscend(*array)) {
-                std::cerr << "ERROR! Array is not sorted correctly :=)\n";
-                delete array;
-                return 1;
-            }
-        }        else {
-            std::cerr << "ERROR! Selected algorithm is not implemented :(\n";
-            delete array;
-            return 1;
-        }
-
-            // jeśli użytkownik podał plik wyjściowy, zapisujemy wynik
-        if (!Parameters::outputFile.empty()) {
-            if (!FileHandler::saveArrayToFile(*array, Parameters::outputFile)) {
-                std::cerr << "ERROR! Failed to save output file :-C\n";
-                delete array;
-                return 1;
-            }
-        }
-
-            delete array;   // zwalniamy pamięć po zakończeniu pracy
-            std::cout << "Sorting completed :)\n";
-            return 0;
-        }
+        std::cout << "Sorting completed :)\n";
+        return 0;
+    }
 
     if (Parameters::runMode == Parameters::RunModes::benchmark) {
+        BenchmarkStats stats{};
 
-        // rozmiar tablicy do testu musi być większy od 0
-        if (Parameters::structureSize <= 0) {
-            std::cerr << "ERROR! structureSize must be greater than 0.\n";
+        if (!BenchmarkRunner::run(stats)) {
             return 1;
         }
-
-        // liczba powtórzeń benchmarku musi być większa od 0
-        if (Parameters::iterations <= 0) {
-            std::cerr << "ERROR! iterations must be greater than 0.\n";
-            return 1;
-        }
-
-        // tablica źródłową
-        Array source(Parameters::structureSize);
-
-        // wypełniamy tablicę losowymi liczbami
-        if (!RandomArrayGenerator::fillRandom(source)) {
-            std::cerr << "ERROR! Failed to generate random data.\n";
-            return 1;
-        }
-
-        // ustawiamy minTime na max możliwą wartość - 1 prawdziwy pomiar na pewno będzie mniejszy
-        auto minTime = std::chrono::microseconds::max();
-        // ustawiamy maxTime na 0
-        auto maxTime = std::chrono::microseconds::zero();
-        //suma dla średniej
-        auto sumTime = std::chrono::microseconds::zero();
-
-        // wykonujemy benchmark tyle razy, ile podano w iterations
-        for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
-            // tworzymy kopię tablicy źródłowej
-            Array* testArray = RandomArrayGenerator::copyArray(source);
-
-            // jeśli nie udało się zrobić kopii, kończymy z błędem
-            if (testArray == nullptr) {
-                std::cerr << "ERROR! Failed to copy source array.\n";
-                return 1;
-            }
-
-            // zapisujemy moment startu sortowania
-            auto start = std::chrono::steady_clock::now();
-            // auto oznacza, że kompilator sam dobierze odpowiedni typ
-
-            // wybieramy algorytm sortowania zależnie od parametrów
-            if (Parameters::algorithm == Parameters::Algorithms::quick) {
-                QuickSort::sort(*testArray, Parameters::pivot);
-            }
-            else if (Parameters::algorithm == Parameters::Algorithms::shell) {
-                // na razie obsługiwane są tylko option1 i option2
-                if (Parameters::shellParameter == Parameters::ShellParameters::option3 ||
-                    Parameters::shellParameter == Parameters::ShellParameters::option4) {
-                    std::cerr << "ERROR! Only shell parameters option1 and option2 are supported now.\n";
-                    delete testArray;
-                    return 1;
-                }
-
-                ShellSort::sort(*testArray, Parameters::shellParameter);
-            }
-            else if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-                // bucket sort zwraca bool, więc sprawdzamy czy sortowanie się udało
-                if (!BucketSort::sort(*testArray)) {
-                    std::cerr << "ERROR! Bucket sort failed.\n";
-                    delete testArray;
-                    return 1;
-                }
-            }
-            else {
-                // jeśli wybrany algorytm nie jest jeszcze gotowy, kończymy z błędem
-                std::cerr << "ERROR! Selected algorithm is not implemented yet.\n";
-                delete testArray;
-                return 1;
-            }
-
-            // zapisujemy moment końca sortowania
-            auto end = std::chrono::steady_clock::now();
-            // auto oznacza, że kompilator sam dobierze odpowiedni typ
-
-            // sprawdzamy, czy po sortowaniu tablica jest naprawdę rosnąca
-            if (!SortingCheck::SortedAscend(*testArray)) {
-                std::cerr << "ERROR! Array is not sorted correctly.\n";
-                delete testArray;
-                return 1;
-            }
-
-            // czas działania jednej iteracji w mikrosekundach
-            auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-
-            // jeśli aktualny czas jest mniejszy niż dotychczasowe minimum
-            // zapisujemy go jako nowy najlepszy wynik
-            if (elapsed < minTime) {
-                minTime = elapsed;
-            }
-            if (elapsed > maxTime) {
-                maxTime = elapsed;
-            }
-            sumTime += elapsed;
-
-            // wypisujemy czas dla aktualnej iteracji
-            std::cout << "iteration " << (iteration + 1) << " [us] = " << elapsed.count() << "\n";
-
-            delete testArray;    // po zakończeniu iteracji usuwamy kopię tablicy z pamięci
-
-        }
-        double averageTime = static_cast<double>(sumTime.count()) / static_cast<double>(Parameters::iterations);
 
         // jeśli wszystkie iteracje zakończyły się poprawnie, wypisujemy komunikat
         std::cout << "Benchmark completed :) \n";
 
         // wypisujemy najmniejszy zmierzony czas ze wszystkich iteracji
-        std::cout << "min [us] = " << minTime.count() << "\n";
-        std::cout << "max [us] = " << maxTime.count() << "\n";
-        std::cout << "avg [us] = " << averageTime << "\n";
+        std::cout << "min [us] = " << stats.minTimeFinal << "\n";
+        std::cout << "max [us] = " << stats.maxTimeFinal<< "\n";
+        std::cout << "avg [us] = " << stats.averageTimeFinal << "\n";
         return 0;
     }
 
