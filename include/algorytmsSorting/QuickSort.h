@@ -6,7 +6,7 @@
 #define PROJECT_QUICKSORT_H
 
 #include "structures/Array.h"
-
+#include "Parameters.h"
 
 
 class QuickSort {
@@ -15,7 +15,7 @@ public:
     //nie ma potrzeby tworzenia obiektu QuickSort
     //funkcja została po prostu umieszczona w klasie
     // Array& - referencja na oryginalne tablice
-    static void sort(Array& array);
+    static void sort(Array& array, Parameters::Pivots pivotType);
 };
 
 #endif //PROJECT_QUICKSORT_H
