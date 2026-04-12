@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
                 return 1;
             }
         }        else {
-            std::cerr << "ERROR! Selected algorithm is not implemented yet.\n";
+            std::cerr << "ERROR! Selected algorithm is not implemented :(\n";
             delete array;
             return 1;
         }
@@ -113,7 +113,78 @@ int main(int argc, char** argv) {
             std::cerr << "ERROR! Failed to generate random data.\n";
             return 1;
         }
+        // tablica o rozmiarze podanym w parametrach
+        Array array(Parameters::structureSize);
 
+        // generator liczb losowych tylko raz
+        // static sprawia, że ta zmienna zapamiętuje swoją wartość między wywołaniami
+        static bool seeded = false;
+
+        // jeśli generator jeszcze nie był ustawiony, ustawiamy go aktualnym czasem
+        if (!seeded) {
+            std::srand(static_cast<unsigned int>(std::time(nullptr)));
+            seeded = true;
+        }
+
+        // wypełniamy tablicę losowymi liczbami
+        for (int i = 0; i < array.getSize(); ++i) {
+            if (!array.set(i, std::rand())) {
+                std::cerr << "ERROR! Failed to fill array with random data\n";
+                return 1;
+            }
+        }
+
+        // zapisujemy moment startu sortowania
+        const auto start = std::chrono::high_resolution_clock::now();
+
+        // wybieramy algorytm sortowania zależnie od parametrów
+        if (Parameters::algorithm == Parameters::Algorithms::quick) {
+            QuickSort::sort(array, Parameters::pivot);
+        }
+        else if (Parameters::algorithm == Parameters::Algorithms::shell) {
+
+            // na razie obsługiwane są tylko option1 i option2
+            if (Parameters::shellParameter == Parameters::ShellParameters::option3 ||
+                Parameters::shellParameter == Parameters::ShellParameters::option4) {
+                std::cerr << "ERROR! Only shell parameters option1 and option2 are supported\n";
+                return 1;
+            }
+
+            ShellSort::sort(array, Parameters::shellParameter);
+        }
+        else if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+
+            // bucket sort zwraca bool, więc sprawdzamy czy sortowanie się udało
+            if (!BucketSort::sort(array)) {
+                std::cerr << "ERROR! Bucket sort failed.\n";
+                return 1;
+            }
+        }
+        else {
+            // jeśli wybrany algorytm nie jest jeszcze gotowy, kończymy z błędem
+            std::cerr << "ERROR! Selected algorithm is not implemented yet.\n";
+            return 1;
+        }
+
+        // zapisujemy moment końca sortowania
+        const auto end = std::chrono::high_resolution_clock::now();
+
+        // sprawdzamy, czy po sortowaniu tablica jest naprawdę rosnąca
+        if (!SortingCheck::SortedAscend(array)) {
+            std::cerr << "ERROR! Array is not sorted correctly.\n";
+            return 1;
+        }
+
+        // obliczamy czas działania w mikrosekundach
+        const long long time =
+            std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+        // wypisujemy wynik benchmarku
+        std::cout << "Benchmark completed successfully.\n";
+        std::cout << "time [us] = " << time << "\n";
+
+        return 0;
+    }
 
         // jeśli nie ustawiono poprawnego trybu, pokazujemy błąd i pomoc
         std::cerr << "ERROR! Run mode is not set.\n";
