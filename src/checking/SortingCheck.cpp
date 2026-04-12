@@ -16,10 +16,9 @@ namespace {
         // zaczynamy od drugiego elementu
         // wtedy możemy porównać go z poprzednim
         for (int i = 1; i < structure.getSize(); ++i) {
-            int last = 0;
-            int current = 0;
-            // last przechowuje poprzednią wartość
-            // current przechowuje bieżącą wartość
+
+            int last = 0; // last przechowuje poprzednią wartość
+            int current = 0;// current przechowuje bieżącą wartość
 
             // próbujemy odczytać dwa sąsiednie elementy
             // jeśli odczyt się nie uda, zwracamy false
