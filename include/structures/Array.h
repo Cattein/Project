@@ -4,38 +4,104 @@
 
 #ifndef PROJECT_ARRAY_H
 #define PROJECT_ARRAY_H
-// Dynamic array
+
+#include <new>
+
+// template - klasa będzie działała dla różnych typów danych
+// typename T - T zostanie później zastąpione prawdziwym typem
+// na przykład int, double albo std::string
+template <typename T>
 class Array {
 private:
-    int* data;   // Pointer to the array
-    int size;    // Number of array elements
+    T* data;   // wskaźnik na dynamiczną tablicę elementów typu T
+    // T* oznacza adres pierwszego elementu tablicy w pamięci dynamicznej
+
+    int size;  // liczba elementów tablicy
 
 public:
-    Array(int size);  // Constructor - creates array
-    ~Array();         // Destructor - frees memory
+    // konstruktor tworzy tablicę o zadanym rozmiarze
+    explicit Array(int s) {
+        size = s;
+        // explicit chroni przed przypadkową zamianą liczby na obiekt Array
 
-    int getSize() const { // Returns array size
+        // jeśli rozmiar jest większy od zera, tworzymy tablicę dynamiczną
+        if (size > 0) {
+            data = new (std::nothrow) T[size];
+            // new (std::nothrow) - przy braku pamięci dostaniemy nullptr zamiast wyjątku
+            // T[size] oznacza utworzenie tablicy z size elementami typu T
+        }
+        else {
+            data = nullptr;
+            // nullptr oznacza pusty wskaźnik, czyli brak zaalokowanej tablicy
+        }
+    }
+
+    // destruktor zwalnia pamięć zajętą przez tablicę
+    ~Array() {
+        delete[] data;
+        // delete[] usuwa całą tablicę utworzoną przez new[]
+    }
+
+    // zwraca aktualny rozmiar tablicy
+    int getSize() const {
         return size;
     }
 
-    bool empty() const { // Checks if array is empty
+    // sprawdza, czy tablica jest pusta
+    bool empty() const {
         return size == 0;
     }
 
-    int& setId(int index) { // Returns element at given index
+    // zwraca referencję do elementu pod danym indeksem
+    T& setId(int index) {
+        // T& oznacza referencję, czyli dostęp do prawdziwego elementu tablicy
+        // dzięki temu można ten element odczytać albo zmienić
         return data[index];
     }
 
-    const int& setId(int index) const { // Const version
+    // wersja const - dla obiektów stałych
+    const T& setId(int index) const {
+        // const T& oznacza referencję tylko do odczytu
+        // tej wersji używamy, gdy obiekt Array jest stały
         return data[index];
     }
 
+    // blokujemy kopiowanie tablicy
+    // dzięki temu nie powstaną dwie tablice ze wskaźnikiem do tej samej pamięci
     Array(const Array&) = delete;
     Array& operator=(const Array&) = delete;
 
-    bool get(int index, int& value) const; // Reads value from given index
-    bool set(int index, int value);        // Sets value at given index
-    void clear();                          // Clears whole array
+    // odczytuje wartość spod indeksu
+    bool get(int index, T& value) const {
+        if (index < 0 || index >= size) {    // jeśli indeks jest poza zakresem, nie można odczytać elementu
+            return false;
+        }
+
+        value = data[index];    // zapisujemy znalezioną wartość do zmiennej przekazanej przez referencję
+        return true;
+    }
+
+    // ustawia nową wartość pod danym indeksem
+    bool set(int index, const T& value) {
+        // const T& - wartość przekazujemy bez kopiowania
+        // const - tej wartości nie zmieniamy w funkcji
+
+        // jeśli indeks jest poza zakresem, zmiana nie jest możliwa
+        if (index < 0 || index >= size) {
+            return false;
+        }
+
+        data[index] = value;    // wpisujemy nową wartość do tablicy
+        return true;
+    }
+
+    // czyści tablicę
+    void clear() {
+        delete[] data;    // zwalniamy pamięć zajętą przez elementy
+        data = nullptr;    // po usunięciu tablica nie wskazuje już na żadne dane
+        size = 0;    // rozmiar ustawiamy na 0, bo tablica jest pusta
+
+    }
 };
 
-#endif //PROJECT_ARRAY_H
+#endif // PROJECT_ARRAY_H
