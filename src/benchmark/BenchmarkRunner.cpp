@@ -6,6 +6,8 @@
 
 #include <iostream>
 #include <chrono>
+#include <string>
+#include <type_traits>
 
 #include "Parameters.h"
 #include "structures/Array.h"
@@ -17,222 +19,269 @@
 #include "checking/SortingCheck.h"
 #include "benchmark/RandomArrayGenerator.h"
 
-bool BenchmarkRunner::run(BenchmarkStats& stats) {
-    // rozmiar tablicy do testu musi być większy od 0
-    if (Parameters::structureSize <= 0) {
-        std::cerr << "ERROR! structureSize must be greater than 0.\n";
+namespace {
+
+    // sprawdza, czy wybrany wariant shellsorta jest obsługiwany
+    bool isShellParameterSupported() {
+        return Parameters::shellParameter != Parameters::ShellParameters::option3 &&
+               Parameters::shellParameter != Parameters::ShellParameters::option4;
+    }
+
+    // ===== wybór algorytmu dla tablicy =====
+
+    template <typename T>
+    bool sortArray(Array<T>& array) {
+        // template <typename T> oznacza, że funkcja działa
+        // dla różnych typów danych, np. int, double albo std::string
+
+        if (Parameters::algorithm == Parameters::Algorithms::quick) {
+            QuickSort::sort(array, Parameters::pivot);
+            return true;
+        }
+
+        if (Parameters::algorithm == Parameters::Algorithms::shell) {
+            if (!isShellParameterSupported()) {
+                std::cerr << "ERROR! Only shell parameters option1 and option2 are supported now.\n";
+                return false;
+            }
+
+            ShellSort::sort(array, Parameters::shellParameter);
+            return true;
+        }
+
+        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+            // bucket sort jest przygotowany tylko dla typu int
+            if constexpr (std::is_same_v<T, int>) {
+                if (!BucketSort::sort(array)) {
+                    std::cerr << "ERROR! Bucket sort failed.\n";
+                    return false;
+                }
+
+                return true;
+            } else {
+                std::cerr << "ERROR! Bucket sort is supported only for int type.\n";
+                return false;
+            }
+        }
+
+        std::cerr << "ERROR! Selected algorithm is not implemented.\n";
         return false;
     }
 
-    // liczba powtórzeń benchmarku musi być większa od 0
-    if (Parameters::iterations <= 0) {
-        std::cerr << "ERROR! iterations must be greater than 0.\n";
+    // ===== wybór algorytmu dla listy jednokierunkowej =====
+
+    template <typename T>
+    bool sortSingleList(SingleList<T>& list) {
+        if (Parameters::algorithm == Parameters::Algorithms::quick) {
+            QuickSort::sort(list, Parameters::pivot);
+            return true;
+        }
+
+        if (Parameters::algorithm == Parameters::Algorithms::shell) {
+            if (!isShellParameterSupported()) {
+                std::cerr << "ERROR! Only shell parameters option1 and option2 are supported now.\n";
+                return false;
+            }
+
+            ShellSort::sort(list, Parameters::shellParameter);
+            return true;
+        }
+
+        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+            // bucket sort jest przygotowany tylko dla typu int
+            if constexpr (std::is_same_v<T, int>) {
+                if (!BucketSort::sort(list)) {
+                    std::cerr << "ERROR! Bucket sort failed.\n";
+                    return false;
+                }
+
+                return true;
+            } else {
+                std::cerr << "ERROR! Bucket sort is supported only for int type.\n";
+                return false;
+            }
+        }
+
+        std::cerr << "ERROR! This algorithm is not implemented for SingleList yet.\n";
         return false;
     }
 
-    // ustawiamy minTime na max możliwą wartość - 1 prawdziwy pomiar na pewno będzie mniejszy
-    auto minTime = std::chrono::microseconds::max();
+    // ===== wybór algorytmu dla listy dwukierunkowej =====
 
-    // ustawiamy maxTime na 0
-    auto maxTime = std::chrono::microseconds::zero();
+    template <typename T>
+    bool sortDoubleList(DoubleList<T>& list) {
+        if (Parameters::algorithm == Parameters::Algorithms::quick) {
+            QuickSort::sort(list, Parameters::pivot);
+            return true;
+        }
 
-    // suma dla średniej
-    auto sumTime = std::chrono::microseconds::zero();
+        if (Parameters::algorithm == Parameters::Algorithms::shell) {
+            if (!isShellParameterSupported()) {
+                std::cerr << "ERROR! Only shell parameters option1 and option2 are supported now.\n";
+                return false;
+            }
 
-    if (Parameters::structure == Parameters::Structures::array) {
-        // tablica źródłowa
-        Array<int> source(Parameters::structureSize);
+            ShellSort::sort(list, Parameters::shellParameter);
+            return true;
+        }
 
-        // wypełniamy tablicę losowymi liczbami
+        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+            // bucket sort jest przygotowany tylko dla typu int
+            if constexpr (std::is_same_v<T, int>) {
+                if (!BucketSort::sort(list)) {
+                    std::cerr << "ERROR! Bucket sort failed.\n";
+                    return false;
+                }
+
+                return true;
+            } else {
+                std::cerr << "ERROR! Bucket sort is supported only for int type.\n";
+                return false;
+            }
+        }
+
+        std::cerr << "ERROR! This algorithm is not implemented for DoubleList yet.\n";
+        return false;
+    }
+
+    // ===== benchmark dla tablicy =====
+
+    template <typename T>
+    bool runArrayBenchmark(BenchmarkStats& stats) {
+        Array<T> source(Parameters::structureSize);
+        // tworzymy strukturę źródłową o zadanym rozmiarze
+
         if (!RandomArrayGenerator::fillRandom(source)) {
             std::cerr << "ERROR! Failed to generate random data.\n";
             return false;
         }
+        // generujemy dane tylko raz, żeby każda iteracja startowała z tego samego układu
 
-        // wykonujemy benchmark tyle razy, ile podano w iterations
+        auto minTime = std::chrono::microseconds::max();
+        auto maxTime = std::chrono::microseconds::zero();
+        auto sumTime = std::chrono::microseconds::zero();
+        // minTime - najlepszy wynik
+        // maxTime - najgorszy wynik
+        // sumTime - suma czasów potrzebna do wyliczenia średniej
+
         for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
-            // tworzymy kopię tablicy źródłowej
-            Array<int>* testArray = RandomArrayGenerator::copyArray(source);
+            Array<T>* testArray = RandomArrayGenerator::copyArray(source);
+            // każda iteracja sortuje kopię danych źródłowych,
+            // dzięki temu wszystkie pomiary są porównywalne
 
-            // jeśli nie udało się zrobić kopii, kończymy z błędem
             if (testArray == nullptr) {
                 std::cerr << "ERROR! Failed to copy source array.\n";
                 return false;
             }
 
-            // zapisujemy moment startu sortowania
             auto start = std::chrono::steady_clock::now();
-            // auto oznacza, że kompilator sam dobierze odpowiedni typ
+            // początek pomiaru - od tego miejsca liczymy tylko czas sortowania
 
-            // wybieramy algorytm sortowania zależnie od parametrów
-            if (Parameters::algorithm == Parameters::Algorithms::quick) {
-                QuickSort::sort(*testArray, Parameters::pivot);
-            }
-            else if (Parameters::algorithm == Parameters::Algorithms::shell) {
-                // na razie obsługiwane są tylko option1 i option2
-                if (Parameters::shellParameter == Parameters::ShellParameters::option3 ||
-                    Parameters::shellParameter == Parameters::ShellParameters::option4) {
-                    std::cerr << "ERROR! Only shell parameters option1 and option2 are supported now.\n";
-                    delete testArray;
-                    return false;
-                }
-
-                ShellSort::sort(*testArray, Parameters::shellParameter);
-            }
-            else if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-                // bucket sort zwraca bool, więc sprawdzamy czy sortowanie się udało
-                if (!BucketSort::sort(*testArray)) {
-                    std::cerr << "ERROR! Bucket sort failed.\n";
-                    delete testArray;
-                    return false;
-                }
-            }
-            else {
-                // jeśli wybrany algorytm nie jest jeszcze gotowy, kończymy z błędem
-                std::cerr << "ERROR! Selected algorithm is not implemented.\n";
+            if (!sortArray(*testArray)) {
                 delete testArray;
                 return false;
             }
 
-            // zapisujemy moment końca sortowania
             auto end = std::chrono::steady_clock::now();
-            // auto oznacza, że kompilator sam dobierze odpowiedni typ
+            // koniec pomiaru
 
-            // sprawdzamy, czy po sortowaniu tablica jest naprawdę rosnąca
             if (!SortingCheck::SortedAscend(*testArray)) {
                 std::cerr << "ERROR! Array is not sorted correctly.\n";
                 delete testArray;
                 return false;
             }
+            // po każdym sortowaniu sprawdzamy poprawność wyniku
 
-            // czas działania jednej iteracji w mikrosekundach
             auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+            // zamieniamy różnicę czasu na mikrosekundy
 
-            // jeśli aktualny czas jest mniejszy niż dotychczasowe minimum
-            // zapisujemy go jako nowy najlepszy wynik
             if (elapsed < minTime) {
                 minTime = elapsed;
             }
 
-            // jeśli aktualny czas jest większy niż dotychczasowe maksimum
-            // zapisujemy go jako nowy najgorszy wynik
             if (elapsed > maxTime) {
                 maxTime = elapsed;
             }
 
             sumTime += elapsed;
 
-            // wypisujemy czas dla aktualnej iteracji
             std::cout << "iteration " << (iteration + 1) << " [us] = " << elapsed.count() << "\n";
 
             delete testArray;
-            // po zakończeniu iteracji usuwamy kopię tablicy z pamięci
         }
 
         stats.minTimeFinal = minTime.count();
         stats.maxTimeFinal = maxTime.count();
         stats.averageTimeFinal =
             static_cast<double>(sumTime.count()) / static_cast<double>(Parameters::iterations);
+        // liczymy średnią jako double, żeby nie stracić części ułamkowej
 
         return true;
     }
 
-    if (Parameters::structure == Parameters::Structures::singleList) {
-        SingleList<int> source;
+    // ===== benchmark dla listy jednokierunkowej =====
+
+    template <typename T>
+    bool runSingleListBenchmark(BenchmarkStats& stats) {
+        SingleList<T> source;
         // tworzymy pustą listę źródłową
 
-        // najpierw dodajemy elementy do listy, żeby miała odpowiedni rozmiar
-        // potem fillRandom będzie mogło wpisywać liczby pod kolejne indeksy
         for (int i = 0; i < Parameters::structureSize; ++i) {
-            if (!source.pushBack(0)) {
+            if (!source.pushBack(T{})) {
                 std::cerr << "ERROR! Failed to create source single list.\n";
                 return false;
             }
         }
+        // najpierw budujemy strukturę o odpowiednim rozmiarze,
+        // a dopiero potem wpisujemy do niej dane losowe
 
-        // wypełniamy listę losowymi liczbami
         if (!RandomArrayGenerator::fillRandom(source)) {
             std::cerr << "ERROR! Failed to generate random data.\n";
             return false;
         }
 
-        // wykonujemy benchmark tyle razy, ile podano w iterations
-        for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
-            // tworzymy kopię listy źródłowej
-            SingleList<int>* testList = RandomArrayGenerator::copySingleList(source);
+        auto minTime = std::chrono::microseconds::max();
+        auto maxTime = std::chrono::microseconds::zero();
+        auto sumTime = std::chrono::microseconds::zero();
 
-            // jeśli nie udało się zrobić kopii, kończymy z błędem
+        for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
+            SingleList<T>* testList = RandomArrayGenerator::copySingleList(source);
+
             if (testList == nullptr) {
                 std::cerr << "ERROR! Failed to copy source single list.\n";
                 return false;
             }
 
-            // zapisujemy moment startu sortowania
             auto start = std::chrono::steady_clock::now();
-            // auto oznacza, że kompilator sam dobierze odpowiedni typ
 
-            // wybieramy algorytm sortowania zależnie od parametrów
-            if (Parameters::algorithm == Parameters::Algorithms::quick) {
-                QuickSort::sort(*testList, Parameters::pivot);
-            }
-            else if (Parameters::algorithm == Parameters::Algorithms::shell) {
-                // na razie obsługiwane są tylko option1 i option2
-                if (Parameters::shellParameter == Parameters::ShellParameters::option3 ||
-                    Parameters::shellParameter == Parameters::ShellParameters::option4) {
-                    std::cerr << "ERROR! Only shell parameters option1 and option2 are supported now.\n";
-                    delete testList;
-                    return false;
-                }
-
-                ShellSort::sort(*testList, Parameters::shellParameter);
-            }
-            else if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-                if (!BucketSort::sort(*testList)) {
-                    std::cerr << "ERROR! Bucket sort failed.\n";
-                    delete testList;
-                    return false;
-                }
-            }
-            else {
-                // pozostałe algorytmy nie są jeszcze gotowe dla singlelist
-                std::cerr << "ERROR! This algorithm is not implemented for SingleList yet.\n";
+            if (!sortSingleList(*testList)) {
                 delete testList;
                 return false;
             }
 
-            // zapisujemy moment końca sortowania
             auto end = std::chrono::steady_clock::now();
-            // auto oznacza, że kompilator sam dobierze odpowiedni typ
 
-            // sprawdzamy, czy po sortowaniu lista jest naprawdę rosnąca
             if (!SortingCheck::SortedAscend(*testList)) {
                 std::cerr << "ERROR! SingleList is not sorted correctly.\n";
                 delete testList;
                 return false;
             }
 
-            // czas działania jednej iteracji w mikrosekundach
             auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
-            // jeśli aktualny czas jest mniejszy niż dotychczasowe minimum
-            // zapisujemy go jako nowy najlepszy wynik
             if (elapsed < minTime) {
                 minTime = elapsed;
             }
 
-            // jeśli aktualny czas jest większy niż dotychczasowe maksimum
-            // zapisujemy go jako nowy najgorszy wynik
             if (elapsed > maxTime) {
                 maxTime = elapsed;
             }
 
             sumTime += elapsed;
 
-            // wypisujemy czas dla aktualnej iteracji
             std::cout << "iteration " << (iteration + 1) << " [us] = " << elapsed.count() << "\n";
 
             delete testList;
-            // po zakończeniu iteracji usuwamy kopię listy z pamięci
         }
 
         stats.minTimeFinal = minTime.count();
@@ -243,102 +292,67 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
         return true;
     }
 
-    if (Parameters::structure == Parameters::Structures::doubleList) {
-        DoubleList<int> source;
-        // tworzymy pustą listę dwukierunkową źródłową
+    // ===== benchmark dla listy dwukierunkowej =====
 
-        // najpierw dodajemy elementy do listy, żeby miała odpowiedni rozmiar
-        // potem fillRandom będzie mogło wpisywać liczby pod kolejne indeksy
+    template <typename T>
+    bool runDoubleListBenchmark(BenchmarkStats& stats) {
+        DoubleList<T> source;
+        // tworzymy pustą listę źródłową
+
         for (int i = 0; i < Parameters::structureSize; ++i) {
-            if (!source.pushBack(0)) {
+            if (!source.pushBack(T{})) {
                 std::cerr << "ERROR! Failed to create source double list.\n";
                 return false;
             }
         }
 
-        // wypełniamy listę losowymi liczbami
         if (!RandomArrayGenerator::fillRandom(source)) {
             std::cerr << "ERROR! Failed to generate random data.\n";
             return false;
         }
 
-        // wykonujemy benchmark tyle razy, ile podano w iterations
-        for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
-            // tworzymy kopię listy źródłowej
-            DoubleList<int>* testList = RandomArrayGenerator::copyDoubleList(source);
+        auto minTime = std::chrono::microseconds::max();
+        auto maxTime = std::chrono::microseconds::zero();
+        auto sumTime = std::chrono::microseconds::zero();
 
-            // jeśli nie udało się zrobić kopii, kończymy z błędem
+        for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
+            DoubleList<T>* testList = RandomArrayGenerator::copyDoubleList(source);
+
             if (testList == nullptr) {
                 std::cerr << "ERROR! Failed to copy source double list.\n";
                 return false;
             }
 
-            // zapisujemy moment startu sortowania
             auto start = std::chrono::steady_clock::now();
-            // auto oznacza, że kompilator sam dobierze odpowiedni typ
 
-            // wybieramy algorytm sortowania zależnie od parametrów
-            if (Parameters::algorithm == Parameters::Algorithms::quick) {
-                QuickSort::sort(*testList, Parameters::pivot);
-            }
-            else if (Parameters::algorithm == Parameters::Algorithms::shell) {
-                // na razie obsługiwane są tylko option1 i option2
-                if (Parameters::shellParameter == Parameters::ShellParameters::option3 ||
-                    Parameters::shellParameter == Parameters::ShellParameters::option4) {
-                    std::cerr << "ERROR! Only shell parameters option1 and option2 are supported now.\n";
-                    delete testList;
-                    return false;
-                }
-
-                ShellSort::sort(*testList, Parameters::shellParameter);
-            }
-            else if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-                if (!BucketSort::sort(*testList)) {
-                    std::cerr << "ERROR! Bucket sort failed.\n";
-                    delete testList;
-                    return false;
-                }
-            }
-            else {
-                // pozostałe algorytmy nie są jeszcze gotowe dla doublelist
-                std::cerr << "ERROR! This algorithm is not implemented for DoubleList yet.\n";
+            if (!sortDoubleList(*testList)) {
                 delete testList;
                 return false;
             }
 
-            // zapisujemy moment końca sortowania
             auto end = std::chrono::steady_clock::now();
-            // auto oznacza, że kompilator sam dobierze odpowiedni typ
 
-            // sprawdzamy, czy po sortowaniu lista jest naprawdę rosnąca
             if (!SortingCheck::SortedAscend(*testList)) {
                 std::cerr << "ERROR! DoubleList is not sorted correctly.\n";
                 delete testList;
                 return false;
             }
 
-            // czas działania jednej iteracji w mikrosekundach
             auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
-            // jeśli aktualny czas jest mniejszy niż dotychczasowe minimum
-            // zapisujemy go jako nowy najlepszy wynik
             if (elapsed < minTime) {
                 minTime = elapsed;
             }
 
-            // jeśli aktualny czas jest większy niż dotychczasowe maksimum
-            // zapisujemy go jako nowy najgorszy wynik
             if (elapsed > maxTime) {
                 maxTime = elapsed;
             }
 
             sumTime += elapsed;
 
-            // wypisujemy czas dla aktualnej iteracji
             std::cout << "iteration " << (iteration + 1) << " [us] = " << elapsed.count() << "\n";
 
             delete testList;
-            // po zakończeniu iteracji usuwamy kopię listy z pamięci
         }
 
         stats.minTimeFinal = minTime.count();
@@ -347,6 +361,102 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
             static_cast<double>(sumTime.count()) / static_cast<double>(Parameters::iterations);
 
         return true;
+    }
+
+} // namespace
+
+bool BenchmarkRunner::run(BenchmarkStats& stats) {
+    // sprawdzamy podstawowe parametry benchmarku
+
+    if (Parameters::structureSize <= 0) {
+        std::cerr << "ERROR! structureSize must be greater than 0.\n";
+        return false;
+    }
+
+    if (Parameters::iterations <= 0) {
+        std::cerr << "ERROR! iterations must be greater than 0.\n";
+        return false;
+    }
+
+    // ===== tablica =====
+
+    if (Parameters::structure == Parameters::Structures::array) {
+        if (Parameters::dataType == Parameters::DataTypes::typeInt) {
+            return runArrayBenchmark<int>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeFloat) {
+            return runArrayBenchmark<float>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeDouble) {
+            return runArrayBenchmark<double>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeString) {
+            return runArrayBenchmark<std::string>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedInt) {
+            return runArrayBenchmark<unsigned int>(stats);
+        }
+
+        std::cerr << "ERROR! This data type is not implemented for Array.\n";
+        return false;
+    }
+
+    // ===== lista jednokierunkowa =====
+
+    if (Parameters::structure == Parameters::Structures::singleList) {
+        if (Parameters::dataType == Parameters::DataTypes::typeInt) {
+            return runSingleListBenchmark<int>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeFloat) {
+            return runSingleListBenchmark<float>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeDouble) {
+            return runSingleListBenchmark<double>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeString) {
+            return runSingleListBenchmark<std::string>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedInt) {
+            return runSingleListBenchmark<unsigned int>(stats);
+        }
+
+        std::cerr << "ERROR! This data type is not implemented for SingleList.\n";
+        return false;
+    }
+
+    // ===== lista dwukierunkowa =====
+
+    if (Parameters::structure == Parameters::Structures::doubleList) {
+        if (Parameters::dataType == Parameters::DataTypes::typeInt) {
+            return runDoubleListBenchmark<int>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeFloat) {
+            return runDoubleListBenchmark<float>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeDouble) {
+            return runDoubleListBenchmark<double>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeString) {
+            return runDoubleListBenchmark<std::string>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedInt) {
+            return runDoubleListBenchmark<unsigned int>(stats);
+        }
+
+        std::cerr << "ERROR! This data type is not implemented for DoubleList.\n";
+        return false;
     }
 
     std::cerr << "ERROR! This structure is not implemented yet.\n";
