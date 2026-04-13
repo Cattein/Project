@@ -18,7 +18,7 @@ add_executable(Project
         lib/parameters/Parameters.cpp
         src/file/FileHandler.cpp
         src/algorytmsSorting/QuickSort.cpp
-        src/checking/sortingCheck.cpp
+        include/checking/sortingCheck.h
         src/algorytmsSorting/ShellSort.cpp
         src/algorytmsSorting/BucketSort.cpp
         src/singleFile/SingleFileRunner.cpp
