@@ -17,9 +17,7 @@ add_executable(Project
         include/structures/DoubleList.h
         lib/parameters/Parameters.cpp
         src/file/FileHandler.cpp
-        src/algorytmsSorting/QuickSort.cpp
-        include/checking/sortingCheck.h
-        src/algorytmsSorting/ShellSort.cpp
+        include/checking/SortingCheck.h
         src/algorytmsSorting/BucketSort.cpp
         src/singleFile/SingleFileRunner.cpp
         src/benchmark/RandomArrayGenerator.cpp
