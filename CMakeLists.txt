@@ -20,7 +20,7 @@ add_executable(Project
         include/checking/SortingCheck.h
         src/algorytmsSorting/BucketSort.cpp
         src/singleFile/SingleFileRunner.cpp
-        src/benchmark/RandomArrayGenerator.cpp
+        include/benchmark/RandomArrayGenerator.h
         src/benchmark/BenchmarkRunner.cpp
         src/benchmark/BenchmarkCsvWriter.cpp
 )
