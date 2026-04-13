@@ -16,7 +16,7 @@ add_executable(Project
         include/structures/SingleList.h
         include/structures/DoubleList.h
         lib/parameters/Parameters.cpp
-        src/file/FileHandler.cpp
+        include/file/FileHandler.h
         include/checking/SortingCheck.h
         src/algorytmsSorting/BucketSort.cpp
         src/singleFile/SingleFileRunner.cpp
