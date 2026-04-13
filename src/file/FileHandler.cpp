@@ -8,7 +8,7 @@
 #include <new>
 
 // odczytuje dane tablicy z pliku
-Array* FileHandler::loadArrayFromFile(const std::string& filename) {
+Array<int>* FileHandler::loadArrayFromFile(const std::string& filename) {
     // const std::string& - nazwa pliku jest przekazywana przez referencję - nie tworzymy kopii napisu
     // const - funkcja nie może zmienić tej nazwy
 
@@ -27,7 +27,7 @@ Array* FileHandler::loadArrayFromFile(const std::string& filename) {
         return nullptr;
     }
 
-    Array* array = new (std::nothrow) Array(size);    // tworzymy nową tablicę o podanym rozmiarze
+    Array<int>* array = new (std::nothrow) Array<int>(size);    // tworzymy nową tablicę o podanym rozmiarze
     // Array* - wskaźnik na obiekt klasy Array
     // new - tworzenie obiektu w pamięci dynamicznej
     // std::nothrow - przy braku pamięci dostaniemy nullptr zamiast wyjątku
@@ -64,7 +64,7 @@ Array* FileHandler::loadArrayFromFile(const std::string& filename) {
 }
 
 // zapisuje tablicę do pliku
-bool FileHandler::saveArrayToFile(const Array& array, const std::string& filename) {
+bool FileHandler::saveArrayToFile(const Array<int>& array, const std::string& filename) {
     std::ofstream file(filename);    // otwieramy plik do zapisu
 
     // jeśli nie udało się otworzyć pliku, zwracamy false
@@ -93,7 +93,7 @@ bool FileHandler::saveArrayToFile(const Array& array, const std::string& filenam
 }
 
 // odczytuje dane listy jednokierunkowej z pliku
-SingleList* FileHandler::loadSingleListFromFile(const std::string& filename) {
+SingleList<int>* FileHandler::loadSingleListFromFile(const std::string& filename) {
     // wynik ma typ SingleList* - funkcja zwraca wskaźnik na nowo utworzoną listę
 
     std::ifstream file(filename);    // otwieramy plik do odczytu
@@ -112,7 +112,7 @@ SingleList* FileHandler::loadSingleListFromFile(const std::string& filename) {
     }
 
     // tworzymy nową pustą listę
-    SingleList* list = new (std::nothrow) SingleList();
+    SingleList<int>* list = new (std::nothrow) SingleList<int>();
 
     // jeśli nie udało się przydzielić pamięci, zwracamy nullptr
     if (list == nullptr) {
@@ -141,7 +141,7 @@ SingleList* FileHandler::loadSingleListFromFile(const std::string& filename) {
 }
 
 // zapisuje listę jednokierunkową do pliku
-bool FileHandler::saveSingleListToFile(const SingleList& list, const std::string& filename) {
+bool FileHandler::saveSingleListToFile(const SingleList<int>& list, const std::string& filename) {
     std::ofstream file(filename);    // otwieramy plik do zapisu
 
     // jeśli nie udało się otworzyć pliku, zwracamy false
@@ -169,7 +169,7 @@ bool FileHandler::saveSingleListToFile(const SingleList& list, const std::string
 }
 
 // odczytuje listę dwukierunkową z pliku
-DoubleList* FileHandler::loadDoubleListFromFile(const std::string& filename) {
+DoubleList<int>* FileHandler::loadDoubleListFromFile(const std::string& filename) {
     // const std::string& - nazwa pliku jest przekazywana bez kopiowania
     // const - funkcja nie może zmienić tej nazwy
     std::ifstream file(filename);
@@ -189,7 +189,7 @@ DoubleList* FileHandler::loadDoubleListFromFile(const std::string& filename) {
         return nullptr;
     }
 
-    DoubleList* list = new (std::nothrow) DoubleList();
+    DoubleList<int>* list = new (std::nothrow) DoubleList<int>();
     // DoubleList* - wskaźnik na obiekt listy dwukierunkowej
     // new tworzy obiekt w pamięci dynamicznej
     // std::nothrow - przy braku pamięci dostaniemy nullptr zamiast wyjątku
@@ -224,7 +224,7 @@ DoubleList* FileHandler::loadDoubleListFromFile(const std::string& filename) {
 }
 
 // zapisuje listę dwukierunkową do pliku
-bool FileHandler::saveDoubleListToFile(const DoubleList& list, const std::string& filename) {
+bool FileHandler::saveDoubleListToFile(const DoubleList<int>& list, const std::string& filename) {
     // const DoubleList& - lista jest przekazywana przez referencję - nie tworzymy kopii listy
     // const - funkcja nie może jej zmieniać
     std::ofstream file(filename);    // std::ofstream - zapis danych do pliku

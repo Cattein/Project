@@ -40,18 +40,18 @@ namespace {
 }
 
 // sprawdza sortowanie dla tablicy
-bool SortingCheck::SortedAscend(const Array& array) {
+bool SortingCheck::SortedAscend(const Array<int>& array) {
     return sortedAscendImpl(array);
 }
 
 // funkcja sprawdza sortowanie dla listy jednokierunkowej
 // korzysta z tej samej wspólnej funkcji
-bool SortingCheck::SortedAscend(const SingleList& list) {
+bool SortingCheck::SortedAscend(const SingleList<int>& list) {
     return sortedAscendImpl(list);
 }
 
 // funkcja sprawdza sortowanie dla listy dwukierunkowej
 // korzysta z tej samej wspólnej funkcji
-bool SortingCheck::SortedAscend(const DoubleList& list) {
+bool SortingCheck::SortedAscend(const DoubleList<int>& list) {
     return sortedAscendImpl(list);
 }

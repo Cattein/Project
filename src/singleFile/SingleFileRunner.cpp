@@ -20,7 +20,7 @@ static bool isShellParameterSupported() {
 }
 
 // wybiera algorytm sortowania dla tablicy
-static bool sortArray(Array& array) {
+static bool sortArray(Array<int>& array) {
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(array, Parameters::pivot);
         return true;
@@ -52,7 +52,7 @@ static bool sortArray(Array& array) {
 }
 
 // wybiera algorytm sortowania dla listy jednokierunkowej
-static bool sortSingleList(SingleList& list) {
+static bool sortSingleList(SingleList<int>& list) {
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(list, Parameters::pivot);
         return true;
@@ -84,7 +84,7 @@ static bool sortSingleList(SingleList& list) {
 }
 
 // wybiera algorytm sortowania dla listy dwukierunkowej
-static bool sortDoubleList(DoubleList& list) {
+static bool sortDoubleList(DoubleList<int>& list) {
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(list, Parameters::pivot);
         return true;
@@ -117,7 +117,7 @@ static bool sortDoubleList(DoubleList& list) {
 
 // obsługuje cały tryb single file dla tablicy
 static bool runArray() {
-    Array* array = FileHandler::loadArrayFromFile(Parameters::inputFile);
+    Array<int>* array = FileHandler::loadArrayFromFile(Parameters::inputFile);
     // Array* oznacza wskaźnik na obiekt utworzony dynamicznie
 
     if (array == nullptr) {
@@ -154,7 +154,7 @@ static bool runArray() {
 
 // obsługuje cały tryb single file dla listy jednokierunkowej
 static bool runSingleList() {
-    SingleList* list = FileHandler::loadSingleListFromFile(Parameters::inputFile);
+    SingleList<int>* list = FileHandler::loadSingleListFromFile(Parameters::inputFile);
     // SingleList* oznacza wskaźnik na obiekt utworzony dynamicznie
 
     if (list == nullptr) {
@@ -191,7 +191,7 @@ static bool runSingleList() {
 
 // obsługuje cały tryb single file dla listy dwukierunkowej
 static bool runDoubleList() {
-    DoubleList* list = FileHandler::loadDoubleListFromFile(Parameters::inputFile);
+    DoubleList<int>* list = FileHandler::loadDoubleListFromFile(Parameters::inputFile);
     // DoubleList* oznacza wskaźnik na obiekt utworzony dynamicznie
 
     if (list == nullptr) {

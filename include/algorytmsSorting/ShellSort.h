@@ -15,9 +15,9 @@ public:
     //nie ma potrzeby tworzenia obiektu,
     //funkcja została po prostu umieszczona w klasie
     // Array& - referencja na oryginalne tablice
-    static void sort(Array& array,  Parameters::ShellParameters parameter);
-    static void sort(SingleList& list,  Parameters::ShellParameters parameter);
-    static void sort(DoubleList& list,  Parameters::ShellParameters parameter);
+    static void sort(Array<int>& array,  Parameters::ShellParameters parameter);
+    static void sort(SingleList<int>& list,  Parameters::ShellParameters parameter);
+    static void sort(DoubleList<int>& list,  Parameters::ShellParameters parameter);
 
 
 

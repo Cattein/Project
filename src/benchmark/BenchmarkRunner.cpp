@@ -41,7 +41,7 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
 
     if (Parameters::structure == Parameters::Structures::array) {
         // tablica źródłowa
-        Array source(Parameters::structureSize);
+        Array<int> source(Parameters::structureSize);
 
         // wypełniamy tablicę losowymi liczbami
         if (!RandomArrayGenerator::fillRandom(source)) {
@@ -52,7 +52,7 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
         // wykonujemy benchmark tyle razy, ile podano w iterations
         for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
             // tworzymy kopię tablicy źródłowej
-            Array* testArray = RandomArrayGenerator::copyArray(source);
+            Array<int>* testArray = RandomArrayGenerator::copyArray(source);
 
             // jeśli nie udało się zrobić kopii, kończymy z błędem
             if (testArray == nullptr) {
@@ -138,7 +138,7 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
     }
 
     if (Parameters::structure == Parameters::Structures::singleList) {
-        SingleList source;
+        SingleList<int> source;
         // tworzymy pustą listę źródłową
 
         // najpierw dodajemy elementy do listy, żeby miała odpowiedni rozmiar
@@ -159,7 +159,7 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
         // wykonujemy benchmark tyle razy, ile podano w iterations
         for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
             // tworzymy kopię listy źródłowej
-            SingleList* testList = RandomArrayGenerator::copySingleList(source);
+            SingleList<int>* testList = RandomArrayGenerator::copySingleList(source);
 
             // jeśli nie udało się zrobić kopii, kończymy z błędem
             if (testList == nullptr) {
@@ -244,7 +244,7 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
     }
 
     if (Parameters::structure == Parameters::Structures::doubleList) {
-        DoubleList source;
+        DoubleList<int> source;
         // tworzymy pustą listę dwukierunkową źródłową
 
         // najpierw dodajemy elementy do listy, żeby miała odpowiedni rozmiar
@@ -265,7 +265,7 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
         // wykonujemy benchmark tyle razy, ile podano w iterations
         for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
             // tworzymy kopię listy źródłowej
-            DoubleList* testList = RandomArrayGenerator::copyDoubleList(source);
+            DoubleList<int>* testList = RandomArrayGenerator::copyDoubleList(source);
 
             // jeśli nie udało się zrobić kopii, kończymy z błędem
             if (testList == nullptr) {

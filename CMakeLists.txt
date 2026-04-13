@@ -12,9 +12,9 @@ set(PROG_LIBS "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
 add_executable(Project
         src/main.cpp
-        src/structures/Array.cpp
-        src/structures/SingleList.cpp
-        src/structures/DoubleList.cpp
+        include/structures/Array.h
+        include/structures/SingleList.h
+        include/structures/DoubleList.h
         lib/parameters/Parameters.cpp
         src/file/FileHandler.cpp
         src/algorytmsSorting/QuickSort.cpp

@@ -14,24 +14,24 @@
 namespace FileHandler {
 
     // wczytuje tablicę z pliku, zwraca wskaźnik na utworzony obiekt
-    Array* loadArrayFromFile(const std::string& filename);
+    Array<int>* loadArrayFromFile(const std::string& filename);
 
     // zapisuje tablicę do pliku i zwraca true, jeśli zapis się udał
-    bool saveArrayToFile(const Array& array, const std::string& filename);
+    bool saveArrayToFile(const Array<int>& array, const std::string& filename);
 
     // wczytuje listę jednokierunkową z pliku i zwraca wskaźnik na utworzony obiekt
-    SingleList* loadSingleListFromFile(const std::string& filename);
+    SingleList<int>* loadSingleListFromFile(const std::string& filename);
 
     // zapisuje listę jednokierunkową do pliku
-    bool saveSingleListToFile(const SingleList& list, const std::string& filename);
+    bool saveSingleListToFile(const SingleList<int>& list, const std::string& filename);
 
     // DoubleList* - wskaźnik na obiekt listy dwukierunkowej - tworzy nową listę na podstawie danych z pliku
     // const std::string& - nazwa pliku jest przekazywana bez kopiowania
-    DoubleList* loadDoubleListFromFile(const std::string& filename);
+    DoubleList<int>* loadDoubleListFromFile(const std::string& filename);
 
     // const DoubleList& - funkcja tylko odczytuje listę i jej nie zmienia
     // zapisuje listę dwukierunkową do pliku
-    bool saveDoubleListToFile(const DoubleList& list, const std::string& filename);
+    bool saveDoubleListToFile(const DoubleList<int>& list, const std::string& filename);
 
 
 }

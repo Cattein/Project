@@ -3,33 +3,33 @@
 namespace { //  widoczne tylko w tym pliku
 
     // odczytuje wartość spod danego indeksu w tablicy
-    int readAt(const Array& array, int index) {
+    int readAt(const Array<int>& array, int index) {
         // const Array& - tablica  przekazywana bez kopiowania
         // const - tej tablicy nie można tutaj zmieniać
         return array.setId(index);
     }
 
     // zapisuje wartość pod danym indeksem w tablicy
-    void writeAt(Array& array, int index, int value) {
+    void writeAt(Array<int>& array, int index, int value) {
         // Array& - pracujemy na oryginalnej tablicy
         array.setId(index) = value;
     }
     
     // odczytuje wartość spod danego indeksu w liście jednokierunkowej
-    int readAt(const SingleList& list, int index) {
+    int readAt(const SingleList<int>& list, int index) {
         int value = 0;    // value chwilowo przechowuje odczytaną liczbę
         list.get(index, value);// get wpisuje wartość spod danego indeksu do zmiennej value
         return value;
     }
 
     // zapisuje wartość pod danym indeksem w liście jednokierunkowej
-    void writeAt(SingleList& list, int index, int value) {
+    void writeAt(SingleList<int>& list, int index, int value) {
         list.set(index, value);    // set podmienia wartość na wskazanej pozycji
 
     }
     
     // odczytuje wartość spod danego indeksu w liście dwukierunkowej
-    int readAt(const DoubleList& list, int index) {
+    int readAt(const DoubleList<int>& list, int index) {
         int value = 0;    // value chwilowo przechowuje odczytaną liczbę
 
         list.get(index, value);    // get wpisuje wartość spod danego indeksu do zmiennej value
@@ -37,7 +37,7 @@ namespace { //  widoczne tylko w tym pliku
     }
 
     // zapisuje wartość pod danym indeksem w liście dwukierunkowej
-    void writeAt(DoubleList& list, int index, int value) {
+    void writeAt(DoubleList<int>& list, int index, int value) {
         list.set(index, value);    // set podmienia wartość na wskazanej pozycji
 
     }
@@ -113,16 +113,16 @@ namespace { //  widoczne tylko w tym pliku
 }
 
 // uruchamia shellsort dla tablicy
-void ShellSort::sort(Array& array, Parameters::ShellParameters parameter) {
+void ShellSort::sort(Array<int>& array, Parameters::ShellParameters parameter) {
     shellSortImpl(array, parameter);
 }
 
 // uruchamia shellsort dla listy jednokierunkowej
-void ShellSort::sort(SingleList& list, Parameters::ShellParameters parameter) {
+void ShellSort::sort(SingleList<int>& list, Parameters::ShellParameters parameter) {
     shellSortImpl(list, parameter);
 }
 
 // uruchamia shellsort dla listy dwukierunkowej
-void ShellSort::sort(DoubleList& list, Parameters::ShellParameters parameter) {
+void ShellSort::sort(DoubleList<int>& list, Parameters::ShellParameters parameter) {
     shellSortImpl(list, parameter);
 }

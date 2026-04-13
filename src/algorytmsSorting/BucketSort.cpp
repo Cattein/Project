@@ -104,20 +104,20 @@ namespace {
 
     // ===== odczyt i zapis dla Array =====
 
-    int readAt(const Array& array, int index) {
+    int readAt(const Array<int>& array, int index) {
         // const Array& oznacza, że tablica jest przekazywana bez kopiowania
         // const oznacza, że tej tablicy nie można tutaj zmieniać
         return array.setId(index);
     }
 
-    void writeAt(Array& array, int index, int value) {
+    void writeAt(Array<int>& array, int index, int value) {
         // Array& - tablica jest przekazywana przez odwołanie
         array.setId(index) = value;
     }
 
     // ===== odczyt i zapis dla SingleList =====
 
-    int readAt(const SingleList& list, int index) {
+    int readAt(const SingleList<int>& list, int index) {
         int value = 0;
         // value chwilowo przechowuje odczytaną liczbę
 
@@ -127,14 +127,14 @@ namespace {
         return value;
     }
 
-    void writeAt(SingleList& list, int index, int value) {
+    void writeAt(SingleList<int>& list, int index, int value) {
         list.set(index, value);
         // set podmienia wartość na wskazanej pozycji
     }
 
     // ===== odczyt i zapis dla DoubleList =====
 
-    int readAt(const DoubleList& list, int index) {
+    int readAt(const DoubleList<int>& list, int index) {
         int value = 0;
         // value chwilowo przechowuje odczytaną liczbę
 
@@ -144,7 +144,7 @@ namespace {
         return value;
     }
 
-    void writeAt(DoubleList& list, int index, int value) {
+    void writeAt(DoubleList<int>& list, int index, int value) {
         list.set(index, value);
         // set podmienia wartość na wskazanej pozycji
     }
@@ -275,16 +275,16 @@ namespace {
 } // namespace
 
 // uruchamia bucketsort dla tablicy
-bool BucketSort::sort(Array& array) {
+bool BucketSort::sort(Array<int>& array) {
     return bucketSortImpl(array);
 }
 
 // uruchamia bucketsort dla listy jednokierunkowej
-bool BucketSort::sort(SingleList& list) {
+bool BucketSort::sort(SingleList<int>& list) {
     return bucketSortImpl(list);
 }
 
 // uruchamia bucketsort dla listy dwukierunkowej
-bool BucketSort::sort(DoubleList& list) {
+bool BucketSort::sort(DoubleList<int>& list) {
     return bucketSortImpl(list);
 }

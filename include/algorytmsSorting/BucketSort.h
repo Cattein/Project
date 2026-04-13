@@ -11,10 +11,18 @@
 
 class BucketSort {
 public:
-    static bool sort(Array& array);
-    static bool sort(SingleList& array);
-    static bool sort(DoubleList& array);
+    // static metody - nie wywołujemy na obiekcie klasy
+    static bool sort(Array<int>& array);
+    // Array<int>& - tablica jest przekazywana przez referencję
+    // sortowanie działa na oryginalnych danych, a nie na kopii
 
+    static bool sort(SingleList<int>& array);
+    // SingleList<int>& - lista jednokierunkowa jest przekazywana przez referencję
+    // funkcja sortuje prawdziwą listę, a nie jej kopię
+
+    static bool sort(DoubleList<int>& array);
+    // DoubleList<int>& - lista dwukierunkowa jest przekazywana przez referencję
+    // funkcja działa bezpośrednio na oryginalnej strukturze
 };
 
 #endif //PROJECT_BUCKETSORT_H

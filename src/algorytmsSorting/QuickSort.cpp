@@ -37,7 +37,7 @@ static int choosePivotIndex(int left, int right, Parameters::Pivots pivotType) {
 
 // ===== array =====
 
-static void QuickSorting(Array& array, int left, int right, Parameters::Pivots pivotType) {
+static void QuickSorting(Array<int>& array, int left, int right, Parameters::Pivots pivotType) {
     // Array& - tablica jest przekazywana przez odwołanie
 
     int i, j, pivotIndex, pivot;
@@ -76,13 +76,13 @@ static void QuickSorting(Array& array, int left, int right, Parameters::Pivots p
 
 // ===== singlelist =====
 
-static int getValue(const SingleList& list, int index) {
+static int getValue(const SingleList<int>& list, int index) {
     int value = 0;
     list.get(index, value);
     return value;
 }
 
-static void swapAt(SingleList& list, int firstIndex, int secondIndex) {
+static void swapAt(SingleList<int>& list, int firstIndex, int secondIndex) {
     if (firstIndex == secondIndex) {
         return;
     }
@@ -97,7 +97,7 @@ static void swapAt(SingleList& list, int firstIndex, int secondIndex) {
     list.set(secondIndex, firstValue);
 }
 
-static void QuickSorting(SingleList& list, int left, int right, Parameters::Pivots pivotType) {
+static void QuickSorting(SingleList<int>& list, int left, int right, Parameters::Pivots pivotType) {
     int i, j, pivotIndex, pivot;
 
     pivotIndex = choosePivotIndex(left, right, pivotType);
@@ -129,13 +129,13 @@ static void QuickSorting(SingleList& list, int left, int right, Parameters::Pivo
 
 // ===== doublelist =====
 
-static int getValue(const DoubleList& list, int index) {
+static int getValue(const DoubleList<int>& list, int index) {
     int value = 0;
     list.get(index, value);
     return value;
 }
 
-static void swapAt(DoubleList& list, int firstIndex, int secondIndex) {
+static void swapAt(DoubleList<int>& list, int firstIndex, int secondIndex) {
     if (firstIndex == secondIndex) {
         return;
     }
@@ -150,7 +150,7 @@ static void swapAt(DoubleList& list, int firstIndex, int secondIndex) {
     list.set(secondIndex, firstValue);
 }
 
-static void QuickSorting(DoubleList& list, int left, int right, Parameters::Pivots pivotType) {
+static void QuickSorting(DoubleList<int>& list, int left, int right, Parameters::Pivots pivotType) {
     int i, j, pivotIndex, pivot;
 
     pivotIndex = choosePivotIndex(left, right, pivotType);
@@ -181,7 +181,7 @@ static void QuickSorting(DoubleList& list, int left, int right, Parameters::Pivo
 }
 
 // główna metoda klasy quicksort dla tablicy
-void QuickSort::sort(Array& array, Parameters::Pivots pivotType)
+void QuickSort::sort(Array<int>& array, Parameters::Pivots pivotType)
 {
     // jeśli tablica ma 0 lub 1 element, to nic sortowac
     if (array.getSize() <= 1) {
@@ -193,7 +193,7 @@ void QuickSort::sort(Array& array, Parameters::Pivots pivotType)
 }
 
 // główna metoda klasy quicksort dla listy jednokierunkowej
-void QuickSort::sort(SingleList& list, Parameters::Pivots pivotType)
+void QuickSort::sort(SingleList<int>& list, Parameters::Pivots pivotType)
 {
     if (list.getSize() <= 1) {
         return;
@@ -203,7 +203,7 @@ void QuickSort::sort(SingleList& list, Parameters::Pivots pivotType)
 }
 
 // główna metoda klasy quicksort dla listy dwukierunkowej
-void QuickSort::sort(DoubleList& list, Parameters::Pivots pivotType)
+void QuickSort::sort(DoubleList<int>& list, Parameters::Pivots pivotType)
 {
     if (list.getSize() <= 1) {
         return;

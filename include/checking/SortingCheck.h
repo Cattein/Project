@@ -15,9 +15,9 @@ public:
      //funkcja została po prostu umieszczona w klasie
      // bool - funkcja zwraca true albo false
      // Array& - referencja na oryginalne tablice
-     static bool SortedAscend(const Array& array);
-     static bool SortedAscend(const DoubleList& list);
-     static bool SortedAscend(const SingleList& list);
+     static bool SortedAscend(const Array<int>& array);
+     static bool SortedAscend(const DoubleList<int>& list);
+     static bool SortedAscend(const SingleList<int>& list);
 
 };
 

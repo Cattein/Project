@@ -75,24 +75,24 @@ static ListType* copyList(const ListType& source) {
 }
 
 // wypełnia tablicę losowymi liczbami
-bool RandomArrayGenerator::fillRandom(Array& array) {
+bool RandomArrayGenerator::fillRandom(Array<int>& array) {
     return fillRandomImpl(array);
 }
 
 // wypełnia listę jednokierunkową losowymi liczbami
-bool RandomArrayGenerator::fillRandom(SingleList& list) {
+bool RandomArrayGenerator::fillRandom(SingleList<int>& list) {
     return fillRandomImpl(list);
 }
 
 // wypełnia listę dwukierunkową losowymi liczbami
-bool RandomArrayGenerator::fillRandom(DoubleList& list) {
+bool RandomArrayGenerator::fillRandom(DoubleList<int>& list) {
     return fillRandomImpl(list);
 }
 
 // tworzy kopię tablicy
-Array* RandomArrayGenerator::copyArray(const Array& source) {
+Array<int>* RandomArrayGenerator::copyArray(const Array<int>& source) {
     // tworzymy nową tablicę o takim samym rozmiarze
-    Array* copy = new (std::nothrow) Array(source.getSize());
+    Array<int>* copy = new (std::nothrow) Array<int>(source.getSize());
     // Array nie jest kopiowany jak lista
     // tutaj trzeba od razu utworzyć tablicę o odpowiednim rozmiarze
 
@@ -121,11 +121,11 @@ Array* RandomArrayGenerator::copyArray(const Array& source) {
 }
 
 // tworzy kopię listy jednokierunkowej
-SingleList* RandomArrayGenerator::copySingleList(const SingleList& source) {
+SingleList<int>* RandomArrayGenerator::copySingleList(const SingleList<int>& source) {
     return copyList(source);
 }
 
 // tworzy kopię listy dwukierunkowej
-DoubleList* RandomArrayGenerator::copyDoubleList(const DoubleList& source) {
+DoubleList<int>* RandomArrayGenerator::copyDoubleList(const DoubleList<int>& source) {
     return copyList(source);
 }
