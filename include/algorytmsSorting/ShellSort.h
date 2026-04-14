@@ -12,7 +12,6 @@
 
 class ShellSort {
 private:
-    // ===== odczyt wartości =====
 
     // odczytuje wartość spod danego indeksu w tablicy
     template <typename T>
@@ -45,7 +44,6 @@ private:
         return value;
     }
 
-    // ===== zapis wartości =====
 
     // zapisuje wartość pod danym indeksem w tablicy
     template <typename T>

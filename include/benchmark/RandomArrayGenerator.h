@@ -18,8 +18,7 @@ class RandomArrayGenerator {
 private:
     // ustawia ziarno generatora tylko raz
     static void seedRandomOnce() {
-        // static oznacza, że zmienna seeded zostanie utworzona tylko raz
-        // przy kolejnych wywołaniach funkcji zachowa swoją wcześniejszą wartość
+        // static - zmienna seeded zostanie utworzona tylko raz (przy kolejnych wywołaniach funkcji zachowa swoją wcześniejszą wartość)
 
         static bool seeded = false;
 
@@ -27,9 +26,6 @@ private:
             std::srand(12345);
             // std::srand ustawia punkt startowy generatora std::rand
             // 12345 to seed, czyli wartość początkowa
-            // dzięki stałemu seed przy każdym uruchomieniu programu
-            // dostaniemy tę samą sekwencję liczb pseudolosowych
-            // to jest wygodne przy badaniach i porównywaniu wyników
 
             seeded = true;
         }
@@ -53,17 +49,15 @@ private:
         // dzięki temu dzielenie nie będzie całkowite
 
         // potem przesuwamy zakres do -1000000 .. 1000000
-        // 2000000 oznacza szerokość całego przedziału
+        // 2000000 - szerokość całego przedziału
         return -1000000.0f + zeroToOne * 2000000.0f;
     }
 
     // losuje wartość typu double
     static double randomDouble() {
         // zamieniamy wynik rand na liczbę z zakresu 0..1
-        const double zeroToOne =
-            static_cast<double>(std::rand()) / static_cast<double>(RAND_MAX);
+        const double zeroToOne =static_cast<double>(std::rand()) / static_cast<double>(RAND_MAX);
         // static_cast<double> zamienia liczbę na typ double
-        // dzięki temu dzielenie nie będzie całkowite
 
         // potem przesuwamy zakres do -1000000 .. 1000000
         return -1000000.0 + zeroToOne * 2000000.0;
@@ -72,7 +66,7 @@ private:
     // losuje wartość typu unsigned int
     static unsigned int randomUnsignedInt() {
         // static_cast<unsigned int> zamienia wynik na typ bez znaku
-        // tutaj liczby będą dodatnie albo równe 0
+        // liczby - dodatnie albo równe 0
         return static_cast<unsigned int>(std::rand());
     }
 
@@ -80,7 +74,7 @@ private:
     static std::string randomString() {
         const std::string characters =
             "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        // const std::string oznacza, że po utworzeniu tego napisu
+        // const std::string - po utworzeniu tego napisu
         // nie można już zmienić jego zawartości
         // characters zawiera wszystkie znaki, z których będziemy budować losowy napis
 
@@ -95,7 +89,7 @@ private:
 
         static std::mt19937 generator(randomDevice());
         // std::mt19937 to generator liczb pseudolosowych z biblioteki C++
-        // static oznacza, że generator tworzymy tylko raz
+        // static - generator tworzymy tylko raz
         // dzięki temu nie tworzymy nowego generatora przy każdym wywołaniu funkcji
 
         std::uniform_int_distribution<> distribution(
@@ -103,8 +97,8 @@ private:
             static_cast<int>(characters.size()) - 1
         );
         // distribution losuje indeks znaku
-        // 0 oznacza pierwszy znak w napisie characters
-        // characters.size() - 1 oznacza ostatni poprawny indeks
+        // 0 - pierwszy znak w napisie characters
+        // characters.size() - 1 - ostatni poprawny indeks
         // static_cast<int> zamienia size_t na int
 
         std::string randomStringValue;
@@ -318,7 +312,7 @@ public:
 
     template <typename T>
     static Array<T>* copyArray(const Array<T>& source) {
-        // template <typename T> oznacza, że funkcja działa dla różnych typów danych
+        // template <typename T> - funkcja działa dla różnych typów danych
 
         Array<T>* copy = new (std::nothrow) Array<T>(source.getSize());
         // Array<T>* - wskaźnik na nową dynamiczną tablicę
@@ -330,7 +324,7 @@ public:
 
         for (int i = 0; i < source.getSize(); ++i) {
             T value{};
-            // {} oznacza domyślną inicjalizację zmiennej typu T
+            // {} - domyślną inicjalizację zmiennej typu T
 
             if (!source.get(i, value)) {
                 delete copy;
