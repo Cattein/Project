@@ -12,6 +12,7 @@
 #include "structures/DoubleList.h"
 #include "structures/Stack.h"
 #include "Parameters.h"
+#include "structures/BinaryTree.h"
 
 class QuickSort {
 private:
@@ -123,6 +124,15 @@ private:
     }
 
 public:
+    template <typename T>
+    static void sort(BinaryTree<T>& tree, Parameters::Pivots pivotType)
+    {
+        if (tree.getSize() <= 1) {
+            return;
+        }
+
+        QuickSorting<BinaryTree<T>, T>(tree, 0, tree.getSize() - 1, pivotType);
+    }
     // główna metoda klasy quicksort dla tablicy
     template <typename T>
     static void sort(Array<T>& array, Parameters::Pivots pivotType)

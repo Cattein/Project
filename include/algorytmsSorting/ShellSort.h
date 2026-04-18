@@ -10,6 +10,7 @@
 #include "structures/DoubleList.h"
 #include "structures/Stack.h"
 #include "Parameters.h"
+#include "structures/BinaryTree.h"
 
 class ShellSort {
 private:
@@ -102,6 +103,10 @@ private:
     }
 
 public:
+    template <typename T>
+    static void sort(BinaryTree<T>& tree, Parameters::ShellParameters parameter) {
+        sortImpl<BinaryTree<T>, T>(tree, parameter);
+    }
     // uruchamia shellsort dla tablicy
     template <typename T>
     static void sort(Array<T>& array, Parameters::ShellParameters parameter) {

@@ -9,6 +9,7 @@
 #include "structures/DoubleList.h"
 #include "structures/SingleList.h"
 #include "structures/Stack.h"
+#include "structures/BinaryTree.h"
 
 class SortingCheck {
 private:
@@ -42,12 +43,10 @@ private:
     }
 
 public:
-    // sprawdza sortowanie dla stosu dowolnego typu T
     template <typename T>
-    static bool SortedAscend(const Stack<T>& stack) {
-        return sortedAscendImpl<Stack<T>, T>(stack);
+    static bool SortedAscend(const BinaryTree<T>& tree) {
+        return sortedAscendImpl<BinaryTree<T>, T>(tree);
     }
-
     // sprawdza sortowanie dla tablicy dowolnego typu T
     template <typename T>
     static bool SortedAscend(const Array<T>& array) {
@@ -65,6 +64,12 @@ public:
     static bool SortedAscend(const DoubleList<T>& list) {
         return sortedAscendImpl<DoubleList<T>, T>(list);
     }
+
+    // sprawdza sortowanie dla stosu dowolnego typu T
+    template <typename T>
+    static bool SortedAscend(const Stack<T>& stack) {
+        return sortedAscendImpl<Stack<T>, T>(stack);
+    }
 };
 
-#endif //PROJECT_SORTINGCHECK_H
+#endif // PROJECT_SORTINGCHECK_H
