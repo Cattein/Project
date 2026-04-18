@@ -23,8 +23,6 @@ add_executable(Project
         include/benchmark/RandomArrayGenerator.h
         src/benchmark/BenchmarkRunner.cpp
         src/benchmark/BenchmarkCsvWriter.cpp
-        include/structures/Stack.h
-        include/structures/BinaryTree.h
 )
 
 target_include_directories(Project PUBLIC
