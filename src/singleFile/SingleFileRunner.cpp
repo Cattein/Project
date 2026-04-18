@@ -258,7 +258,17 @@ bool SingleFileRunner::run() {
         std::cerr << "ERROR! Input file is not set.\n";
         return false;
     }
+    if (Parameters::algorithm == Parameters::Algorithms::quick &&
+        Parameters::pivot == Parameters::Pivots::undefined) {
+        std::cerr << "ERROR! pivot must be set for quick sort.\n";
+        return false;
+        }
 
+    if (Parameters::algorithm == Parameters::Algorithms::shell &&
+        Parameters::shellParameter == Parameters::ShellParameters::undefined) {
+        std::cerr << "ERROR! shellParameter must be set for shell sort.\n";
+        return false;
+        }
     // ===== array =====
 
     if (Parameters::structure == Parameters::Structures::array) {
