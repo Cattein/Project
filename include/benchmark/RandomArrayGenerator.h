@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
+#include <type_traits>
 
 #include "structures/Array.h"
 #include "structures/SingleList.h"
@@ -86,184 +87,178 @@ private:
         return randomStringValue;
     }
 
+    // zwraca losową wartość odpowiedniego typu
+    template <typename T>
+    static T randomValue() {
+        if constexpr (std::is_same_v<T, int>) {
+            return randomInt();
+        } else if constexpr (std::is_same_v<T, float>) {
+            return randomFloat();
+        } else if constexpr (std::is_same_v<T, double>) {
+            return randomDouble();
+        } else if constexpr (std::is_same_v<T, unsigned int>) {
+            return randomUnsignedInt();
+        } else {
+            return randomString();
+        }
+    }
+
+    // zwraca wartość rosnącą dla różnych typów danych
+    template <typename T>
+    static T makeAscendingValue(int index) {
+        if constexpr (std::is_same_v<T, std::string>) {
+            return "str_" + std::to_string(index);
+            // dla string tworzymy napisy str_0, str_1, str_2...
+        } else {
+            return static_cast<T>(index);
+            // dla typów liczbowych zwracamy po prostu kolejne wartości
+        }
+    }
+
+    // zwraca wartość malejącą dla różnych typów danych
+    template <typename T>
+    static T makeDescendingValue(int size, int index) {
+        if constexpr (std::is_same_v<T, std::string>) {
+            return "str_" + std::to_string(size - index);
+            // dla string tworzymy napisy malejąco według numeru
+        } else {
+            return static_cast<T>(size - index);
+            // dla typów liczbowych zwracamy wartości od większych do mniejszych
+        }
+    }
+
+    // wspólna funkcja do wypełniania struktury losowo
+    template <typename Structure, typename T>
+    static bool fillRandomImpl(Structure& structure) {
+        seedRandomOnce();
+
+        for (int i = 0; i < structure.getSize(); ++i) {
+            if (!structure.set(i, randomValue<T>())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // wspólna funkcja do wypełniania struktury rosnąco
+    template <typename Structure, typename T>
+    static bool fillAscendingImpl(Structure& structure) {
+        for (int i = 0; i < structure.getSize(); ++i) {
+            if (!structure.set(i, makeAscendingValue<T>(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // wspólna funkcja do wypełniania struktury malejąco
+    template <typename Structure, typename T>
+    static bool fillDescendingImpl(Structure& structure) {
+        const int size = structure.getSize();
+
+        for (int i = 0; i < size; ++i) {
+            if (!structure.set(i, makeDescendingValue<T>(size, i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // ustawia pierwszą połowę struktury rosnąco
+    template <typename Structure, typename T>
+    static bool makeFirstHalfAscendingImpl(Structure& structure) {
+        const int half = structure.getSize() / 2;
+        // half oznacza połowę liczby elementów
+
+        for (int i = 0; i < half; ++i) {
+            if (!structure.set(i, makeAscendingValue<T>(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // wspólna funkcja: najpierw losowo, potem pierwsza połowa rosnąco
+    template <typename Structure, typename T>
+    static bool fillAscending50PerImpl(Structure& structure) {
+        if (!fillRandomImpl<Structure, T>(structure)) {
+            return false;
+        }
+
+        return makeFirstHalfAscendingImpl<Structure, T>(structure);
+    }
+
 public:
-    // ===== fillRandom dla Array =====
+    // ===== fillRandom =====
 
-    static bool fillRandom(Array<int>& array) {
-        seedRandomOnce();
-        // Array<int>& - tablica jest przekazywana przez referencję
-        // funkcja działa na oryginalnej tablicy, a nie na kopii
-        for (int i = 0; i < array.getSize(); ++i) {
-            if (!array.set(i, randomInt())) {
-                return false;
-            }
-        }
-
-        return true;
+    template <typename T>
+    static bool fillRandom(Array<T>& array) {
+        return fillRandomImpl<Array<T>, T>(array);
     }
 
-    static bool fillRandom(Array<float>& array) {
-        seedRandomOnce();
-        for (int i = 0; i < array.getSize(); ++i) {
-            if (!array.set(i, randomFloat())) {
-                return false;
-            }
-        }
-
-        return true;
+    template <typename T>
+    static bool fillRandom(SingleList<T>& list) {
+        return fillRandomImpl<SingleList<T>, T>(list);
     }
 
-    static bool fillRandom(Array<double>& array) {
-        seedRandomOnce();
-        for (int i = 0; i < array.getSize(); ++i) {
-            if (!array.set(i, randomDouble())) {
-                return false;
-            }
-        }
-
-        return true;
+    template <typename T>
+    static bool fillRandom(DoubleList<T>& list) {
+        return fillRandomImpl<DoubleList<T>, T>(list);
     }
 
-    static bool fillRandom(Array<unsigned int>& array) {
-        seedRandomOnce();
-        for (int i = 0; i < array.getSize(); ++i) {
-            if (!array.set(i, randomUnsignedInt())) {
-                return false;
-            }
-        }
+    // ===== fillAscending =====
 
-        return true;
+    template <typename T>
+    static bool fillAscending(Array<T>& array) {
+        return fillAscendingImpl<Array<T>, T>(array);
     }
 
-    static bool fillRandom(Array<std::string>& array) {
-        seedRandomOnce();
-        for (int i = 0; i < array.getSize(); ++i) {
-            if (!array.set(i, randomString())) {
-                return false;
-            }
-        }
-
-        return true;
+    template <typename T>
+    static bool fillAscending(SingleList<T>& list) {
+        return fillAscendingImpl<SingleList<T>, T>(list);
     }
 
-    // ===== fillRandom dla SingleList =====
-
-    static bool fillRandom(SingleList<int>& list) {
-        seedRandomOnce();
-        // SingleList<int>& - lista jest przekazywana przez referencję
-        // funkcja wpisuje dane bezpośrednio do prawdziwej listy
-
-        for (int i = 0; i < list.getSize(); ++i) {
-            if (!list.set(i, randomInt())) {
-                return false;
-            }
-        }
-
-        return true;
+    template <typename T>
+    static bool fillAscending(DoubleList<T>& list) {
+        return fillAscendingImpl<DoubleList<T>, T>(list);
     }
 
-    static bool fillRandom(SingleList<float>& list) {
-        seedRandomOnce();
-        for (int i = 0; i < list.getSize(); ++i) {
-            if (!list.set(i, randomFloat())) {
-                return false;
-            }
-        }
+    // ===== fillDescending =====
 
-        return true;
+    template <typename T>
+    static bool fillDescending(Array<T>& array) {
+        return fillDescendingImpl<Array<T>, T>(array);
     }
 
-    static bool fillRandom(SingleList<double>& list) {
-        seedRandomOnce();
-        for (int i = 0; i < list.getSize(); ++i) {
-            if (!list.set(i, randomDouble())) {
-                return false;
-            }
-        }
-
-        return true;
+    template <typename T>
+    static bool fillDescending(SingleList<T>& list) {
+        return fillDescendingImpl<SingleList<T>, T>(list);
     }
 
-    static bool fillRandom(SingleList<unsigned int>& list) {
-        seedRandomOnce();
-        for (int i = 0; i < list.getSize(); ++i) {
-            if (!list.set(i, randomUnsignedInt())) {
-                return false;
-            }
-        }
-
-        return true;
+    template <typename T>
+    static bool fillDescending(DoubleList<T>& list) {
+        return fillDescendingImpl<DoubleList<T>, T>(list);
     }
 
-    static bool fillRandom(SingleList<std::string>& list) {
-        seedRandomOnce();
-        for (int i = 0; i < list.getSize(); ++i) {
-            if (!list.set(i, randomString())) {
-                return false;
-            }
-        }
+    // ===== fillAscending50Per =====
 
-        return true;
+    template <typename T>
+    static bool fillAscending50Per(Array<T>& array) {
+        return fillAscending50PerImpl<Array<T>, T>(array);
     }
 
-    // ===== fillRandom dla DoubleList =====
-
-    static bool fillRandom(DoubleList<int>& list) {
-        seedRandomOnce();
-        // DoubleList<int>& - lista dwukierunkowa jest przekazywana przez referencję
-        // funkcja zmienia prawdziwą strukturę danych
-
-        for (int i = 0; i < list.getSize(); ++i) {
-            if (!list.set(i, randomInt())) {
-                return false;
-            }
-        }
-
-        return true;
+    template <typename T>
+    static bool fillAscending50Per(SingleList<T>& list) {
+        return fillAscending50PerImpl<SingleList<T>, T>(list);
     }
 
-    static bool fillRandom(DoubleList<float>& list) {
-        seedRandomOnce();
-        for (int i = 0; i < list.getSize(); ++i) {
-            if (!list.set(i, randomFloat())) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    static bool fillRandom(DoubleList<double>& list) {
-        seedRandomOnce();
-        for (int i = 0; i < list.getSize(); ++i) {
-            if (!list.set(i, randomDouble())) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    static bool fillRandom(DoubleList<unsigned int>& list) {
-        seedRandomOnce();
-        for (int i = 0; i < list.getSize(); ++i) {
-            if (!list.set(i, randomUnsignedInt())) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    static bool fillRandom(DoubleList<std::string>& list) {
-        seedRandomOnce();
-        for (int i = 0; i < list.getSize(); ++i) {
-            if (!list.set(i, randomString())) {
-                return false;
-            }
-        }
-
-        return true;
+    template <typename T>
+    static bool fillAscending50Per(DoubleList<T>& list) {
+        return fillAscending50PerImpl<DoubleList<T>, T>(list);
     }
 
     // ===== copyArray =====
