@@ -107,7 +107,7 @@ static std::string pivotToString(Parameters::Pivots pivot) {
     if (pivot == Parameters::Pivots::middle) {
         return "middle";
     }
-    if (pivot == Parameters::Pivots::left ) {
+    if (pivot == Parameters::Pivots::left || pivot == Parameters::Pivots::right) {
         return "edge";
     }
 
