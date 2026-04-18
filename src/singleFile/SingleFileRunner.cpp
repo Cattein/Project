@@ -6,7 +6,6 @@
 
 #include <iostream>
 #include <string>
-#include <type_traits>
 
 #include "Parameters.h"
 #include "file/FileHandler.h"
@@ -21,9 +20,10 @@ static bool isShellParameterSupported() {
            Parameters::shellParameter != Parameters::ShellParameters::option4;
 }
 
-// wybiera algorytm sortowania dla tablicy
+// ===== wybór algorytmu dla tablicy =====
+
 template <typename T>
-static bool sortArray(Array<T>& array) {
+static bool sortStructure(Array<T>& array) {
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(array, Parameters::pivot);
         return true;
@@ -40,29 +40,28 @@ static bool sortArray(Array<T>& array) {
         return true;
     }
 
-    if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-        // bucket sort w tym projekcie działa na razie tylko dla int
-        if constexpr (std::is_same_v<T, int>) {
-            if (!BucketSort::sort(array)) {
-                std::cerr << "ERROR! Bucket sort failed.\n";
-                return false;
-            }
-
-            return true;
-        } else {
-            std::cerr << "ERROR! Bucket sort is supported only for int type.\n";
-            return false;
-        }
-    }
-
     // jeśli wybrany algorytm nie jest jeszcze gotowy, kończymy z błędem
-    std::cerr << "ERROR! Selected algorithm is not implemented.\n";
+    std::cerr << "ERROR! Selected algorithm is not implemented for this data type.\n";
     return false;
 }
 
-// wybiera algorytm sortowania dla listy jednokierunkowej
+static bool sortStructure(Array<int>& array) {
+    if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+        if (!BucketSort::sort(array)) {
+            std::cerr << "ERROR! Bucket sort failed.\n";
+            return false;
+        }
+
+        return true;
+    }
+
+    return sortStructure<int>(array);
+}
+
+// ===== wybór algorytmu dla listy jednokierunkowej =====
+
 template <typename T>
-static bool sortSingleList(SingleList<T>& list) {
+static bool sortStructure(SingleList<T>& list) {
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(list, Parameters::pivot);
         return true;
@@ -77,31 +76,30 @@ static bool sortSingleList(SingleList<T>& list) {
 
         ShellSort::sort(list, Parameters::shellParameter);
         return true;
-    }
-
-    if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-        // bucket sort w tym projekcie działa na razie tylko dla int
-        if constexpr (std::is_same_v<T, int>) {
-            if (!BucketSort::sort(list)) {
-                std::cerr << "ERROR! Bucket sort failed.\n";
-                return false;
-            }
-
-            return true;
-        } else {
-            std::cerr << "ERROR! Bucket sort is supported only for int type.\n";
-            return false;
-        }
     }
 
     // pozostałe algorytmy nie są jeszcze gotowe dla singlelist
-    std::cerr << "ERROR! This algorithm is not implemented for SingleList yet.\n";
+    std::cerr << "ERROR! Selected algorithm is not implemented for this data type.\n";
     return false;
 }
 
-// wybiera algorytm sortowania dla listy dwukierunkowej
+static bool sortStructure(SingleList<int>& list) {
+    if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+        if (!BucketSort::sort(list)) {
+            std::cerr << "ERROR! Bucket sort failed.\n";
+            return false;
+        }
+
+        return true;
+    }
+
+    return sortStructure<int>(list);
+}
+
+// ===== wybór algorytmu dla listy dwukierunkowej =====
+
 template <typename T>
-static bool sortDoubleList(DoubleList<T>& list) {
+static bool sortStructure(DoubleList<T>& list) {
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(list, Parameters::pivot);
         return true;
@@ -118,27 +116,26 @@ static bool sortDoubleList(DoubleList<T>& list) {
         return true;
     }
 
-    if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-        // bucket sort w tym projekcie działa na razie tylko dla int
-        if constexpr (std::is_same_v<T, int>) {
-            if (!BucketSort::sort(list)) {
-                std::cerr << "ERROR! Bucket sort failed.\n";
-                return false;
-            }
-
-            return true;
-        } else {
-            std::cerr << "ERROR! Bucket sort is supported only for int type.\n";
-            return false;
-        }
-    }
-
     // pozostałe algorytmy nie są jeszcze gotowe dla doublelist
-    std::cerr << "ERROR! This algorithm is not implemented for DoubleList yet.\n";
+    std::cerr << "ERROR! Selected algorithm is not implemented for this data type.\n";
     return false;
 }
 
-// obsługuje cały tryb single file dla tablicy
+static bool sortStructure(DoubleList<int>& list) {
+    if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+        if (!BucketSort::sort(list)) {
+            std::cerr << "ERROR! Bucket sort failed.\n";
+            return false;
+        }
+
+        return true;
+    }
+
+    return sortStructure<int>(list);
+}
+
+// ===== obsługa trybu single file dla tablicy =====
+
 template <typename T>
 static bool runArray() {
     Array<T>* array = FileHandler::loadArrayFromFile<T>(Parameters::inputFile);
@@ -150,7 +147,7 @@ static bool runArray() {
     }
 
     // uruchamiamy wybrane sortowanie
-    if (!sortArray(*array)) {
+    if (!sortStructure(*array)) {
         delete array;
         return false;
     }
@@ -176,7 +173,8 @@ static bool runArray() {
     return true;
 }
 
-// obsługuje cały tryb single file dla listy jednokierunkowej
+// ===== obsługa trybu single file dla listy jednokierunkowej =====
+
 template <typename T>
 static bool runSingleList() {
     SingleList<T>* list = FileHandler::loadSingleListFromFile<T>(Parameters::inputFile);
@@ -188,7 +186,7 @@ static bool runSingleList() {
     }
 
     // uruchamiamy wybrane sortowanie
-    if (!sortSingleList(*list)) {
+    if (!sortStructure(*list)) {
         delete list;
         return false;
     }
@@ -214,7 +212,8 @@ static bool runSingleList() {
     return true;
 }
 
-// obsługuje cały tryb single file dla listy dwukierunkowej
+// ===== obsługa trybu single file dla listy dwukierunkowej =====
+
 template <typename T>
 static bool runDoubleList() {
     DoubleList<T>* list = FileHandler::loadDoubleListFromFile<T>(Parameters::inputFile);
@@ -226,7 +225,7 @@ static bool runDoubleList() {
     }
 
     // uruchamiamy wybrane sortowanie
-    if (!sortDoubleList(*list)) {
+    if (!sortStructure(*list)) {
         delete list;
         return false;
     }
@@ -256,6 +255,18 @@ bool SingleFileRunner::run() {
     // bez pliku wejściowego nie mamy czego wczytać
     if (Parameters::inputFile.empty()) {
         std::cerr << "ERROR! Input file is not set.\n";
+        return false;
+    }
+
+    if (Parameters::algorithm == Parameters::Algorithms::quick &&
+        Parameters::pivot == Parameters::Pivots::undefined) {
+        std::cerr << "ERROR! pivot must be set for quick sort.\n";
+        return false;
+    }
+
+    if (Parameters::algorithm == Parameters::Algorithms::shell &&
+        Parameters::shellParameter == Parameters::ShellParameters::undefined) {
+        std::cerr << "ERROR! shellParameter must be set for shell sort.\n";
         return false;
     }
 
