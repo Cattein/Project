@@ -1,7 +1,3 @@
-//
-// Created by MashaGuzhva on 12/04/2026.
-//
-
 #ifndef PROJECT_RANDOMARRAYGENERATOR_H
 #define PROJECT_RANDOMARRAYGENERATOR_H
 
@@ -261,7 +257,9 @@ private:
             }
         }
 
-        return true;
+    template <typename T>
+    static bool fillAscending(DoubleList<T>& list) {
+        return fillAscendingImpl<DoubleList<T>, T>(list);
     }
 
     // wspólna funkcja do wypełniania struktury malejąco
@@ -275,7 +273,9 @@ private:
             }
         }
 
-        return true;
+    template <typename T>
+    static bool fillDescending(SingleList<T>& list) {
+        return fillDescendingImpl<SingleList<T>, T>(list);
     }
 
     // ustawia pierwszą połowę struktury rosnąco
@@ -290,7 +290,9 @@ private:
             }
         }
 
-        return true;
+    template <typename T>
+    static bool fillAscending50Per(Array<T>& array) {
+        return fillAscending50PerImpl<Array<T>, T>(array);
     }
 
     // wspólna funkcja: najpierw losowo, potem pierwsza połowa rosnąco

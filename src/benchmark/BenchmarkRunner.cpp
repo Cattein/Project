@@ -21,7 +21,68 @@
 #include "benchmark/RandomArrayGenerator.h"
 
 namespace {
+    template <typename T>
+    bool fillArrayByDistribution(Array<T>& source) {
+        if (Parameters::distribution == Parameters::Distribution::random) {
+            return RandomArrayGenerator::fillRandom(source);
+        }
 
+        if (Parameters::distribution == Parameters::Distribution::ascending) {
+            return RandomArrayGenerator::fillAscending(source);
+        }
+
+        if (Parameters::distribution == Parameters::Distribution::ascending50Per) {
+            return RandomArrayGenerator::fillAscending50Per(source);
+        }
+
+        if (Parameters::distribution == Parameters::Distribution::descending) {
+            return RandomArrayGenerator::fillDescending(source);
+        }
+
+        return false;
+    }
+
+    template <typename T>
+    bool fillSingleListByDistribution(SingleList<T>& source) {
+        if (Parameters::distribution == Parameters::Distribution::random) {
+            return RandomArrayGenerator::fillRandom(source);
+        }
+
+        if (Parameters::distribution == Parameters::Distribution::ascending) {
+            return RandomArrayGenerator::fillAscending(source);
+        }
+
+        if (Parameters::distribution == Parameters::Distribution::ascending50Per) {
+            return RandomArrayGenerator::fillAscending50Per(source);
+        }
+
+        if (Parameters::distribution == Parameters::Distribution::descending) {
+            return RandomArrayGenerator::fillDescending(source);
+        }
+
+        return false;
+    }
+
+    template <typename T>
+    bool fillDoubleListByDistribution(DoubleList<T>& source) {
+        if (Parameters::distribution == Parameters::Distribution::random) {
+            return RandomArrayGenerator::fillRandom(source);
+        }
+
+        if (Parameters::distribution == Parameters::Distribution::ascending) {
+            return RandomArrayGenerator::fillAscending(source);
+        }
+
+        if (Parameters::distribution == Parameters::Distribution::ascending50Per) {
+            return RandomArrayGenerator::fillAscending50Per(source);
+        }
+
+        if (Parameters::distribution == Parameters::Distribution::descending) {
+            return RandomArrayGenerator::fillDescending(source);
+        }
+
+        return false;
+    }
     // sprawdza, czy wybrany wariant shellsorta jest obsługiwany
     bool isShellParameterSupported() {
         return Parameters::shellParameter != Parameters::ShellParameters::option3 &&
@@ -449,6 +510,22 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
         std::cerr << "ERROR! structureSize must be greater than 0.\n";
         return false;
     }
+    if (Parameters::distribution == Parameters::Distribution::undefined) {
+        std::cerr << "ERROR! distribution must be set in benchmark mode.\n";
+        return false;
+    }
+
+    if (Parameters::algorithm == Parameters::Algorithms::quick &&
+        Parameters::pivot == Parameters::Pivots::undefined) {
+        std::cerr << "ERROR! pivot must be set for quick sort.\n";
+        return false;
+        }
+
+    if (Parameters::algorithm == Parameters::Algorithms::shell &&
+        Parameters::shellParameter == Parameters::ShellParameters::undefined) {
+        std::cerr << "ERROR! shellParameter must be set for shell sort.\n";
+        return false;
+        }
 
     if (Parameters::distribution == Parameters::Distribution::undefined) {
         std::cerr << "ERROR! distribution must be set in benchmark mode.\n";

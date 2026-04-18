@@ -111,6 +111,11 @@ static std::string pivotToString(Parameters::Pivots pivot) {
         return "edge";
     }
 
+    if (pivot == Parameters::Pivots::right) {
+        return "right";
+    }
+
+
     // jeśli pivot nie został poprawnie ustawiony
     return "undefined";
 }
