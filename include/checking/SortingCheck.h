@@ -15,8 +15,8 @@ private:
     // Structure będzie tutaj zastąpione prawdziwym typem, np Array<int> albo SingleList<double>
     template <typename Structure, typename T>
     static bool sortedAscendImpl(const Structure& structure) {
-        // const Structure& oznacza, że struktura jest przekazywana bez kopiowania
-        // const oznacza, że funkcja tylko sprawdza dane i nie może ich zmieniać
+        // const Structure& - struktura jest przekazywana bez kopiowania
+        // const - funkcja tylko sprawdza dane i nie może ich zmieniać
 
         // zaczynamy od drugiego elementu
         // wtedy możemy porównać go z poprzednim
