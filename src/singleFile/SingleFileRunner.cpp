@@ -282,7 +282,7 @@ bool SingleFileRunner::run() {
             return runArray<std::string>();
         }
 
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedInt) {
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
             return runArray<unsigned int>();
         }
 
@@ -321,7 +321,7 @@ bool SingleFileRunner::run() {
             return runSingleList<std::string>();
         }
 
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedInt) {
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
             return runSingleList<unsigned int>();
         }
 
@@ -360,7 +360,7 @@ bool SingleFileRunner::run() {
             return runDoubleList<std::string>();
         }
 
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedInt) {
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
             return runDoubleList<unsigned int>();
         }
 

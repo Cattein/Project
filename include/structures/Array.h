@@ -20,20 +20,21 @@ private:
 
 public:
     // konstruktor tworzy tablicę o zadanym rozmiarze
-    explicit Array(int s) {
-        size = s;
-        // explicit chroni przed przypadkową zamianą liczby na obiekt Array
+    explicit Array(int s)  {
+        data = nullptr;     // data - nullptr - tablica jeszcze nie wskazuje na żadne dane
+        size =0;    //bo  tablica jest pusta
 
-        // jeśli rozmiar jest większy od zera, tworzymy tablicę dynamiczną
-        if (size > 0) {
-            data = new (std::nothrow) T[size];
-            // new (std::nothrow) - przy braku pamięci dostaniemy nullptr zamiast wyjątku
-            // T[size] oznacza utworzenie tablicy z size elementami typu T
+        // jeśli rozmiar jest 0 albo < - nie tworzymy tablicy
+        if (s <= 0) {
+            return;
         }
-        else {
-            data = nullptr;
-            // nullptr oznacza pusty wskaźnik, czyli brak zaalokowanej tablicy
-        }
+        // tworzymy dynamiczną tablicę z s elementami typu T
+        // std::nothrow - przy braku pamięci dostaniemy nullptr zamiast wyjątku
+
+        data = new (std::nothrow) T[s];
+        if (data != nullptr) {
+            size = s;
+        }        // jeśli pamięć została poprawnie przydzielona - zapisujemy prawdziwy rozmiar tablicy
     }
 
     // destruktor zwalnia pamięć zajętą przez tablicę

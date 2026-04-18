@@ -1,109 +1,121 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#define LIB_VERSION "v.1.1"
+#define LIB_VERSION "v.1.2"
 
 #include <string>
 
 namespace Parameters
 {
-    enum class RunModes {
-        undefined = -1,
-        singleFile = 0,
-        benchmark,
-        help
-      };
+  enum class RunModes {
+    undefined = -1,
+    singleFile = 0,
+    benchmark,
+    help
+  };
 
-    enum class Algorithms {
-        undefined = -1,
-        bubble = 0,
-        cocktail,
-        merge,
-        insertion,
-        bucket,
-        quick,
-        shell,
+  enum class Algorithms {
+    undefined = -1,
+    bubble = 0,
+    cocktail,
+    merge,
+    insertion,
+    bucket,
+    quick,
+    shell,
 
-        count
-      };
+    count
+  };
 
-    enum class Structures {
-        undefined = -1,
-        array = 0,
-        singleList,
-        doubleList,
-        queue,
-        stack,
-        binaryTree,
+  enum class Structures {
+    undefined = -1,
+    array = 0,
+    singleList,
+    doubleList,
+    queue,
+    stack,
+    binaryTree,
 
-        count
-      };
+    count
+  };
 
-    enum class DataTypes {
-        undefined = -1,
-        typeInt = 0,
-        typeFloat,
-        typeDouble,
-        typeChar,
-        typeString,
-        typeUnsignedInt,
-        typeUnsignedLong,
-        typeUnsignedChar,
+  enum class DataTypes {
+    undefined = -1,
+    typeInt = 0,
+    typeFloat,
+    typeDouble,
+    typeChar,
+    typeString,
+    tyleUnsignedInt,
+    typeUnsignedLong,
+    typeUnsignedChar,
 
-        count
-      };
+    count
+  };
 
-    enum class Pivots {
-        undefined = -1,
-        random = 0,
-        left,
-        right,
-        middle,
+  enum class Distribution {
+    undefined = -1,
+    random = 0,
+    ascending,
+    ascending50Per,
+    descending,
 
-        count
-      };
+    count
+  };
 
-    enum class ShellParameters {
-        undefined = -1,
-        option1 = 0,
-        option2,
-        option3,
-        option4,
+  enum class Pivots {
+    undefined = -1,
+    random = 0,
+    left,
+    right,
+    middle,
 
-        count
-      };
+    count
+  };
 
-    //
-    // Parameters to use.
-    //
+  enum class ShellParameters {
+    undefined = -1,
+    option1 = 0,
+    option2,
+    option3,
+    option4,
 
-    extern RunModes runMode;
-    extern Algorithms algorithm;
-    extern Structures structure;
-    extern DataTypes dataType;
+    count
+  };
 
-    extern std::string inputFile;
-    extern std::string outputFile;
-    extern std::string resultsFile;
+  //
+  // Parameters to use.
+  //
 
-    extern int structureSize;
-    extern int iterations;
+  extern RunModes runMode;
+  extern Algorithms algorithm;
+  extern Structures structure;
+  extern DataTypes dataType;
 
-    extern Pivots pivot;
-    extern ShellParameters shellParameter;
+  extern std::string inputFile;
+  extern std::string outputFile;
+  extern std::string resultsFile;
 
-    //
-    // Methods to use.
-    //
+  extern Distribution distribution;
 
-    int readParameters(int argc, char **argv);
-    void printParameters();
+  extern int structureSize;
+  extern int iterations;
 
-    void enableDebug();
-    void disableDebug();
+  extern Pivots pivot;
+  extern ShellParameters shellParameter;
 
-    void help();
-    const char *getVersion();
+  //
+  // Methods to use.
+  //
+
+  int readParameters(int argc, char **argv);
+  void printParameters();
+
+  void enableDebug();
+  void disableDebug();
+
+  void help();
+  const char *getVersion();
 };
 
 #endif

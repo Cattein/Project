@@ -397,7 +397,7 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
             return runArrayBenchmark<std::string>(stats);
         }
 
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedInt) {
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
             return runArrayBenchmark<unsigned int>(stats);
         }
 
@@ -424,7 +424,7 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
             return runSingleListBenchmark<std::string>(stats);
         }
 
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedInt) {
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
             return runSingleListBenchmark<unsigned int>(stats);
         }
 
@@ -451,7 +451,7 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
             return runDoubleListBenchmark<std::string>(stats);
         }
 
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedInt) {
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
             return runDoubleListBenchmark<unsigned int>(stats);
         }
 

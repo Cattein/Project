@@ -11,6 +11,22 @@
 
 #include "Parameters.h"
 
+static std::string distributionToString(Parameters::Distribution distribution) {
+    if (distribution == Parameters::Distribution::random) {
+        return "random";
+    }
+    if (distribution == Parameters::Distribution::ascending) {
+        return "ascending";
+    }
+    if (distribution == Parameters::Distribution::ascending50Per) {
+        return "ascending50Per";
+    }
+    if (distribution == Parameters::Distribution::descending) {
+        return "descending";
+    }
+
+    return "undefined";
+}
 // zamienia enum algorytmu na tekst do pliku csv
 static std::string algorithmToString(Parameters::Algorithms algorithm) {
     if (algorithm == Parameters::Algorithms::quick) {
@@ -69,7 +85,7 @@ static std::string dataTypeToString(Parameters::DataTypes dataType) {
     if (dataType == Parameters::DataTypes::typeString) {
         return "string";
     }
-    if (dataType == Parameters::DataTypes::typeUnsignedInt) {
+    if (dataType == Parameters::DataTypes::tyleUnsignedInt) {
         return "unsignedInt";
     }
     if (dataType == Parameters::DataTypes::typeUnsignedLong) {
@@ -91,7 +107,7 @@ static std::string pivotToString(Parameters::Pivots pivot) {
     if (pivot == Parameters::Pivots::middle) {
         return "middle";
     }
-    if (pivot == Parameters::Pivots::left || pivot == Parameters::Pivots::right) {
+    if (pivot == Parameters::Pivots::left ) {
         return "edge";
     }
 
@@ -140,9 +156,8 @@ bool BenchmarkCsvWriter::appendResult(const std::string& filename, const Benchma
     // jeśli nie udało się otworzyć pliku, kończymy błędem
 
     if (writeHeader) {
-        file << "timestamp,algorithm,structure,dataType,size,iterations,pivot,shellParameter,min_us,max_us,avg_us\n";
-    }
-    // zapisujemy nazwy kolumn tylko przy pierwszym zapisie do pliku
+        file << "timestamp,algorithm,structure,dataType,distribution,size,iterations,pivot,shellParameter,min_us,max_us,avg_us\n";    }
+    // nazwy kolumn tylko przy pierwszym zapisie do pliku
 
     const auto now = std::chrono::system_clock::now();
     // pobieramy aktualny czas systemowy
@@ -154,6 +169,7 @@ bool BenchmarkCsvWriter::appendResult(const std::string& filename, const Benchma
          << algorithmToString(Parameters::algorithm) << ","
          << structureToString(Parameters::structure) << ","
          << dataTypeToString(Parameters::dataType) << ","
+         << distributionToString(Parameters::distribution) << ","
          << Parameters::structureSize << ","
          << Parameters::iterations << ","
          << pivotToString(Parameters::pivot) << ","
