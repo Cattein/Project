@@ -13,6 +13,7 @@
 #include "structures/SingleList.h"
 #include "structures/DoubleList.h"
 #include "structures/Stack.h"
+#include "structures/BinaryTree.h"
 
 // przestrzeń nazw z funkcjami do odczytu i zapisu struktur w pliku
 namespace FileHandler {
@@ -117,7 +118,78 @@ namespace FileHandler {
 
         return true;
     }
+    // ===== binary tree =====
+    // zapisuje drzewo binarne do pliku
+    template <typename T>
+    bool saveBinaryTreeToFile(const BinaryTree<T>& tree, const std::string& filename) {
+        // const BinaryTree<T>& - drzewo jest przekazywane przez referencję
+        // const - funkcja nie może go zmieniać
 
+        std::ofstream file(filename);
+        // otwieramy plik do zapisu
+
+        if (!file) {
+            return false;
+        }
+
+        file << tree.getSize() << '\n';
+        // zapis liczby elementów drzewa
+
+        // zapisujemy elementy poziomami według indeksów
+        for (int i = 0; i < tree.getSize(); ++i) {
+            T value{};
+
+            if (!tree.get(i, value)) {
+                return false;
+            }
+
+            file << value << '\n';
+        }
+
+        return true;
+    }
+    // wczytuje drzewo binarne z pliku i zwraca wskaźnik na utworzony obiekt
+    template <typename T>
+    BinaryTree<T>* loadBinaryTreeFromFile(const std::string& filename) {
+        std::ifstream file(filename);
+        // otwieramy plik do odczytu
+
+        if (!file) {
+            return nullptr;
+        }
+
+        int size = 0;
+        file >> size;
+        // odczytujemy liczbę elementów drzewa
+
+        if (!file || size < 0) {
+            return nullptr;
+        }
+
+        BinaryTree<T>* tree = new (std::nothrow) BinaryTree<T>();
+        // tworzymy nowe puste drzewo
+
+        if (tree == nullptr) {
+            return nullptr;
+        }
+
+        // wczytujemy kolejne wartości i dodajemy je poziomami
+        for (int i = 0; i < size; ++i) {
+            T value{};
+
+            if (!readValue(file, value)) {
+                delete tree;
+                return nullptr;
+            }
+
+            if (!tree->pushBack(value)) {
+                delete tree;
+                return nullptr;
+            }
+        }
+
+        return tree;
+    }
     // ===== array =====
 
     // wczytuje tablicę z pliku, zwraca wskaźnik na utworzony obiekt
