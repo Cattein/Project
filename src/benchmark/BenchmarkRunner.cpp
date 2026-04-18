@@ -7,88 +7,23 @@
 #include <iostream>
 #include <chrono>
 #include <string>
-#include <type_traits>
 
 #include "Parameters.h"
 #include "structures/Array.h"
 #include "structures/SingleList.h"
 #include "structures/DoubleList.h"
+#include "structures/Stack.h"
 #include "algorytmsSorting/QuickSort.h"
 #include "algorytmsSorting/ShellSort.h"
 #include "algorytmsSorting/BucketSort.h"
 #include "checking/SortingCheck.h"
 #include "benchmark/RandomArrayGenerator.h"
-#include "structures/Stack.h"
 
 namespace {
-    template <typename T>
-bool fillArrayByDistribution(Array<T>& source) {
-    if (Parameters::distribution == Parameters::Distribution::random) {
-        return RandomArrayGenerator::fillRandom(source);
-    }
 
-    if (Parameters::distribution == Parameters::Distribution::ascending) {
-        return RandomArrayGenerator::fillAscending(source);
-    }
-
-    if (Parameters::distribution == Parameters::Distribution::ascending50Per) {
-        return RandomArrayGenerator::fillAscending50Per(source);
-    }
-
-    if (Parameters::distribution == Parameters::Distribution::descending) {
-        return RandomArrayGenerator::fillDescending(source);
-    }
-
-    return false;
-}
-
-template <typename T>
-
-bool fillSingleListByDistribution(SingleList<T>& source) {
-    if (Parameters::distribution == Parameters::Distribution::random) {
-        return RandomArrayGenerator::fillRandom(source);
-    }
-
-    if (Parameters::distribution == Parameters::Distribution::ascending) {
-        return RandomArrayGenerator::fillAscending(source);
-    }
-
-    if (Parameters::distribution == Parameters::Distribution::ascending50Per) {
-        return RandomArrayGenerator::fillAscending50Per(source);
-    }
-
-    if (Parameters::distribution == Parameters::Distribution::descending) {
-        return RandomArrayGenerator::fillDescending(source);
-    }
-
-    return false;
-}
-
-template <typename T>
-bool fillDoubleListByDistribution(DoubleList<T>& source) {
-    if (Parameters::distribution == Parameters::Distribution::random) {
-        return RandomArrayGenerator::fillRandom(source);
-    }
-
-    if (Parameters::distribution == Parameters::Distribution::ascending) {
-        return RandomArrayGenerator::fillAscending(source);
-    }
-
-    if (Parameters::distribution == Parameters::Distribution::ascending50Per) {
-        return RandomArrayGenerator::fillAscending50Per(source);
-    }
-
-    if (Parameters::distribution == Parameters::Distribution::descending) {
-        return RandomArrayGenerator::fillDescending(source);
-    }
-
-    return false;
-}
-
-    template <typename T>
-    bool fillStackByDistribution(Stack<T>& source) {
-        // wybieramy sposób wypełnienia stosu zależnie od parametru distribution
-
+    // wspólna funkcja wypełniania struktury zgodnie z wybranym rozkładem
+    template <typename Structure>
+    bool fillByDistribution(Structure& source) {
         if (Parameters::distribution == Parameters::Distribution::random) {
             return RandomArrayGenerator::fillRandom(source);
         }
@@ -107,6 +42,7 @@ bool fillDoubleListByDistribution(DoubleList<T>& source) {
 
         return false;
     }
+
     // sprawdza, czy wybrany wariant shellsorta jest obsługiwany
     bool isShellParameterSupported() {
         return Parameters::shellParameter != Parameters::ShellParameters::option3 &&
@@ -116,10 +52,7 @@ bool fillDoubleListByDistribution(DoubleList<T>& source) {
     // ===== wybór algorytmu dla tablicy =====
 
     template <typename T>
-    bool sortArray(Array<T>& array) {
-        // template <typename T> oznacza, że funkcja działa
-        // dla różnych typów danych, np. int, double albo std::string
-
+    bool sortStructure(Array<T>& array) {
         if (Parameters::algorithm == Parameters::Algorithms::quick) {
             QuickSort::sort(array, Parameters::pivot);
             return true;
@@ -135,29 +68,27 @@ bool fillDoubleListByDistribution(DoubleList<T>& source) {
             return true;
         }
 
-        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-            // bucket sort jest przygotowany tylko dla typu int
-            if constexpr (std::is_same_v<T, int>) {
-                if (!BucketSort::sort(array)) {
-                    std::cerr << "ERROR! Bucket sort failed.\n";
-                    return false;
-                }
+        std::cerr << "ERROR! Selected algorithm is not implemented for this data type.\n";
+        return false;
+    }
 
-                return true;
-            } else {
-                std::cerr << "ERROR! Bucket sort is supported only for int type.\n";
+    bool sortStructure(Array<int>& array) {
+        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+            if (!BucketSort::sort(array)) {
+                std::cerr << "ERROR! Bucket sort failed.\n";
                 return false;
             }
+
+            return true;
         }
 
-        std::cerr << "ERROR! Selected algorithm is not implemented.\n";
-        return false;
+        return sortStructure<int>(array);
     }
 
     // ===== wybór algorytmu dla listy jednokierunkowej =====
 
     template <typename T>
-    bool sortSingleList(SingleList<T>& list) {
+    bool sortStructure(SingleList<T>& list) {
         if (Parameters::algorithm == Parameters::Algorithms::quick) {
             QuickSort::sort(list, Parameters::pivot);
             return true;
@@ -173,29 +104,27 @@ bool fillDoubleListByDistribution(DoubleList<T>& source) {
             return true;
         }
 
-        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-            // bucket sort jest przygotowany tylko dla typu int
-            if constexpr (std::is_same_v<T, int>) {
-                if (!BucketSort::sort(list)) {
-                    std::cerr << "ERROR! Bucket sort failed.\n";
-                    return false;
-                }
+        std::cerr << "ERROR! Selected algorithm is not implemented for this data type.\n";
+        return false;
+    }
 
-                return true;
-            } else {
-                std::cerr << "ERROR! Bucket sort is supported only for int type.\n";
+    bool sortStructure(SingleList<int>& list) {
+        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+            if (!BucketSort::sort(list)) {
+                std::cerr << "ERROR! Bucket sort failed.\n";
                 return false;
             }
+
+            return true;
         }
 
-        std::cerr << "ERROR! This algorithm is not implemented for SingleList yet.\n";
-        return false;
+        return sortStructure<int>(list);
     }
 
     // ===== wybór algorytmu dla listy dwukierunkowej =====
 
     template <typename T>
-    bool sortDoubleList(DoubleList<T>& list) {
+    bool sortStructure(DoubleList<T>& list) {
         if (Parameters::algorithm == Parameters::Algorithms::quick) {
             QuickSort::sort(list, Parameters::pivot);
             return true;
@@ -211,38 +140,62 @@ bool fillDoubleListByDistribution(DoubleList<T>& source) {
             return true;
         }
 
-        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-            // bucket sort jest przygotowany tylko dla typu int
-            if constexpr (std::is_same_v<T, int>) {
-                if (!BucketSort::sort(list)) {
-                    std::cerr << "ERROR! Bucket sort failed.\n";
-                    return false;
-                }
-
-                return true;
-            } else {
-                std::cerr << "ERROR! Bucket sort is supported only for int type.\n";
-                return false;
-            }
-        }
-
-        std::cerr << "ERROR! This algorithm is not implemented for DoubleList yet.\n";
+        std::cerr << "ERROR! Selected algorithm is not implemented for this data type.\n";
         return false;
     }
 
-    // ===== benchmark dla tablicy =====
+    bool sortStructure(DoubleList<int>& list) {
+        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+            if (!BucketSort::sort(list)) {
+                std::cerr << "ERROR! Bucket sort failed.\n";
+                return false;
+            }
+
+            return true;
+        }
+
+        return sortStructure<int>(list);
+    }
+
+    // ===== wybór algorytmu dla stosu =====
 
     template <typename T>
-    bool runArrayBenchmark(BenchmarkStats& stats) {
-        Array<T> source(Parameters::structureSize);
-        // tworzymy strukturę źródłową o zadanym rozmiarze
-
-        if (!fillArrayByDistribution(source)) {
-            std::cerr << "ERROR! Failed to generate source data.\n";
-            return false;
+    bool sortStructure(Stack<T>& stack) {
+        if (Parameters::algorithm == Parameters::Algorithms::quick) {
+            QuickSort::sort(stack, Parameters::pivot);
+            return true;
         }
-        // generujemy dane tylko raz, żeby każda iteracja startowała z tego samego układu
 
+        std::cerr << "ERROR! This algorithm is not implemented for Stack yet.\n";
+        return false;
+    }
+
+    // ===== kopiowanie struktur =====
+
+    template <typename T>
+    Array<T>* copyStructure(const Array<T>& source) {
+        return RandomArrayGenerator::copyArray(source);
+    }
+
+    template <typename T>
+    SingleList<T>* copyStructure(const SingleList<T>& source) {
+        return RandomArrayGenerator::copySingleList(source);
+    }
+
+    template <typename T>
+    DoubleList<T>* copyStructure(const DoubleList<T>& source) {
+        return RandomArrayGenerator::copyDoubleList(source);
+    }
+
+    template <typename T>
+    Stack<T>* copyStructure(const Stack<T>& source) {
+        return RandomArrayGenerator::copyStack(source);
+    }
+
+    // ===== wspólna pętla benchmarku =====
+
+    template <typename Structure>
+    bool benchmarkLoop(const Structure& source, BenchmarkStats& stats, const char* structureName) {
         auto minTime = std::chrono::microseconds::max();
         auto maxTime = std::chrono::microseconds::zero();
         auto sumTime = std::chrono::microseconds::zero();
@@ -251,29 +204,29 @@ bool fillDoubleListByDistribution(DoubleList<T>& source) {
         // sumTime - suma czasów potrzebna do wyliczenia średniej
 
         for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
-            Array<T>* testArray = RandomArrayGenerator::copyArray(source);
+            Structure* testStructure = copyStructure(source);
             // każda iteracja sortuje kopię danych źródłowych,
             // dzięki temu wszystkie pomiary są porównywalne
 
-            if (testArray == nullptr) {
-                std::cerr << "ERROR! Failed to copy source array.\n";
+            if (testStructure == nullptr) {
+                std::cerr << "ERROR! Failed to copy source " << structureName << ".\n";
                 return false;
             }
 
             auto start = std::chrono::steady_clock::now();
             // początek pomiaru - od tego miejsca liczymy tylko czas sortowania
 
-            if (!sortArray(*testArray)) {
-                delete testArray;
+            if (!sortStructure(*testStructure)) {
+                delete testStructure;
                 return false;
             }
 
             auto end = std::chrono::steady_clock::now();
             // koniec pomiaru
 
-            if (!SortingCheck::SortedAscend(*testArray)) {
-                std::cerr << "ERROR! Array is not sorted correctly.\n";
-                delete testArray;
+            if (!SortingCheck::SortedAscend(*testStructure)) {
+                std::cerr << "ERROR! " << structureName << " is not sorted correctly.\n";
+                delete testStructure;
                 return false;
             }
             // po każdym sortowaniu sprawdzamy poprawność wyniku
@@ -293,7 +246,7 @@ bool fillDoubleListByDistribution(DoubleList<T>& source) {
 
             std::cout << "iteration " << (iteration + 1) << " [us] = " << elapsed.count() << "\n";
 
-            delete testArray;
+            delete testStructure;
         }
 
         stats.minTimeFinal = minTime.count();
@@ -303,6 +256,26 @@ bool fillDoubleListByDistribution(DoubleList<T>& source) {
         // liczymy średnią jako double, żeby nie stracić części ułamkowej
 
         return true;
+    }
+
+    // ===== benchmark dla tablicy =====
+
+    template <typename T>
+    bool runArrayBenchmark(BenchmarkStats& stats) {
+        Array<T> source(Parameters::structureSize);
+        // tworzymy strukturę źródłową o zadanym rozmiarze
+
+        if (source.getSize() != Parameters::structureSize) {
+            std::cerr << "ERROR! Failed to allocate source array.\n";
+            return false;
+        }
+
+        if (!fillByDistribution(source)) {
+            std::cerr << "ERROR! Failed to generate source data.\n";
+            return false;
+        }
+
+        return benchmarkLoop(source, stats, "Array");
     }
 
     // ===== benchmark dla listy jednokierunkowej =====
@@ -319,62 +292,14 @@ bool fillDoubleListByDistribution(DoubleList<T>& source) {
             }
         }
         // najpierw budujemy strukturę o odpowiednim rozmiarze,
-        // a dopiero potem wpisujemy do niej dane losowe
-        if (!fillSingleListByDistribution(source)) {
+        // a dopiero potem wpisujemy do niej dane zgodne z wybranym rozkładem
+
+        if (!fillByDistribution(source)) {
             std::cerr << "ERROR! Failed to generate source data.\n";
             return false;
         }
 
-        auto minTime = std::chrono::microseconds::max();
-        auto maxTime = std::chrono::microseconds::zero();
-        auto sumTime = std::chrono::microseconds::zero();
-
-        for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
-            SingleList<T>* testList = RandomArrayGenerator::copySingleList(source);
-
-            if (testList == nullptr) {
-                std::cerr << "ERROR! Failed to copy source single list.\n";
-                return false;
-            }
-
-            auto start = std::chrono::steady_clock::now();
-
-            if (!sortSingleList(*testList)) {
-                delete testList;
-                return false;
-            }
-
-            auto end = std::chrono::steady_clock::now();
-
-            if (!SortingCheck::SortedAscend(*testList)) {
-                std::cerr << "ERROR! SingleList is not sorted correctly.\n";
-                delete testList;
-                return false;
-            }
-
-            auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-
-            if (elapsed < minTime) {
-                minTime = elapsed;
-            }
-
-            if (elapsed > maxTime) {
-                maxTime = elapsed;
-            }
-
-            sumTime += elapsed;
-
-            std::cout << "iteration " << (iteration + 1) << " [us] = " << elapsed.count() << "\n";
-
-            delete testList;
-        }
-
-        stats.minTimeFinal = minTime.count();
-        stats.maxTimeFinal = maxTime.count();
-        stats.averageTimeFinal =
-            static_cast<double>(sumTime.count()) / static_cast<double>(Parameters::iterations);
-
-        return true;
+        return benchmarkLoop(source, stats, "SingleList");
     }
 
     // ===== benchmark dla listy dwukierunkowej =====
@@ -391,61 +316,34 @@ bool fillDoubleListByDistribution(DoubleList<T>& source) {
             }
         }
 
-        if (!fillDoubleListByDistribution(source)) {
+        if (!fillByDistribution(source)) {
             std::cerr << "ERROR! Failed to generate source data.\n";
             return false;
         }
 
-        auto minTime = std::chrono::microseconds::max();
-        auto maxTime = std::chrono::microseconds::zero();
-        auto sumTime = std::chrono::microseconds::zero();
+        return benchmarkLoop(source, stats, "DoubleList");
+    }
 
-        for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
-            DoubleList<T>* testList = RandomArrayGenerator::copyDoubleList(source);
+    // ===== benchmark dla stosu =====
 
-            if (testList == nullptr) {
-                std::cerr << "ERROR! Failed to copy source double list.\n";
+    template <typename T>
+    bool runStackBenchmark(BenchmarkStats& stats) {
+        Stack<T> source;
+        // tworzymy pusty stos źródłowy
+
+        for (int i = 0; i < Parameters::structureSize; ++i) {
+            if (!source.push(T{})) {
+                std::cerr << "ERROR! Failed to create source stack.\n";
                 return false;
             }
-
-            auto start = std::chrono::steady_clock::now();
-
-            if (!sortDoubleList(*testList)) {
-                delete testList;
-                return false;
-            }
-
-            auto end = std::chrono::steady_clock::now();
-
-            if (!SortingCheck::SortedAscend(*testList)) {
-                std::cerr << "ERROR! DoubleList is not sorted correctly.\n";
-                delete testList;
-                return false;
-            }
-
-            auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-
-            if (elapsed < minTime) {
-                minTime = elapsed;
-            }
-
-            if (elapsed > maxTime) {
-                maxTime = elapsed;
-            }
-
-            sumTime += elapsed;
-
-            std::cout << "iteration " << (iteration + 1) << " [us] = " << elapsed.count() << "\n";
-
-            delete testList;
         }
 
-        stats.minTimeFinal = minTime.count();
-        stats.maxTimeFinal = maxTime.count();
-        stats.averageTimeFinal =
-            static_cast<double>(sumTime.count()) / static_cast<double>(Parameters::iterations);
+        if (!fillByDistribution(source)) {
+            std::cerr << "ERROR! Failed to generate source data.\n";
+            return false;
+        }
 
-        return true;
+        return benchmarkLoop(source, stats, "Stack");
     }
 
 } // namespace
@@ -458,10 +356,6 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
         return false;
     }
 
-    if (Parameters::iterations <= 0) {
-        std::cerr << "ERROR! iterations must be greater than 0.\n";
-        return false;
-    }
     if (Parameters::distribution == Parameters::Distribution::undefined) {
         std::cerr << "ERROR! distribution must be set in benchmark mode.\n";
         return false;
@@ -471,13 +365,18 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
         Parameters::pivot == Parameters::Pivots::undefined) {
         std::cerr << "ERROR! pivot must be set for quick sort.\n";
         return false;
-        }
+    }
 
     if (Parameters::algorithm == Parameters::Algorithms::shell &&
         Parameters::shellParameter == Parameters::ShellParameters::undefined) {
         std::cerr << "ERROR! shellParameter must be set for shell sort.\n";
         return false;
-        }
+    }
+
+    if (Parameters::iterations <= 0) {
+        std::cerr << "ERROR! iterations must be greater than 0.\n";
+        return false;
+    }
 
     // ===== tablica =====
 
@@ -557,6 +456,33 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
         }
 
         std::cerr << "ERROR! This data type is not implemented for DoubleList.\n";
+        return false;
+    }
+
+    // ===== stos =====
+
+    if (Parameters::structure == Parameters::Structures::stack) {
+        if (Parameters::dataType == Parameters::DataTypes::typeInt) {
+            return runStackBenchmark<int>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeFloat) {
+            return runStackBenchmark<float>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeDouble) {
+            return runStackBenchmark<double>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeString) {
+            return runStackBenchmark<std::string>(stats);
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
+            return runStackBenchmark<unsigned int>(stats);
+        }
+
+        std::cerr << "ERROR! This data type is not implemented for Stack.\n";
         return false;
     }
 

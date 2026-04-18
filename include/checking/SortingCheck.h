@@ -8,6 +8,7 @@
 #include "structures/Array.h"
 #include "structures/DoubleList.h"
 #include "structures/SingleList.h"
+#include "structures/Stack.h"
 
 class SortingCheck {
 private:
@@ -41,6 +42,12 @@ private:
     }
 
 public:
+    // sprawdza sortowanie dla stosu dowolnego typu T
+    template <typename T>
+    static bool SortedAscend(const Stack<T>& stack) {
+        return sortedAscendImpl<Stack<T>, T>(stack);
+    }
+
     // sprawdza sortowanie dla tablicy dowolnego typu T
     template <typename T>
     static bool SortedAscend(const Array<T>& array) {

@@ -10,6 +10,7 @@
 #include "structures/Array.h"
 #include "structures/SingleList.h"
 #include "structures/DoubleList.h"
+#include "structures/Stack.h"
 #include "Parameters.h"
 
 class QuickSort {
@@ -46,12 +47,39 @@ private:
         return (left + right) / 2;
     }
 
-    // ===== array =====
+    // wspólny odczyt wartości dla każdej struktury
+    template <typename Structure, typename T>
+    static T getValue(const Structure& structure, int index) {
+        T value{};
+        // {} oznacza domyślną inicjalizację zmiennej
 
-    template <typename T>
-    static void QuickSorting(Array<T>& array, int left, int right, Parameters::Pivots pivotType) {
-        // Array<T>& - tablica jest przekazywana przez odwołanie
-        // template <typename T> oznacza, że sortowanie działa dla różnych typów danych
+        structure.get(index, value);
+        return value;
+    }
+
+    // wspólna zamiana elementów miejscami dla każdej struktury
+    template <typename Structure, typename T>
+    static void swapAt(Structure& structure, int firstIndex, int secondIndex) {
+        if (firstIndex == secondIndex) {
+            return;
+        }
+
+        T firstValue{};
+        T secondValue{};
+
+        structure.get(firstIndex, firstValue);
+        structure.get(secondIndex, secondValue);
+
+        structure.set(firstIndex, secondValue);
+        structure.set(secondIndex, firstValue);
+    }
+
+    // wspólna implementacja quicksorta
+    template <typename Structure, typename T>
+    static void QuickSorting(Structure& structure, int left, int right, Parameters::Pivots pivotType) {
+        // Structure& - struktura jest przekazywana przez odwołanie
+        // template <typename Structure, typename T> oznacza,
+        // że sortowanie działa dla różnych struktur i różnych typów danych
 
         if (left >= right) {
             return;
@@ -60,161 +88,37 @@ private:
 
         int i, j, pivotIndex;
         T pivot;
-        // T pivot - pivot ma ten sam typ co elementy tablicy
+        // T pivot - pivot ma ten sam typ co elementy struktury
 
         pivotIndex = choosePivotIndex(left, right, pivotType);
-        pivot = array.setId(pivotIndex);
+        pivot = getValue<Structure, T>(structure, pivotIndex);
 
         // przenosimy pivot na koniec
-        swapValues(array.setId(pivotIndex), array.setId(right));
+        swapAt<Structure, T>(structure, pivotIndex, right);
 
-        j = left;  // indeks zew
+        j = left;
 
         // przechodzimy po całym fragmencie != pivot
         for (i = left; i < right; i++) {
 
-            // jeśli element jest mniejszy od pivota -> trafi do lewej części tablicy
-            if (array.setId(i) < pivot) {
-                swapValues(array.setId(i), array.setId(j));
+            // jeśli element jest mniejszy od pivota -> trafi do lewej części
+            if (getValue<Structure, T>(structure, i) < pivot) {
+                swapAt<Structure, T>(structure, i, j);
                 j++;
             }
         }
 
         // ustawiamy pivot na jego miejsce, gdzie po lewej stronie będą elementy < a po prawej >=
-        swapValues(array.setId(right), array.setId(j));
+        swapAt<Structure, T>(structure, right, j);
 
         // jeśli po lewej stronie > 1 element - sortujemy
         if (left < j - 1) {
-            QuickSorting(array, left, j - 1, pivotType);
+            QuickSorting<Structure, T>(structure, left, j - 1, pivotType);
         }
 
         // jeśli po prawej stronie > 1 element - sortujemy
         if (j + 1 < right) {
-            QuickSorting(array, j + 1, right, pivotType);
-        }
-    }
-
-    // ===== singlelist =====
-
-    template <typename T>
-    static T getValue(const SingleList<T>& list, int index) {
-        T value{};
-        // {} oznacza domyślną inicjalizację zmiennej
-
-        list.get(index, value);
-        return value;
-    }
-
-    template <typename T>
-    static void swapAt(SingleList<T>& list, int firstIndex, int secondIndex) {
-        if (firstIndex == secondIndex) {
-            return;
-        }
-
-        T firstValue{};
-        T secondValue{};
-
-        list.get(firstIndex, firstValue);
-        list.get(secondIndex, secondValue);
-
-        list.set(firstIndex, secondValue);
-        list.set(secondIndex, firstValue);
-    }
-
-    template <typename T>
-    static void QuickSorting(SingleList<T>& list, int left, int right, Parameters::Pivots pivotType) {
-        if (left >= right) {
-            return;
-        }
-
-        int i, j, pivotIndex;
-        T pivot;
-
-        pivotIndex = choosePivotIndex(left, right, pivotType);
-        pivot = getValue(list, pivotIndex);
-
-        // przenosimy pivot na koniec
-        swapAt(list, pivotIndex, right);
-
-        j = left;
-
-        for (i = left; i < right; i++) {
-            if (getValue(list, i) < pivot) {
-                swapAt(list, i, j);
-                j++;
-            }
-        }
-
-        // ustawiamy pivot na jego miejsce
-        swapAt(list, right, j);
-
-        if (left < j - 1) {
-            QuickSorting(list, left, j - 1, pivotType);
-        }
-
-        if (j + 1 < right) {
-            QuickSorting(list, j + 1, right, pivotType);
-        }
-    }
-
-    // ===== doublelist =====
-
-    template <typename T>
-    static T getValue(const DoubleList<T>& list, int index) {
-        T value{};
-        list.get(index, value);
-        return value;
-    }
-
-    template <typename T>
-    static void swapAt(DoubleList<T>& list, int firstIndex, int secondIndex) {
-        if (firstIndex == secondIndex) {
-            return;
-        }
-
-        T firstValue{};
-        T secondValue{};
-
-        list.get(firstIndex, firstValue);
-        list.get(secondIndex, secondValue);
-
-        list.set(firstIndex, secondValue);
-        list.set(secondIndex, firstValue);
-    }
-
-    template <typename T>
-    static void QuickSorting(DoubleList<T>& list, int left, int right, Parameters::Pivots pivotType) {
-        if (left >= right) {
-            return;
-        }
-
-        int i, j, pivotIndex;
-        T pivot;
-
-        pivotIndex = choosePivotIndex(left, right, pivotType);
-        pivot = getValue(list, pivotIndex);
-
-        // przenosimy pivot na koniec
-        swapAt(list, pivotIndex, right);
-
-        j = left;
-
-        for (i = left; i < right; i++) {
-            if (getValue(list, i) < pivot) {
-                swapAt(list, i, j);
-                j++;
-            }
-        }
-
-        // ustawiamy pivot na jego miejsce
-        swapAt(list, right, j);
-
-        if (left < j - 1) {
-            QuickSorting(list, left, j - 1, pivotType);
-        }
-
-        if (j + 1 < right) {
-            QuickSorting(list, j + 1, right, pivotType);
+            QuickSorting<Structure, T>(structure, j + 1, right, pivotType);
         }
     }
 
@@ -229,7 +133,7 @@ public:
         }
 
         // sortujemy tablicę od pierwszego do ostatniego indeksu
-        QuickSorting(array, 0, array.getSize() - 1, pivotType);
+        QuickSorting<Array<T>, T>(array, 0, array.getSize() - 1, pivotType);
     }
 
     // główna metoda klasy quicksort dla listy jednokierunkowej
@@ -240,7 +144,7 @@ public:
             return;
         }
 
-        QuickSorting(list, 0, list.getSize() - 1, pivotType);
+        QuickSorting<SingleList<T>, T>(list, 0, list.getSize() - 1, pivotType);
     }
 
     // główna metoda klasy quicksort dla listy dwukierunkowej
@@ -251,7 +155,18 @@ public:
             return;
         }
 
-        QuickSorting(list, 0, list.getSize() - 1, pivotType);
+        QuickSorting<DoubleList<T>, T>(list, 0, list.getSize() - 1, pivotType);
+    }
+
+    // główna metoda klasy quicksort dla stosu
+    template <typename T>
+    static void sort(Stack<T>& stack, Parameters::Pivots pivotType)
+    {
+        if (stack.getSize() <= 1) {
+            return;
+        }
+
+        QuickSorting<Stack<T>, T>(stack, 0, stack.getSize() - 1, pivotType);
     }
 };
 
