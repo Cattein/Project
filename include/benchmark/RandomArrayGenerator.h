@@ -16,82 +16,61 @@
 #include "structures/Stack.h"
 #include "structures/BinaryTree.h"
 
+// klasa pomocnicza do:
+// - generowania danych w różnych układach
+// - kopiowania struktur danych
 class RandomArrayGenerator {
 private:
-    // ustawia ziarno generatora tylko raz
-    static void seedRandomOnce() {
-        // static - zmienna seeded zostanie utworzona tylko raz
-        // przy kolejnych wywołaniach funkcji zachowa swoją wcześniejszą wartość
-        static bool seeded = false;
+    // ===== wybór losowej wartości zależnie od typu =====
+    // poniższe przeciążone funkcje wybierają właściwy generator
+    // na podstawie typu przekazanego argumentu
 
-        if (!seeded) {
-            std::srand(static_cast<unsigned int>(std::time(nullptr)));
-            // std::time(nullptr) zwraca aktualny czas
-            // dzięki temu przy każdym uruchomieniu programu seed będzie inny
-
-            seeded = true;
-        }
-    }
-
-    // ===== losowanie podstawowych typów =====
-
-    // losuje wartość typu int
-    static int randomInt() {
+    static int randomValueByType(int) {
         // std::rand zwraca liczbę pseudolosową z zakresu od 0 do RAND_MAX
         // odejmujemy połowę RAND_MAX, żeby otrzymać także liczby ujemne
         return std::rand() - (RAND_MAX / 2);
     }
 
-    // losuje wartość typu float
-    static float randomFloat() {
+    static float randomValueByType(float) {
         // zamieniamy wynik rand na liczbę z zakresu 0..1
         const float zeroToOne =
             static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
-        // static_cast<float> zamienia liczbę na typ float
-        // dzięki temu dzielenie nie będzie całkowite
 
         // potem przesuwamy zakres do -1000000 .. 1000000
         return -1000000.0f + zeroToOne * 2000000.0f;
     }
 
-    // losuje wartość typu double
-    static double randomDouble() {
+    static double randomValueByType(double) {
         // zamieniamy wynik rand na liczbę z zakresu 0..1
         const double zeroToOne =
             static_cast<double>(std::rand()) / static_cast<double>(RAND_MAX);
-        // static_cast<double> zamienia liczbę na typ double
 
         // potem przesuwamy zakres do -1000000 .. 1000000
         return -1000000.0 + zeroToOne * 2000000.0;
     }
 
-    // losuje wartość typu unsigned int
-    static unsigned int randomUnsignedInt() {
+    static unsigned int randomValueByType(unsigned int) {
         // liczby bez znaku są zawsze dodatnie albo równe 0
         return static_cast<unsigned int>(std::rand());
     }
 
-    // losuje wartość typu unsigned long
-    static unsigned long randomUnsignedLong() {
+    static unsigned long randomValueByType(unsigned long) {
         return static_cast<unsigned long>(std::rand());
     }
 
-    // losuje wartość typu unsigned char
-    static unsigned char randomUnsignedChar() {
+    static unsigned char randomValueByType(unsigned char) {
         // % 256 daje zakres od 0 do 255
         return static_cast<unsigned char>(std::rand() % 256);
     }
 
-    // losuje wartość typu char
-    static char randomChar() {
+    static char randomValueByType(char) {
         // zakres printable ascii: 32..126
         return static_cast<char>(32 + (std::rand() % 95));
     }
 
-    // losuje napis z liter i cyfr
-    static std::string randomString() {
+    static std::string randomValueByType(std::string) {
         const std::string characters =
-            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+                    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         // characters zawiera wszystkie znaki, z których będziemy budować losowy napis
 
         const int length = (std::rand() % 20) + 1;
@@ -111,40 +90,6 @@ private:
         return randomStringValue;
     }
 
-    // ===== wybór losowej wartości zależnie od typu =====
-
-    static int randomValueByType(int) {
-        return randomInt();
-    }
-
-    static float randomValueByType(float) {
-        return randomFloat();
-    }
-
-    static double randomValueByType(double) {
-        return randomDouble();
-    }
-
-    static unsigned int randomValueByType(unsigned int) {
-        return randomUnsignedInt();
-    }
-
-    static unsigned long randomValueByType(unsigned long) {
-        return randomUnsignedLong();
-    }
-
-    static unsigned char randomValueByType(unsigned char) {
-        return randomUnsignedChar();
-    }
-
-    static char randomValueByType(char) {
-        return randomChar();
-    }
-
-    static std::string randomValueByType(std::string) {
-        return randomString();
-    }
-
     // wybiera odpowiednią funkcję losującą dla typu T
     template <typename T>
     static T randomValue() {
@@ -152,6 +97,7 @@ private:
     }
 
     // ===== wartości rosnące =====
+    // poniższe funkcje tworzą dane już uporządkowane rosnąco
 
     static int makeAscendingValueByType(int index, int) {
         return index;
@@ -194,6 +140,7 @@ private:
     }
 
     // ===== wartości malejące =====
+    // poniższe funkcje tworzą dane uporządkowane malejąco
 
     static int makeDescendingValueByType(int size, int index, int) {
         return size - index;
@@ -240,7 +187,13 @@ private:
     // wspólna funkcja do wypełniania struktury losowo
     template <typename Structure, typename T>
     static bool fillRandomImpl(Structure& structure) {
-        seedRandomOnce();
+        // ustawiamy ziarno generatora tylko raz
+        static bool seeded = false;
+
+        if (!seeded) {
+            std::srand(static_cast<unsigned int>(std::time(nullptr)));
+            seeded = true;
+        }
 
         for (int i = 0; i < structure.getSize(); ++i) {
             if (!structure.set(i, randomValue<T>())) {
@@ -293,7 +246,9 @@ private:
         return true;
     }
 
-    // wspólna funkcja: najpierw losowo, potem pierwsza połowa rosnąco
+    // wspólna funkcja:
+    // najpierw wypełniamy strukturę losowo,
+    // a potem pierwszą połowę ustawiamy rosnąco
     template <typename Structure, typename T>
     static bool fillAscending50PerImpl(Structure& structure) {
         if (!fillRandomImpl<Structure, T>(structure)) {
@@ -303,7 +258,9 @@ private:
         return makeFirstHalfAscendingImpl<Structure, T>(structure);
     }
 
-    // wspólna funkcja kopiowania dla struktur z pushBack
+    // wspólna funkcja kopiowania dla struktur,
+    // które można budować przez pushBack
+    // działa dla: SingleList, DoubleList, BinaryTree
     template <typename Structure, typename T>
     static Structure* copyPushBackStructureImpl(const Structure& source) {
         Structure* copy = new (std::nothrow) Structure();
@@ -334,29 +291,31 @@ private:
 public:
     // ===== fillRandom =====
 
+    // wypełnia tablicę losowymi wartościami
     template <typename T>
     static bool fillRandom(Array<T>& array) {
-        // Array<T>& - tablica jest przekazywana przez referencję
         return fillRandomImpl<Array<T>, T>(array);
     }
 
+    // wypełnia listę jednokierunkową losowymi wartościami
     template <typename T>
     static bool fillRandom(SingleList<T>& list) {
-        // SingleList<T>& - lista jest przekazywana przez referencję
         return fillRandomImpl<SingleList<T>, T>(list);
     }
 
+    // wypełnia listę dwukierunkową losowymi wartościami
     template <typename T>
     static bool fillRandom(DoubleList<T>& list) {
-        // DoubleList<T>& - lista dwukierunkowa jest przekazywana przez referencję
         return fillRandomImpl<DoubleList<T>, T>(list);
     }
 
+    // wypełnia stos losowymi wartościami
     template <typename T>
     static bool fillRandom(Stack<T>& stack) {
         return fillRandomImpl<Stack<T>, T>(stack);
     }
 
+    // wypełnia drzewo binarne losowymi wartościami
     template <typename T>
     static bool fillRandom(BinaryTree<T>& tree) {
         return fillRandomImpl<BinaryTree<T>, T>(tree);
@@ -364,26 +323,31 @@ public:
 
     // ===== fillAscending =====
 
+    // wypełnia tablicę wartościami rosnącymi
     template <typename T>
     static bool fillAscending(Array<T>& array) {
         return fillAscendingImpl<Array<T>, T>(array);
     }
 
+    // wypełnia listę jednokierunkową wartościami rosnącymi
     template <typename T>
     static bool fillAscending(SingleList<T>& list) {
         return fillAscendingImpl<SingleList<T>, T>(list);
     }
 
+    // wypełnia listę dwukierunkową wartościami rosnącymi
     template <typename T>
     static bool fillAscending(DoubleList<T>& list) {
         return fillAscendingImpl<DoubleList<T>, T>(list);
     }
 
+    // wypełnia stos wartościami rosnącymi
     template <typename T>
     static bool fillAscending(Stack<T>& stack) {
         return fillAscendingImpl<Stack<T>, T>(stack);
     }
 
+    // wypełnia drzewo binarne wartościami rosnącymi
     template <typename T>
     static bool fillAscending(BinaryTree<T>& tree) {
         return fillAscendingImpl<BinaryTree<T>, T>(tree);
@@ -391,26 +355,31 @@ public:
 
     // ===== fillDescending =====
 
+    // wypełnia tablicę wartościami malejącymi
     template <typename T>
     static bool fillDescending(Array<T>& array) {
         return fillDescendingImpl<Array<T>, T>(array);
     }
 
+    // wypełnia listę jednokierunkową wartościami malejącymi
     template <typename T>
     static bool fillDescending(SingleList<T>& list) {
         return fillDescendingImpl<SingleList<T>, T>(list);
     }
 
+    // wypełnia listę dwukierunkową wartościami malejącymi
     template <typename T>
     static bool fillDescending(DoubleList<T>& list) {
         return fillDescendingImpl<DoubleList<T>, T>(list);
     }
 
+    // wypełnia stos wartościami malejącymi
     template <typename T>
     static bool fillDescending(Stack<T>& stack) {
         return fillDescendingImpl<Stack<T>, T>(stack);
     }
 
+    // wypełnia drzewo binarne wartościami malejącymi
     template <typename T>
     static bool fillDescending(BinaryTree<T>& tree) {
         return fillDescendingImpl<BinaryTree<T>, T>(tree);
@@ -418,26 +387,31 @@ public:
 
     // ===== fillAscending50Per =====
 
+    // wypełnia tablicę tak, że pierwsza połowa jest rosnąca
     template <typename T>
     static bool fillAscending50Per(Array<T>& array) {
         return fillAscending50PerImpl<Array<T>, T>(array);
     }
 
+    // wypełnia listę jednokierunkową tak, że pierwsza połowa jest rosnąca
     template <typename T>
     static bool fillAscending50Per(SingleList<T>& list) {
         return fillAscending50PerImpl<SingleList<T>, T>(list);
     }
 
+    // wypełnia listę dwukierunkową tak, że pierwsza połowa jest rosnąca
     template <typename T>
     static bool fillAscending50Per(DoubleList<T>& list) {
         return fillAscending50PerImpl<DoubleList<T>, T>(list);
     }
 
+    // wypełnia stos tak, że pierwsza połowa jest rosnąca
     template <typename T>
     static bool fillAscending50Per(Stack<T>& stack) {
         return fillAscending50PerImpl<Stack<T>, T>(stack);
     }
 
+    // wypełnia drzewo binarne tak, że pierwsza połowa jest rosnąca
     template <typename T>
     static bool fillAscending50Per(BinaryTree<T>& tree) {
         return fillAscending50PerImpl<BinaryTree<T>, T>(tree);
@@ -445,6 +419,7 @@ public:
 
     // ===== copyArray =====
 
+    // tworzy kopię tablicy
     template <typename T>
     static Array<T>* copyArray(const Array<T>& source) {
         Array<T>* copy = new (std::nothrow) Array<T>(source.getSize());
@@ -473,6 +448,7 @@ public:
 
     // ===== copySingleList =====
 
+    // tworzy kopię listy jednokierunkowej
     template <typename T>
     static SingleList<T>* copySingleList(const SingleList<T>& source) {
         return copyPushBackStructureImpl<SingleList<T>, T>(source);
@@ -480,6 +456,7 @@ public:
 
     // ===== copyDoubleList =====
 
+    // tworzy kopię listy dwukierunkowej
     template <typename T>
     static DoubleList<T>* copyDoubleList(const DoubleList<T>& source) {
         return copyPushBackStructureImpl<DoubleList<T>, T>(source);
@@ -487,6 +464,7 @@ public:
 
     // ===== copyBinaryTree =====
 
+    // tworzy kopię drzewa binarnego
     template <typename T>
     static BinaryTree<T>* copyBinaryTree(const BinaryTree<T>& source) {
         return copyPushBackStructureImpl<BinaryTree<T>, T>(source);
@@ -494,6 +472,7 @@ public:
 
     // ===== copyStack =====
 
+    // tworzy kopię stosu
     template <typename T>
     static Stack<T>* copyStack(const Stack<T>& source) {
         Stack<T>* copy = new (std::nothrow) Stack<T>();

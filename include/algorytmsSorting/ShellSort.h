@@ -15,11 +15,12 @@
 class ShellSort {
 private:
     // wspólny odczyt wartości spod danego indeksu
+    // działa dla każdej struktury, która ma metodę get(index, value)
     template <typename Structure, typename T>
     static T readAt(const Structure& structure, int index) {
         T value{};
         // {} oznacza domyślną inicjalizację zmiennej
-        // value chwilowo przechowuje odczytaną liczbę
+        // value chwilowo przechowuje odczytaną wartość
 
         structure.get(index, value);
         // get wpisuje wartość spod danego indeksu do zmiennej value
@@ -27,40 +28,39 @@ private:
     }
 
     // wspólny zapis wartości pod danym indeksem
+    // działa dla każdej struktury, która ma metodę set(index, value)
     template <typename Structure, typename T>
     static void writeAt(Structure& structure, int index, const T& value) {
         // Structure& - pracujemy na oryginalnej strukturze
         // const T& - wartość przekazujemy bez kopiowania
-        // const - tej wartości nie zmieniamy w funkcji
-
+\
         structure.set(index, value);
         // set podmienia wartość na wskazanej pozycji
     }
 
-    // wspólna wersja insertion dla shellsorta
+    // wersja insertion sorta używana wewnątrz shellsorta, porównujemy elementy oddalone od siebie o gap
     template <typename Structure, typename T>
     static void insertion(Structure& structure, int gap) {
         // przechodzimy po strukturze od indeksu gap do końca
         for (int i = gap; i < structure.getSize(); ++i) {
             const T temp = readAt<Structure, T>(structure, i);
-            // zapamiętujemy bieżący element, żeby nie zgubić go podczas przesuwania innych
-            // const oznacza, że po utworzeniu temp nie zmieniamy jego wartości
+            // zapamiętujemy bieżący element
 
             int j = i;
             // od tej pozycji zaczynamy szukać miejsca dla temp
 
-            // dopóki element oddalony o gap jest większy od temp
-            // przesuwamy go w prawo
+            // dopóki element oddalony o gap jest większy od temp,  przesuwamy go w prawo
             while (j >= gap && readAt<Structure, T>(structure, j - gap) > temp) {
                 writeAt<Structure, T>(structure, j, readAt<Structure, T>(structure, j - gap));
                 j -= gap;
             }
 
-            writeAt<Structure, T>(structure, j, temp);
             // wstawiamy temp na właściwe miejsce
+            writeAt<Structure, T>(structure, j, temp);
         }
     }
 
+    // shellsort z prostym ciągiem odstępów: najpierw połowa rozmiaru, potem gap dzielony przez 2
     template <typename Structure, typename T>
     static void shellHalfGaps(Structure& structure) {
         for (int gap = structure.getSize() / 2; gap > 0; gap /= 2) {
@@ -68,11 +68,13 @@ private:
         }
     }
 
+    // shellsort z odstępami Knutha:
+    // 1, 4, 13, 40, ...
     template <typename Structure, typename T>
     static void shellKnuthGaps(Structure& structure) {
         int gap = 1;
 
-        // wyznaczamy największy odstęp knutha, który jeszcze pasuje do rozmiaru struktury
+        // wyznaczamy największy odstęp Knutha, który jeszcze pasuje do rozmiaru struktury
         while (gap < structure.getSize() / 3) {
             gap = 3 * gap + 1;
         }
@@ -87,12 +89,13 @@ private:
     // wspólna funkcja uruchamiająca shellsort
     template <typename Structure, typename T>
     static void sortImpl(Structure& structure, Parameters::ShellParameters parameter) {
-        // jeśli struktura ma 0 lub 1 element, nie trzeba nic sortować
+        // jeśli struktura ma 0 lub 1 element,
+        // nie trzeba nic sortować
         if (structure.getSize() <= 1) {
             return;
         }
 
-        // option2 oznacza wariant z odstępami knutha
+        // option2 oznacza wariant z odstępami Knutha
         if (parameter == Parameters::ShellParameters::option2) {
             shellKnuthGaps<Structure, T>(structure);
             return;
@@ -103,10 +106,13 @@ private:
     }
 
 public:
+    // uruchamia shellsort dla drzewa binarnego
+    // drzewo traktujemy jak strukturę indeksowaną poziomami
     template <typename T>
     static void sort(BinaryTree<T>& tree, Parameters::ShellParameters parameter) {
         sortImpl<BinaryTree<T>, T>(tree, parameter);
     }
+
     // uruchamia shellsort dla tablicy
     template <typename T>
     static void sort(Array<T>& array, Parameters::ShellParameters parameter) {

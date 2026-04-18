@@ -20,24 +20,28 @@ namespace FileHandler {
 
     // ===== odczyt pojedynczej wartości =====
 
+    // wczytuje jedną wartość z pliku
+    // dla większości typów używamy zwykłego operatora >>
     template <typename T>
     bool readValue(std::ifstream& file, T& value) {
-        // dla większości typów używamy zwykłego operatora >>
         file >> value;
         return static_cast<bool>(file);
     }
 
+    // specjalizacja dla std::string
+    // getline odczytuje cały wiersz, więc string może zawierać spacje
     template <>
     inline bool readValue<std::string>(std::ifstream& file, std::string& value) {
         // std::ws pomija białe znaki przed właściwą linią
-        // getline odczytuje cały wiersz, dzięki temu string może zawierać spacje
         std::getline(file >> std::ws, value);
         return static_cast<bool>(file);
     }
 
     // ===== wspólna funkcja wczytywania struktur z pushBack =====
     // działa dla: SingleList, DoubleList, BinaryTree
-
+    // zakładamy, że dana struktura:
+    // - ma pusty konstruktor
+    // - ma metodę pushBack(...)
     template <typename Structure, typename T>
     Structure* loadPushBackStructureFromFileImpl(const std::string& filename) {
         std::ifstream file(filename);
@@ -51,18 +55,19 @@ namespace FileHandler {
         file >> size;
         // odczytujemy liczbę elementów zapisanych w pliku
 
+        // jeśli plik jest błędny albo rozmiar jest ujemny, kończymy
         if (!file || size < 0) {
             return nullptr;
         }
 
         Structure* structure = new (std::nothrow) Structure();
-        // tworzymy nową pustą strukturę
+        // tworzymy nową pustą strukturę w pamięci dynamicznej
 
         if (structure == nullptr) {
             return nullptr;
         }
 
-        // wczytujemy kolejne wartości i dopisujemy na koniec
+        // wczytujemy kolejne wartości i dopisujemy je na koniec struktury
         for (int i = 0; i < size; ++i) {
             T value{};
             // {} oznacza domyślną inicjalizację zmiennej typu T
@@ -83,7 +88,9 @@ namespace FileHandler {
 
     // ===== wspólna funkcja zapisu struktur indeksowanych =====
     // działa dla: Array, SingleList, DoubleList, BinaryTree
-
+    // zakładamy, że dana struktura:
+    // - ma metodę getSize()
+    // - ma metodę get(index, value)
     template <typename Structure, typename T>
     bool saveIndexedStructureToFileImpl(const Structure& structure, const std::string& filename) {
         std::ofstream file(filename);
@@ -94,9 +101,9 @@ namespace FileHandler {
         }
 
         file << structure.getSize() << '\n';
-        // zapisujemy liczbę elementów
+        // najpierw zapisujemy liczbę elementów
 
-        // zapisujemy wszystkie elementy po indeksach
+        // potem zapisujemy wszystkie elementy po kolei według indeksów
         for (int i = 0; i < structure.getSize(); ++i) {
             T value{};
 
@@ -116,12 +123,9 @@ namespace FileHandler {
     template <typename T>
     Stack<T>* loadStackFromFile(const std::string& filename) {
         // const std::string& - nazwa pliku jest przekazywana bez kopiowania
-        // const - funkcja nie może zmienić tej nazwy
-
         std::ifstream file(filename);
         // otwieramy plik do odczytu
 
-        // jeśli plik nie został otwarty, zwracamy nullptr
         if (!file) {
             return nullptr;
         }
@@ -130,13 +134,12 @@ namespace FileHandler {
         file >> size;
         // odczytujemy liczbę elementów stosu
 
-        // jeśli odczyt się nie udał albo rozmiar jest niepoprawny, kończymy działanie
         if (!file || size < 0) {
             return nullptr;
         }
 
         Stack<T>* stack = new (std::nothrow) Stack<T>();
-        // Stack<T>* - wskaźnik na nowy obiekt stosu
+        // tworzymy pusty stos w pamięci dynamicznej
 
         if (stack == nullptr) {
             return nullptr;
@@ -144,7 +147,7 @@ namespace FileHandler {
 
         // wczytujemy kolejne elementy stosu
         // wartości w pliku zapisujemy od dołu do góry,
-        // dzięki temu zwykły push odtworzy poprawną kolejność
+        // dzięki temu zwykły push odtworzy poprawną kolejność stosu
         for (int i = 0; i < size; ++i) {
             T value{};
 
@@ -165,13 +168,9 @@ namespace FileHandler {
     // zapisuje stos do pliku
     template <typename T>
     bool saveStackToFile(const Stack<T>& stack, const std::string& filename) {
-        // const Stack<T>& - stos jest przekazywany przez referencję
-        // const - funkcja nie może go zmieniać
-
         std::ofstream file(filename);
         // otwieramy plik do zapisu
 
-        // jeśli nie udało się otworzyć pliku, zwracamy false
         if (!file) {
             return false;
         }
@@ -196,7 +195,7 @@ namespace FileHandler {
 
     // ===== binary tree =====
 
-    // wczytuje drzewo binarne z pliku i zwraca wskaźnik na utworzony obiekt
+    // wczytuje drzewo binarne z pliku
     template <typename T>
     BinaryTree<T>* loadBinaryTreeFromFile(const std::string& filename) {
         // pushBack dodaje elementy poziomami,
@@ -212,12 +211,9 @@ namespace FileHandler {
 
     // ===== array =====
 
-    // wczytuje tablicę z pliku, zwraca wskaźnik na utworzony obiekt
+    // wczytuje tablicę z pliku i zwraca wskaźnik na utworzony obiekt
     template <typename T>
     Array<T>* loadArrayFromFile(const std::string& filename) {
-        // const std::string& - nazwa pliku jest przekazywana przez referencję
-        // const - funkcja nie może zmienić tej nazwy
-
         std::ifstream file(filename);
         // otwieramy plik do odczytu
 
@@ -234,13 +230,13 @@ namespace FileHandler {
         }
 
         Array<T>* array = new (std::nothrow) Array<T>(size);
-        // Array<T>* - wskaźnik na obiekt klasy Array
+        // tworzymy tablicę o podanym rozmiarze
 
         if (array == nullptr) {
             return nullptr;
         }
 
-        // wczytujemy kolejne elementy tablicy
+        // wczytujemy kolejne elementy i zapisujemy je pod odpowiednimi indeksami
         for (int i = 0; i < size; ++i) {
             T value{};
 
