@@ -12,17 +12,15 @@ set(PROG_LIBS "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
 add_executable(Project
         src/main.cpp
-        src/structures/Array.cpp
-        src/structures/SingleList.cpp
-        src/structures/DoubleList.cpp
+        include/structures/Array.h
+        include/structures/SingleList.h
+        include/structures/DoubleList.h
         lib/parameters/Parameters.cpp
-        src/file/FileHandler.cpp
-        src/algorytmsSorting/QuickSort.cpp
-        src/checking/sortingCheck.cpp
-        src/algorytmsSorting/ShellSort.cpp
+        include/file/FileHandler.h
+        include/checking/SortingCheck.h
         src/algorytmsSorting/BucketSort.cpp
         src/singleFile/SingleFileRunner.cpp
-        src/benchmark/RandomArrayGenerator.cpp
+        include/benchmark/RandomArrayGenerator.h
         src/benchmark/BenchmarkRunner.cpp
         src/benchmark/BenchmarkCsvWriter.cpp
 )

@@ -5,6 +5,8 @@
 #include "singleFile/SingleFileRunner.h"
 
 #include <iostream>
+#include <string>
+#include <type_traits>
 
 #include "Parameters.h"
 #include "file/FileHandler.h"
@@ -20,7 +22,8 @@ static bool isShellParameterSupported() {
 }
 
 // wybiera algorytm sortowania dla tablicy
-static bool sortArray(Array& array) {
+template <typename T>
+static bool sortArray(Array<T>& array) {
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(array, Parameters::pivot);
         return true;
@@ -38,12 +41,18 @@ static bool sortArray(Array& array) {
     }
 
     if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-        if (!BucketSort::sort(array)) {
-            std::cerr << "ERROR! Bucket sort failed.\n";
+        // bucket sort w tym projekcie działa na razie tylko dla int
+        if constexpr (std::is_same_v<T, int>) {
+            if (!BucketSort::sort(array)) {
+                std::cerr << "ERROR! Bucket sort failed.\n";
+                return false;
+            }
+
+            return true;
+        } else {
+            std::cerr << "ERROR! Bucket sort is supported only for int type.\n";
             return false;
         }
-
-        return true;
     }
 
     // jeśli wybrany algorytm nie jest jeszcze gotowy, kończymy z błędem
@@ -52,7 +61,8 @@ static bool sortArray(Array& array) {
 }
 
 // wybiera algorytm sortowania dla listy jednokierunkowej
-static bool sortSingleList(SingleList& list) {
+template <typename T>
+static bool sortSingleList(SingleList<T>& list) {
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(list, Parameters::pivot);
         return true;
@@ -70,12 +80,18 @@ static bool sortSingleList(SingleList& list) {
     }
 
     if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-        if (!BucketSort::sort(list)) {
-            std::cerr << "ERROR! Bucket sort failed.\n";
+        // bucket sort w tym projekcie działa na razie tylko dla int
+        if constexpr (std::is_same_v<T, int>) {
+            if (!BucketSort::sort(list)) {
+                std::cerr << "ERROR! Bucket sort failed.\n";
+                return false;
+            }
+
+            return true;
+        } else {
+            std::cerr << "ERROR! Bucket sort is supported only for int type.\n";
             return false;
         }
-
-        return true;
     }
 
     // pozostałe algorytmy nie są jeszcze gotowe dla singlelist
@@ -84,7 +100,8 @@ static bool sortSingleList(SingleList& list) {
 }
 
 // wybiera algorytm sortowania dla listy dwukierunkowej
-static bool sortDoubleList(DoubleList& list) {
+template <typename T>
+static bool sortDoubleList(DoubleList<T>& list) {
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(list, Parameters::pivot);
         return true;
@@ -102,12 +119,18 @@ static bool sortDoubleList(DoubleList& list) {
     }
 
     if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-        if (!BucketSort::sort(list)) {
-            std::cerr << "ERROR! Bucket sort failed.\n";
+        // bucket sort w tym projekcie działa na razie tylko dla int
+        if constexpr (std::is_same_v<T, int>) {
+            if (!BucketSort::sort(list)) {
+                std::cerr << "ERROR! Bucket sort failed.\n";
+                return false;
+            }
+
+            return true;
+        } else {
+            std::cerr << "ERROR! Bucket sort is supported only for int type.\n";
             return false;
         }
-
-        return true;
     }
 
     // pozostałe algorytmy nie są jeszcze gotowe dla doublelist
@@ -116,9 +139,10 @@ static bool sortDoubleList(DoubleList& list) {
 }
 
 // obsługuje cały tryb single file dla tablicy
+template <typename T>
 static bool runArray() {
-    Array* array = FileHandler::loadArrayFromFile(Parameters::inputFile);
-    // Array* oznacza wskaźnik na obiekt utworzony dynamicznie
+    Array<T>* array = FileHandler::loadArrayFromFile<T>(Parameters::inputFile);
+    // Array<T>* oznacza wskaźnik na obiekt utworzony dynamicznie
 
     if (array == nullptr) {
         std::cerr << "ERROR! Failed to load input file.\n";
@@ -153,9 +177,10 @@ static bool runArray() {
 }
 
 // obsługuje cały tryb single file dla listy jednokierunkowej
+template <typename T>
 static bool runSingleList() {
-    SingleList* list = FileHandler::loadSingleListFromFile(Parameters::inputFile);
-    // SingleList* oznacza wskaźnik na obiekt utworzony dynamicznie
+    SingleList<T>* list = FileHandler::loadSingleListFromFile<T>(Parameters::inputFile);
+    // SingleList<T>* oznacza wskaźnik na obiekt utworzony dynamicznie
 
     if (list == nullptr) {
         std::cerr << "ERROR! Failed to load input file.\n";
@@ -190,9 +215,10 @@ static bool runSingleList() {
 }
 
 // obsługuje cały tryb single file dla listy dwukierunkowej
+template <typename T>
 static bool runDoubleList() {
-    DoubleList* list = FileHandler::loadDoubleListFromFile(Parameters::inputFile);
-    // DoubleList* oznacza wskaźnik na obiekt utworzony dynamicznie
+    DoubleList<T>* list = FileHandler::loadDoubleListFromFile<T>(Parameters::inputFile);
+    // DoubleList<T>* oznacza wskaźnik na obiekt utworzony dynamicznie
 
     if (list == nullptr) {
         std::cerr << "ERROR! Failed to load input file.\n";
@@ -227,29 +253,127 @@ static bool runDoubleList() {
 }
 
 bool SingleFileRunner::run() {
-    // na razie cały projekt działa tylko dla int
-    if (Parameters::dataType != Parameters::DataTypes::typeInt) {
-        std::cerr << "ERROR! Only int type is supported now.\n";
-        return false;
-    }
-
     // bez pliku wejściowego nie mamy czego wczytać
     if (Parameters::inputFile.empty()) {
         std::cerr << "ERROR! Input file is not set.\n";
         return false;
     }
 
-    // wybieramy odpowiednią strukturę zależnie od parametrów
+    // ===== array =====
+
     if (Parameters::structure == Parameters::Structures::array) {
-        return runArray();
+        if (Parameters::dataType == Parameters::DataTypes::typeInt) {
+            return runArray<int>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeFloat) {
+            return runArray<float>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeDouble) {
+            return runArray<double>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeChar) {
+            return runArray<char>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeString) {
+            return runArray<std::string>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
+            return runArray<unsigned int>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedLong) {
+            return runArray<unsigned long>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedChar) {
+            return runArray<unsigned char>();
+        }
+
+        std::cerr << "ERROR! This data type is not implemented for Array.\n";
+        return false;
     }
+
+    // ===== single list =====
 
     if (Parameters::structure == Parameters::Structures::singleList) {
-        return runSingleList();
+        if (Parameters::dataType == Parameters::DataTypes::typeInt) {
+            return runSingleList<int>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeFloat) {
+            return runSingleList<float>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeDouble) {
+            return runSingleList<double>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeChar) {
+            return runSingleList<char>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeString) {
+            return runSingleList<std::string>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
+            return runSingleList<unsigned int>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedLong) {
+            return runSingleList<unsigned long>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedChar) {
+            return runSingleList<unsigned char>();
+        }
+
+        std::cerr << "ERROR! This data type is not implemented for SingleList.\n";
+        return false;
     }
 
+    // ===== double list =====
+
     if (Parameters::structure == Parameters::Structures::doubleList) {
-        return runDoubleList();
+        if (Parameters::dataType == Parameters::DataTypes::typeInt) {
+            return runDoubleList<int>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeFloat) {
+            return runDoubleList<float>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeDouble) {
+            return runDoubleList<double>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeChar) {
+            return runDoubleList<char>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeString) {
+            return runDoubleList<std::string>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
+            return runDoubleList<unsigned int>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedLong) {
+            return runDoubleList<unsigned long>();
+        }
+
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedChar) {
+            return runDoubleList<unsigned char>();
+        }
+
+        std::cerr << "ERROR! This data type is not implemented for DoubleList.\n";
+        return false;
     }
 
     // jeśli wybrana struktura nie jest jeszcze gotowa, kończymy z błędem
