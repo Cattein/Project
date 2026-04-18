@@ -8,6 +8,8 @@
 #include "structures/Array.h"
 #include "structures/DoubleList.h"
 #include "structures/SingleList.h"
+#include "structures/Stack.h"
+#include "structures/BinaryTree.h"
 
 class SortingCheck {
 private:
@@ -15,8 +17,8 @@ private:
     // Structure będzie tutaj zastąpione prawdziwym typem, np Array<int> albo SingleList<double>
     template <typename Structure, typename T>
     static bool sortedAscendImpl(const Structure& structure) {
-        // const Structure& oznacza, że struktura jest przekazywana bez kopiowania
-        // const oznacza, że funkcja tylko sprawdza dane i nie może ich zmieniać
+        // const Structure& - struktura jest przekazywana bez kopiowania
+        // const - funkcja tylko sprawdza dane i nie może ich zmieniać
 
         // zaczynamy od drugiego elementu
         // wtedy możemy porównać go z poprzednim
@@ -41,6 +43,10 @@ private:
     }
 
 public:
+    template <typename T>
+    static bool SortedAscend(const BinaryTree<T>& tree) {
+        return sortedAscendImpl<BinaryTree<T>, T>(tree);
+    }
     // sprawdza sortowanie dla tablicy dowolnego typu T
     template <typename T>
     static bool SortedAscend(const Array<T>& array) {
@@ -58,6 +64,12 @@ public:
     static bool SortedAscend(const DoubleList<T>& list) {
         return sortedAscendImpl<DoubleList<T>, T>(list);
     }
+
+    // sprawdza sortowanie dla stosu dowolnego typu T
+    template <typename T>
+    static bool SortedAscend(const Stack<T>& stack) {
+        return sortedAscendImpl<Stack<T>, T>(stack);
+    }
 };
 
-#endif //PROJECT_SORTINGCHECK_H
+#endif // PROJECT_SORTINGCHECK_H
