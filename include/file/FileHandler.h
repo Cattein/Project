@@ -12,10 +12,10 @@
 #include "structures/Array.h"
 #include "structures/SingleList.h"
 #include "structures/DoubleList.h"
+#include "structures/Stack.h"
 
 // przestrzeń nazw z funkcjami do odczytu i zapisu struktur w pliku
 namespace FileHandler {
-
 
     template <typename T>
     bool readValue(std::ifstream& file, T& value) {
@@ -30,6 +30,92 @@ namespace FileHandler {
         // getline odczytuje cały wiersz, dzięki temu string może zawierać spacje
         std::getline(file >> std::ws, value);
         return static_cast<bool>(file);
+    }
+
+    // ===== stack =====
+
+    // wczytuje stos z pliku i zwraca wskaźnik na utworzony obiekt
+    template <typename T>
+    Stack<T>* loadStackFromFile(const std::string& filename) {
+        // const std::string& - nazwa pliku jest przekazywana bez kopiowania
+        // const - funkcja nie może zmienić tej nazwy
+
+        std::ifstream file(filename);
+        // otwieramy plik do odczytu
+
+        // jeśli plik nie został otwarty, zwracamy nullptr
+        if (!file) {
+            return nullptr;
+        }
+
+        int size = 0;
+        file >> size;
+        // odczytujemy liczbę elementów stosu
+
+        // jeśli odczyt się nie udał albo rozmiar jest niepoprawny, kończymy działanie
+        if (!file || size < 0) {
+            return nullptr;
+        }
+
+        Stack<T>* stack = new (std::nothrow) Stack<T>();
+        // Stack<T>* - wskaźnik na nowy obiekt stosu
+        // std::nothrow - przy braku pamięci dostaniemy nullptr zamiast wyjątku
+
+        if (stack == nullptr) {
+            return nullptr;
+        }
+
+        // wczytujemy kolejne elementy stosu
+        // wartości w pliku zapisujemy od dołu do góry,
+        // dzięki temu zwykły push odtworzy poprawną kolejność
+        for (int i = 0; i < size; ++i) {
+            T value{};
+            // {} oznacza domyślną inicjalizację zmiennej typu T
+
+            if (!readValue(file, value)) {
+                delete stack;
+                return nullptr;
+            }
+
+            if (!stack->push(value)) {
+                delete stack;
+                return nullptr;
+            }
+        }
+
+        return stack;
+    }
+
+    // zapisuje stos do pliku
+    template <typename T>
+    bool saveStackToFile(const Stack<T>& stack, const std::string& filename) {
+        // const Stack<T>& - stos jest przekazywany przez referencję
+        // const - funkcja nie może go zmieniać
+
+        std::ofstream file(filename);
+        // otwieramy plik do zapisu
+
+        // jeśli nie udało się otworzyć pliku, zwracamy false
+        if (!file) {
+            return false;
+        }
+
+        file << stack.getSize() << '\n';
+        // zapis liczby elementów stosu
+
+        // zapisujemy elementy od dołu do góry,
+        // żeby loadStackFromFile mogło poprawnie odtworzyć stos przez push
+        for (int i = stack.getSize() - 1; i >= 0; --i) {
+            T value{};
+
+            if (!stack.get(i, value)) {
+                return false;
+            }
+
+            file << value << '\n';
+        }
+
+        return true;
     }
 
     // ===== array =====
