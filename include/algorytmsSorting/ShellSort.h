@@ -83,77 +83,47 @@ private:
         }
     }
 
-public:
-    // uruchamia shellsort dla tablicy
-    template <typename T>
-    static void sort(Array<T>& array, Parameters::ShellParameters parameter) {
+    // wspólna funkcja uruchamiająca shellsort
+    template <typename Structure, typename T>
+    static void sortImpl(Structure& structure, Parameters::ShellParameters parameter) {
         // jeśli struktura ma 0 lub 1 element, nie trzeba nic sortować
-        if (array.getSize() <= 1) {
+        if (structure.getSize() <= 1) {
             return;
         }
 
         // option2 oznacza wariant z odstępami knutha
         if (parameter == Parameters::ShellParameters::option2) {
-            shellKnuthGaps<Array<T>, T>(array);
+            shellKnuthGaps<Structure, T>(structure);
             return;
         }
 
         // w przeciwnym razie używamy prostszego dzielenia odstępu przez 2
-        shellHalfGaps<Array<T>, T>(array);
+        shellHalfGaps<Structure, T>(structure);
+    }
+
+public:
+    // uruchamia shellsort dla tablicy
+    template <typename T>
+    static void sort(Array<T>& array, Parameters::ShellParameters parameter) {
+        sortImpl<Array<T>, T>(array, parameter);
     }
 
     // uruchamia shellsort dla listy jednokierunkowej
     template <typename T>
     static void sort(SingleList<T>& list, Parameters::ShellParameters parameter) {
-        // jeśli struktura ma 0 lub 1 element, nie trzeba nic sortować
-        if (list.getSize() <= 1) {
-            return;
-        }
-
-        // option2 oznacza wariant z odstępami knutha
-        if (parameter == Parameters::ShellParameters::option2) {
-            shellKnuthGaps<SingleList<T>, T>(list);
-            return;
-        }
-
-        // w przeciwnym razie używamy prostszego dzielenia odstępu przez 2
-        shellHalfGaps<SingleList<T>, T>(list);
+        sortImpl<SingleList<T>, T>(list, parameter);
     }
 
     // uruchamia shellsort dla listy dwukierunkowej
     template <typename T>
     static void sort(DoubleList<T>& list, Parameters::ShellParameters parameter) {
-        // jeśli struktura ma 0 lub 1 element, nie trzeba nic sortować
-        if (list.getSize() <= 1) {
-            return;
-        }
-
-        // option2 oznacza wariant z odstępami knutha
-        if (parameter == Parameters::ShellParameters::option2) {
-            shellKnuthGaps<DoubleList<T>, T>(list);
-            return;
-        }
-
-        // w przeciwnym razie używamy prostszego dzielenia odstępu przez 2
-        shellHalfGaps<DoubleList<T>, T>(list);
+        sortImpl<DoubleList<T>, T>(list, parameter);
     }
 
     // uruchamia shellsort dla stosu
     template <typename T>
     static void sort(Stack<T>& stack, Parameters::ShellParameters parameter) {
-        // jeśli struktura ma 0 lub 1 element, nie trzeba nic sortować
-        if (stack.getSize() <= 1) {
-            return;
-        }
-
-        // option2 oznacza wariant z odstępami knutha
-        if (parameter == Parameters::ShellParameters::option2) {
-            shellKnuthGaps<Stack<T>, T>(stack);
-            return;
-        }
-
-        // w przeciwnym razie używamy prostszego dzielenia odstępu przez 2
-        shellHalfGaps<Stack<T>, T>(stack);
+        sortImpl<Stack<T>, T>(stack, parameter);
     }
 };
 
