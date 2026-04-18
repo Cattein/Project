@@ -5,12 +5,11 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
+#include <type_traits>
 
 #include "structures/Array.h"
 #include "structures/SingleList.h"
 #include "structures/DoubleList.h"
-#include "structures/Stack.h"
-#include "structures/BinaryTree.h"
 
 class RandomArrayGenerator {
 private:
@@ -28,8 +27,6 @@ private:
             seeded = true;
         }
     }
-
-    // ===== losowanie podstawowych typów =====
 
     // losuje wartość typu int
     static int randomInt() {
@@ -63,25 +60,8 @@ private:
 
     // losuje wartość typu unsigned int
     static unsigned int randomUnsignedInt() {
-        // liczby bez znaku są zawsze dodatnie albo równe 0
+        // static_cast<unsigned int> zamienia wynik na typ bez znaku
         return static_cast<unsigned int>(std::rand());
-    }
-
-    // losuje wartość typu unsigned long
-    static unsigned long randomUnsignedLong() {
-        return static_cast<unsigned long>(std::rand());
-    }
-
-    // losuje wartość typu unsigned char
-    static unsigned char randomUnsignedChar() {
-        // % 256 daje zakres od 0 do 255
-        return static_cast<unsigned char>(std::rand() % 256);
-    }
-
-    // losuje wartość typu char
-    static char randomChar() {
-        // zakres printable ascii: 32..126
-        return static_cast<char>(32 + (std::rand() % 95));
     }
 
     // losuje napis z liter i cyfr
@@ -107,131 +87,45 @@ private:
         return randomStringValue;
     }
 
-    // ===== wybór losowej wartości zależnie od typu =====
-
-    static int randomValueByType(int) {
-        return randomInt();
-    }
-
-    static float randomValueByType(float) {
-        return randomFloat();
-    }
-
-    static double randomValueByType(double) {
-        return randomDouble();
-    }
-
-    static unsigned int randomValueByType(unsigned int) {
-        return randomUnsignedInt();
-    }
-
-    static unsigned long randomValueByType(unsigned long) {
-        return randomUnsignedLong();
-    }
-
-    static unsigned char randomValueByType(unsigned char) {
-        return randomUnsignedChar();
-    }
-
-    static char randomValueByType(char) {
-        return randomChar();
-    }
-
-    static std::string randomValueByType(std::string) {
-        return randomString();
-    }
-
-    // wybiera odpowiednią funkcję losującą dla typu T
+    // zwraca losową wartość odpowiedniego typu
     template <typename T>
     static T randomValue() {
-        return randomValueByType(T{});
+        if constexpr (std::is_same_v<T, int>) {
+            return randomInt();
+        } else if constexpr (std::is_same_v<T, float>) {
+            return randomFloat();
+        } else if constexpr (std::is_same_v<T, double>) {
+            return randomDouble();
+        } else if constexpr (std::is_same_v<T, unsigned int>) {
+            return randomUnsignedInt();
+        } else {
+            return randomString();
+        }
     }
 
-    // ===== wartości rosnące =====
-
-    static int makeAscendingValueByType(int index, int) {
-        return index;
-    }
-
-    static float makeAscendingValueByType(int index, float) {
-        return static_cast<float>(index);
-    }
-
-    static double makeAscendingValueByType(int index, double) {
-        return static_cast<double>(index);
-    }
-
-    static unsigned int makeAscendingValueByType(int index, unsigned int) {
-        return static_cast<unsigned int>(index);
-    }
-
-    static unsigned long makeAscendingValueByType(int index, unsigned long) {
-        return static_cast<unsigned long>(index);
-    }
-
-    static unsigned char makeAscendingValueByType(int index, unsigned char) {
-        return static_cast<unsigned char>(index % 256);
-    }
-
-    static char makeAscendingValueByType(int index, char) {
-        // dla char używamy znaków printable
-        return static_cast<char>(32 + (index % 95));
-    }
-
-    static std::string makeAscendingValueByType(int index, std::string) {
-        // dla string tworzymy napisy str_0, str_1, str_2...
-        return "str_" + std::to_string(index);
-    }
-
-    // zwraca wartość rosnącą dla typu T
+    // zwraca wartość rosnącą dla różnych typów danych
     template <typename T>
     static T makeAscendingValue(int index) {
-        return makeAscendingValueByType(index, T{});
+        if constexpr (std::is_same_v<T, std::string>) {
+            return "str_" + std::to_string(index);
+            // dla string tworzymy napisy str_0, str_1, str_2...
+        } else {
+            return static_cast<T>(index);
+            // dla typów liczbowych zwracamy po prostu kolejne wartości
+        }
     }
 
-    // ===== wartości malejące =====
-
-    static int makeDescendingValueByType(int size, int index, int) {
-        return size - index;
-    }
-
-    static float makeDescendingValueByType(int size, int index, float) {
-        return static_cast<float>(size - index);
-    }
-
-    static double makeDescendingValueByType(int size, int index, double) {
-        return static_cast<double>(size - index);
-    }
-
-    static unsigned int makeDescendingValueByType(int size, int index, unsigned int) {
-        return static_cast<unsigned int>(size - index);
-    }
-
-    static unsigned long makeDescendingValueByType(int size, int index, unsigned long) {
-        return static_cast<unsigned long>(size - index);
-    }
-
-    static unsigned char makeDescendingValueByType(int size, int index, unsigned char) {
-        return static_cast<unsigned char>((size - index) % 256);
-    }
-
-    static char makeDescendingValueByType(int size, int index, char) {
-        // dla char używamy znaków printable
-        return static_cast<char>(32 + ((size - index) % 95));
-    }
-
-    static std::string makeDescendingValueByType(int size, int index, std::string) {
-        // dla string tworzymy napisy malejąco według numeru
-        return "str_" + std::to_string(size - index);
-    }
-
-    // zwraca wartość malejącą dla typu T
+    // zwraca wartość malejącą dla różnych typów danych
     template <typename T>
     static T makeDescendingValue(int size, int index) {
-        return makeDescendingValueByType(size, index, T{});
+        if constexpr (std::is_same_v<T, std::string>) {
+            return "str_" + std::to_string(size - index);
+            // dla string tworzymy napisy malejąco według numeru
+        } else {
+            return static_cast<T>(size - index);
+            // dla typów liczbowych zwracamy wartości od większych do mniejszych
+        }
     }
-
-    // ===== wspólne funkcje wypełniania =====
 
     // wspólna funkcja do wypełniania struktury losowo
     template <typename Structure, typename T>
@@ -242,7 +136,6 @@ private:
             if (!structure.set(i, randomValue<T>())) {
                 return false;
             }
-            // set wpisuje wylosowaną wartość pod dany indeks
         }
 
         return true;
@@ -257,9 +150,7 @@ private:
             }
         }
 
-    template <typename T>
-    static bool fillAscending(DoubleList<T>& list) {
-        return fillAscendingImpl<DoubleList<T>, T>(list);
+        return true;
     }
 
     // wspólna funkcja do wypełniania struktury malejąco
@@ -273,9 +164,7 @@ private:
             }
         }
 
-    template <typename T>
-    static bool fillDescending(SingleList<T>& list) {
-        return fillDescendingImpl<SingleList<T>, T>(list);
+        return true;
     }
 
     // ustawia pierwszą połowę struktury rosnąco
@@ -290,9 +179,7 @@ private:
             }
         }
 
-    template <typename T>
-    static bool fillAscending50Per(Array<T>& array) {
-        return fillAscending50PerImpl<Array<T>, T>(array);
+        return true;
     }
 
     // wspólna funkcja: najpierw losowo, potem pierwsza połowa rosnąco
@@ -305,63 +192,22 @@ private:
         return makeFirstHalfAscendingImpl<Structure, T>(structure);
     }
 
-    // wspólna funkcja kopiowania dla struktur z pushBack
-    template <typename Structure, typename T>
-    static Structure* copyPushBackStructureImpl(const Structure& source) {
-        Structure* copy = new (std::nothrow) Structure();
-        // wskaźnik na nowy obiekt struktury
-
-        if (copy == nullptr) {
-            return nullptr;
-        }
-
-        for (int i = 0; i < source.getSize(); ++i) {
-            T value{};
-            // {} - domyślna inicjalizacja zmiennej typu T
-
-            if (!source.get(i, value)) {
-                delete copy;
-                return nullptr;
-            }
-
-            if (!copy->pushBack(value)) {
-                delete copy;
-                return nullptr;
-            }
-        }
-
-        return copy;
-    }
-
 public:
     // ===== fillRandom =====
 
     template <typename T>
     static bool fillRandom(Array<T>& array) {
-        // Array<T>& - tablica jest przekazywana przez referencję
         return fillRandomImpl<Array<T>, T>(array);
     }
 
     template <typename T>
     static bool fillRandom(SingleList<T>& list) {
-        // SingleList<T>& - lista jest przekazywana przez referencję
         return fillRandomImpl<SingleList<T>, T>(list);
     }
 
     template <typename T>
     static bool fillRandom(DoubleList<T>& list) {
-        // DoubleList<T>& - lista dwukierunkowa jest przekazywana przez referencję
         return fillRandomImpl<DoubleList<T>, T>(list);
-    }
-
-    template <typename T>
-    static bool fillRandom(Stack<T>& stack) {
-        return fillRandomImpl<Stack<T>, T>(stack);
-    }
-
-    template <typename T>
-    static bool fillRandom(BinaryTree<T>& tree) {
-        return fillRandomImpl<BinaryTree<T>, T>(tree);
     }
 
     // ===== fillAscending =====
@@ -381,16 +227,6 @@ public:
         return fillAscendingImpl<DoubleList<T>, T>(list);
     }
 
-    template <typename T>
-    static bool fillAscending(Stack<T>& stack) {
-        return fillAscendingImpl<Stack<T>, T>(stack);
-    }
-
-    template <typename T>
-    static bool fillAscending(BinaryTree<T>& tree) {
-        return fillAscendingImpl<BinaryTree<T>, T>(tree);
-    }
-
     // ===== fillDescending =====
 
     template <typename T>
@@ -406,16 +242,6 @@ public:
     template <typename T>
     static bool fillDescending(DoubleList<T>& list) {
         return fillDescendingImpl<DoubleList<T>, T>(list);
-    }
-
-    template <typename T>
-    static bool fillDescending(Stack<T>& stack) {
-        return fillDescendingImpl<Stack<T>, T>(stack);
-    }
-
-    template <typename T>
-    static bool fillDescending(BinaryTree<T>& tree) {
-        return fillDescendingImpl<BinaryTree<T>, T>(tree);
     }
 
     // ===== fillAscending50Per =====
@@ -435,22 +261,15 @@ public:
         return fillAscending50PerImpl<DoubleList<T>, T>(list);
     }
 
-    template <typename T>
-    static bool fillAscending50Per(Stack<T>& stack) {
-        return fillAscending50PerImpl<Stack<T>, T>(stack);
-    }
-
-    template <typename T>
-    static bool fillAscending50Per(BinaryTree<T>& tree) {
-        return fillAscending50PerImpl<BinaryTree<T>, T>(tree);
-    }
-
     // ===== copyArray =====
 
     template <typename T>
     static Array<T>* copyArray(const Array<T>& source) {
+        // template <typename T> - funkcja działa dla różnych typów danych
+
         Array<T>* copy = new (std::nothrow) Array<T>(source.getSize());
-        // Array<T>* - wskaźnik na nową tablicę
+        // Array<T>* - wskaźnik na nową dynamiczną tablicę
+        // std::nothrow - przy braku pamięci dostaniemy nullptr zamiast wyjątku
 
         if (copy == nullptr) {
             return nullptr;
@@ -458,6 +277,7 @@ public:
 
         for (int i = 0; i < source.getSize(); ++i) {
             T value{};
+            // {} - domyślną inicjalizację zmiennej typu T
 
             if (!source.get(i, value)) {
                 delete copy;
@@ -477,37 +297,14 @@ public:
 
     template <typename T>
     static SingleList<T>* copySingleList(const SingleList<T>& source) {
-        return copyPushBackStructureImpl<SingleList<T>, T>(source);
-    }
-
-    // ===== copyDoubleList =====
-
-    template <typename T>
-    static DoubleList<T>* copyDoubleList(const DoubleList<T>& source) {
-        return copyPushBackStructureImpl<DoubleList<T>, T>(source);
-    }
-
-    // ===== copyBinaryTree =====
-
-    template <typename T>
-    static BinaryTree<T>* copyBinaryTree(const BinaryTree<T>& source) {
-        return copyPushBackStructureImpl<BinaryTree<T>, T>(source);
-    }
-
-    // ===== copyStack =====
-
-    template <typename T>
-    static Stack<T>* copyStack(const Stack<T>& source) {
-        Stack<T>* copy = new (std::nothrow) Stack<T>();
-        // Stack<T>* - wskaźnik na nowy obiekt stosu
+        SingleList<T>* copy = new (std::nothrow) SingleList<T>();
+        // SingleList<T>* - wskaźnik na nowy obiekt listy
 
         if (copy == nullptr) {
             return nullptr;
         }
 
-        // kopiujemy od najniższego elementu do szczytu,
-        // żeby zachować tę samą kolejność w nowym stosie
-        for (int i = source.getSize() - 1; i >= 0; --i) {
+        for (int i = 0; i < source.getSize(); ++i) {
             T value{};
 
             if (!source.get(i, value)) {
@@ -515,7 +312,35 @@ public:
                 return nullptr;
             }
 
-            if (!copy->push(value)) {
+            if (!copy->pushBack(value)) {
+                delete copy;
+                return nullptr;
+            }
+        }
+
+        return copy;
+    }
+
+    // ===== copyDoubleList =====
+
+    template <typename T>
+    static DoubleList<T>* copyDoubleList(const DoubleList<T>& source) {
+        DoubleList<T>* copy = new (std::nothrow) DoubleList<T>();
+        // DoubleList<T>* - wskaźnik na nowy obiekt listy
+
+        if (copy == nullptr) {
+            return nullptr;
+        }
+
+        for (int i = 0; i < source.getSize(); ++i) {
+            T value{};
+
+            if (!source.get(i, value)) {
+                delete copy;
+                return nullptr;
+            }
+
+            if (!copy->pushBack(value)) {
                 delete copy;
                 return nullptr;
             }
@@ -525,4 +350,4 @@ public:
     }
 };
 
-#endif // PROJECT_RANDOMARRAYGENERATOR_H
+#endif //PROJECT_RANDOMARRAYGENERATOR_H

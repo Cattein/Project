@@ -12,13 +12,10 @@
 #include "structures/Array.h"
 #include "structures/SingleList.h"
 #include "structures/DoubleList.h"
-#include "structures/Stack.h"
-#include "structures/BinaryTree.h"
 
 // przestrzeń nazw z funkcjami do odczytu i zapisu struktur w pliku
 namespace FileHandler {
 
-    // ===== odczyt pojedynczej wartości =====
 
     template <typename T>
     bool readValue(std::ifstream& file, T& value) {
@@ -35,88 +32,99 @@ namespace FileHandler {
         return static_cast<bool>(file);
     }
 
-    // ===== wspólna funkcja wczytywania struktur z pushBack =====
-    // działa dla: SingleList, DoubleList, BinaryTree
+    // ===== array =====
 
-    template <typename Structure, typename T>
-    Structure* loadPushBackStructureFromFileImpl(const std::string& filename) {
+    // wczytuje tablicę z pliku, zwraca wskaźnik na utworzony obiekt
+    template <typename T>
+    Array<T>* loadArrayFromFile(const std::string& filename) {
+        // const std::string& - nazwa pliku jest przekazywana przez referencję - nie tworzymy kopii napisu
+        // const - funkcja nie może zmienić tej nazwy
+
         std::ifstream file(filename);
-        // otwieramy plik do odczytu
+        // std::ifstream - otwieramy plik do odczytu
 
+        // jeśli plik nie został otwarty, zwracamy nullptr
         if (!file) {
             return nullptr;
         }
 
         int size = 0;
         file >> size;
-        // odczytujemy liczbę elementów zapisanych w pliku
+        // odczytujemy rozmiar tablicy zapisany w pliku
 
+        // jeśli odczyt się nie udał albo rozmiar jest niepoprawny - kończymy działanie
         if (!file || size < 0) {
             return nullptr;
         }
 
-        Structure* structure = new (std::nothrow) Structure();
-        // tworzymy nową pustą strukturę
+        Array<T>* array = new (std::nothrow) Array<T>(size);
+        // Array<T>* - wskaźnik na obiekt klasy Array
+        // new - tworzenie obiektu w pamięci dynamicznej
+        // std::nothrow - przy braku pamięci dostaniemy nullptr zamiast wyjątku
 
-        if (structure == nullptr) {
+        // jeśli nie udało się przydzielić pamięci, zwracamy nullptr
+        if (!array) {
             return nullptr;
         }
 
-        // wczytujemy kolejne wartości i dopisujemy na koniec
+        // wczytujemy kolejne elementy tablicy
         for (int i = 0; i < size; ++i) {
             T value{};
             // {} oznacza domyślną inicjalizację zmiennej typu T
 
             if (!readValue(file, value)) {
-                delete structure;
+                delete array;
                 return nullptr;
             }
 
-            if (!structure->pushBack(value)) {
-                delete structure;
+            // zapisujemy wartość do tablicy na odpowiedniej pozycji
+            if (!array->set(i, value)) {
+                delete array;
                 return nullptr;
             }
         }
 
-        return structure;
+        // zwracamy gotową tablicę
+        return array;
     }
 
-    // ===== wspólna funkcja zapisu struktur indeksowanych =====
-    // działa dla: Array, SingleList, DoubleList, BinaryTree
-
-    template <typename Structure, typename T>
-    bool saveIndexedStructureToFileImpl(const Structure& structure, const std::string& filename) {
+    // zapisuje tablicę do pliku i zwraca true, jeśli zapis się udał
+    template <typename T>
+    bool saveArrayToFile(const Array<T>& array, const std::string& filename) {
         std::ofstream file(filename);
-        // otwieramy plik do zapisu
+        // std::ofstream - otwieramy plik do zapisu
 
+        // jeśli nie udało się otworzyć pliku, zwracamy false
         if (!file) {
             return false;
         }
 
-        file << structure.getSize() << '\n';
-        // zapisujemy liczbę elementów
+        // zapisujemy rozmiar tablicy
+        file << array.getSize() << '\n';
 
-        // zapisujemy wszystkie elementy po indeksach
-        for (int i = 0; i < structure.getSize(); ++i) {
+        // zapisujemy wszystkie elementy tablicy
+        for (int i = 0; i < array.getSize(); ++i) {
             T value{};
 
-            if (!structure.get(i, value)) {
+            // pobieramy wartość z tablicy
+            if (!array.get(i, value)) {
                 return false;
             }
 
+            // zapisujemy wartość do pliku
             file << value << '\n';
         }
 
+        // zapis się udał
         return true;
     }
 
-    // ===== stack =====
+    // ===== single list =====
 
-    // wczytuje stos z pliku i zwraca wskaźnik na utworzony obiekt
+    // wczytuje listę jednokierunkową z pliku i zwraca wskaźnik na utworzony obiekt
     template <typename T>
-    Stack<T>* loadStackFromFile(const std::string& filename) {
-        // const std::string& - nazwa pliku jest przekazywana bez kopiowania
-        // const - funkcja nie może zmienić tej nazwy
+    SingleList<T>* loadSingleListFromFile(const std::string& filename) {
+        // wynik ma typ SingleList<T>* - funkcja zwraca wskaźnik na nowo utworzoną listę
 
         std::ifstream file(filename);
         // otwieramy plik do odczytu
@@ -128,46 +136,44 @@ namespace FileHandler {
 
         int size = 0;
         file >> size;
-        // odczytujemy liczbę elementów stosu
+        // odczytujemy liczbę elementów listy
 
         // jeśli odczyt się nie udał albo rozmiar jest niepoprawny, kończymy działanie
         if (!file || size < 0) {
             return nullptr;
         }
 
-        Stack<T>* stack = new (std::nothrow) Stack<T>();
-        // Stack<T>* - wskaźnik na nowy obiekt stosu
+        // tworzymy nową pustą listę
+        SingleList<T>* list = new (std::nothrow) SingleList<T>();
 
-        if (stack == nullptr) {
+        // jeśli nie udało się przydzielić pamięci, zwracamy nullptr
+        if (list == nullptr) {
             return nullptr;
         }
 
-        // wczytujemy kolejne elementy stosu
-        // wartości w pliku zapisujemy od dołu do góry,
-        // dzięki temu zwykły push odtworzy poprawną kolejność
+        // wczytujemy kolejne elementy listy
         for (int i = 0; i < size; ++i) {
             T value{};
+            // {} oznacza domyślną inicjalizację zmiennej typu T
 
             if (!readValue(file, value)) {
-                delete stack;
+                delete list;
                 return nullptr;
             }
 
-            if (!stack->push(value)) {
-                delete stack;
+            // dopisujemy wartość na koniec listy
+            if (!list->pushBack(value)) {
+                delete list;
                 return nullptr;
             }
         }
 
-        return stack;
+        return list;
     }
 
-    // zapisuje stos do pliku
+    // zapisuje listę jednokierunkową do pliku
     template <typename T>
-    bool saveStackToFile(const Stack<T>& stack, const std::string& filename) {
-        // const Stack<T>& - stos jest przekazywany przez referencję
-        // const - funkcja nie może go zmieniać
-
+    bool saveSingleListToFile(const SingleList<T>& list, const std::string& filename) {
         std::ofstream file(filename);
         // otwieramy plik do zapisu
 
@@ -176,120 +182,112 @@ namespace FileHandler {
             return false;
         }
 
-        file << stack.getSize() << '\n';
-        // zapis liczby elementów stosu
+        // zapisujemy liczbę elementów listy
+        file << list.getSize() << '\n';
 
-        // zapisujemy elementy od dołu do góry,
-        // żeby loadStackFromFile mogło poprawnie odtworzyć stos przez push
-        for (int i = stack.getSize() - 1; i >= 0; --i) {
+        // zapisujemy wszystkie elementy listy
+        for (int i = 0; i < list.getSize(); ++i) {
             T value{};
 
-            if (!stack.get(i, value)) {
+            // pobieramy wartość z listy
+            if (!list.get(i, value)) {
                 return false;
             }
 
             file << value << '\n';
+            // zapisujemy wartość do pliku
         }
 
         return true;
     }
 
-    // ===== binary tree =====
+    // ===== double list =====
 
-    // wczytuje drzewo binarne z pliku i zwraca wskaźnik na utworzony obiekt
+    // wczytuje listę dwukierunkową z pliku i zwraca wskaźnik na utworzony obiekt
     template <typename T>
-    BinaryTree<T>* loadBinaryTreeFromFile(const std::string& filename) {
-        // pushBack dodaje elementy poziomami,
-        // więc odtworzymy tę samą strukturę drzewa
-        return loadPushBackStructureFromFileImpl<BinaryTree<T>, T>(filename);
-    }
-
-    // zapisuje drzewo binarne do pliku
-    template <typename T>
-    bool saveBinaryTreeToFile(const BinaryTree<T>& tree, const std::string& filename) {
-        return saveIndexedStructureToFileImpl<BinaryTree<T>, T>(tree, filename);
-    }
-
-    // ===== array =====
-
-    // wczytuje tablicę z pliku, zwraca wskaźnik na utworzony obiekt
-    template <typename T>
-    Array<T>* loadArrayFromFile(const std::string& filename) {
-        // const std::string& - nazwa pliku jest przekazywana przez referencję
+    DoubleList<T>* loadDoubleListFromFile(const std::string& filename) {
+        // const std::string& - nazwa pliku jest przekazywana bez kopiowania
         // const - funkcja nie może zmienić tej nazwy
 
         std::ifstream file(filename);
-        // otwieramy plik do odczytu
+        // std::ifstream - odczyt danych z pliku
 
+        // jeśli plik nie został poprawnie otwarty, zwracamy nullptr
         if (!file) {
             return nullptr;
         }
 
         int size = 0;
         file >> size;
-        // odczytujemy rozmiar tablicy zapisany w pliku
+        // odczyt liczby elementów zapisanych w pliku
 
+        // jeśli odczyt się nie udał albo rozmiar jest ujemny, kończymy działanie
         if (!file || size < 0) {
             return nullptr;
         }
 
-        Array<T>* array = new (std::nothrow) Array<T>(size);
-        // Array<T>* - wskaźnik na obiekt klasy Array
+        DoubleList<T>* list = new (std::nothrow) DoubleList<T>();
+        // DoubleList<T>* - wskaźnik na obiekt listy dwukierunkowej
+        // new tworzy obiekt w pamięci dynamicznej
+        // std::nothrow - przy braku pamięci dostaniemy nullptr zamiast wyjątku
 
-        if (array == nullptr) {
+        // jeśli nie udało się utworzyć listy, zwracamy nullptr
+        if (list == nullptr) {
             return nullptr;
         }
 
-        // wczytujemy kolejne elementy tablicy
+        // wczytujemy kolejne wartości z pliku
         for (int i = 0; i < size; ++i) {
             T value{};
+            // {} oznacza domyślną inicjalizację zmiennej typu T
 
             if (!readValue(file, value)) {
-                delete array;
+                delete list;
                 return nullptr;
             }
 
-            if (!array->set(i, value)) {
-                delete array;
+            // dodajemy wartość na koniec listy
+            // strzałka -> służy do dostępu do metod obiektu wskazywanego przez wskaźnik
+            if (!list->pushBack(value)) {
+                delete list;
                 return nullptr;
             }
         }
 
-        return array;
-    }
-
-    // zapisuje tablicę do pliku
-    template <typename T>
-    bool saveArrayToFile(const Array<T>& array, const std::string& filename) {
-        return saveIndexedStructureToFileImpl<Array<T>, T>(array, filename);
-    }
-
-    // ===== single list =====
-
-    // wczytuje listę jednokierunkową z pliku
-    template <typename T>
-    SingleList<T>* loadSingleListFromFile(const std::string& filename) {
-        return loadPushBackStructureFromFileImpl<SingleList<T>, T>(filename);
-    }
-
-    // zapisuje listę jednokierunkową do pliku
-    template <typename T>
-    bool saveSingleListToFile(const SingleList<T>& list, const std::string& filename) {
-        return saveIndexedStructureToFileImpl<SingleList<T>, T>(list, filename);
-    }
-
-    // ===== double list =====
-
-    // wczytuje listę dwukierunkową z pliku
-    template <typename T>
-    DoubleList<T>* loadDoubleListFromFile(const std::string& filename) {
-        return loadPushBackStructureFromFileImpl<DoubleList<T>, T>(filename);
+        return list;
     }
 
     // zapisuje listę dwukierunkową do pliku
     template <typename T>
     bool saveDoubleListToFile(const DoubleList<T>& list, const std::string& filename) {
-        return saveIndexedStructureToFileImpl<DoubleList<T>, T>(list, filename);
+        // const DoubleList<T>& - lista jest przekazywana przez referencję - nie tworzymy kopii listy
+        // const - funkcja nie może jej zmieniać
+
+        std::ofstream file(filename);
+        // std::ofstream - zapis danych do pliku
+
+        // jeśli nie udało się otworzyć pliku, zwracamy false
+        if (!file) {
+            return false;
+        }
+
+        file << list.getSize() << '\n';
+        // zapis liczby elementów listy
+
+        // zapis wszystkich elementów listy
+        for (int i = 0; i < list.getSize(); ++i) {
+            T value{};
+
+            // pobieramy wartość spod danego indeksu
+            if (!list.get(i, value)) {
+                return false;
+            }
+
+            file << value << '\n';
+            // zapisujemy wartość do pliku
+        }
+
+        return true;
     }
 
 } // namespace FileHandler
