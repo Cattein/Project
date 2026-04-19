@@ -37,7 +37,7 @@ private:
         }
 
         // domyślnie pivot ze środka
-        return left + (left - right) / 2;
+        return left + (right - left) / 2;
     }
 
     // wspólny odczyt wartości spod danego indeksu
