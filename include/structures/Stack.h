@@ -24,14 +24,15 @@ private:
     int size;         // aktualna liczba elementów w stosie
 
     // zwraca wskaźnik do węzła o podanym indeksie
-    // indeks 0 - element ze szczytu stosu
+    // indeks 0 oznacza element ze szczytu stosu
     Node* getNode(int index) {
         // jeśli indeks jest niepoprawny, zwracamy nullptr
         if (index < 0 || index >= size) {
             return nullptr;
         }
 
-        Node* current = topNode;        // szczyt stosu
+        Node* current = topNode;
+        // zaczynamy od szczytu stosu
 
         // przechodzimy do kolejnych elementów aż do podanego indeksu
         for (int i = 0; i < index; ++i) {
@@ -41,17 +42,18 @@ private:
         return current;
     }
 
-    // wersja const tej samej funkcji, używana gdy stos nie może być modyfikowany
+    // wersja const tej samej funkcji
+    // używana wtedy, gdy stos nie może być modyfikowany
     const Node* getNode(int index) const {
         // jeśli indeks jest niepoprawny, zwracamy nullptr
         if (index < 0 || index >= size) {
             return nullptr;
         }
 
-        const Node* current = topNode;        // szczyt stosu
+        const Node* current = topNode;
+        // zaczynamy od szczytu stosu
 
-
-        // przechodzimy do kolejnych elementów aż do podanego indeksu
+        // przechodzimy dalej aż do szukanego indeksu
         for (int i = 0; i < index; ++i) {
             current = current->next;
         }
@@ -60,7 +62,7 @@ private:
     }
 
 public:
-    // pusty stos
+    // tworzy pusty stos
     Stack() : topNode(nullptr), size(0) {}
 
     // destruktor usuwa wszystkie elementy stosu
@@ -84,40 +86,41 @@ public:
 
     // dodaje nowy element na szczyt stosu
     bool push(const T& value) {
-        Node* newNode = new (std::nothrow) Node(value);    // tworzy nowy węzeł
+        Node* newNode = new (std::nothrow) Node(value);
 
         // jeśli nie udało się przydzielić pamięci, zwracamy false
         if (newNode == nullptr) {
             return false;
         }
 
-        newNode->next = topNode;    // nowy element wskazuje na poprzedni szczyt
-        topNode = newNode;    // nowy element staje się nowym szczytem stosu
+        // nowy element wskazuje na poprzedni szczyt
+        newNode->next = topNode;
+
+        // nowy element staje się nowym szczytem stosu
+        topNode = newNode;
         ++size;
 
         return true;
     }
 
-    // usuwa element ze szczytu stosu i zapisuje jego wartość do zmiennej value
+    // usuwa element ze szczytu stosu i zapisuje jego wartość do value
     bool pop(T& value) {
         // jeśli stos jest pusty, nie można nic usunąć
         if (topNode == nullptr) {
             return false;
         }
 
-        // zapamiętujemy węzeł do usunięcia
+        // zapamiętujemy stary szczyt
         Node* nodeToDelete = topNode;
 
         // odczytujemy wartość ze szczytu
         value = nodeToDelete->value;
 
-        // przesuwamy szczyt na następny element
+        // przesuwamy szczyt na kolejny element
         topNode = topNode->next;
 
         // usuwamy stary węzeł
         delete nodeToDelete;
-
-        // zmniejszamy liczbę elementów
         --size;
 
         return true;
@@ -130,13 +133,13 @@ public:
             return false;
         }
 
-        // zapisujemy wartość ze szczytu do zmiennej value
         value = topNode->value;
         return true;
     }
 
     // odczytuje wartość elementu pod podanym indeksem
-    // indeks 0 - szczyt stosu
+    // indeks 0 oznacza szczyt stosu
+    // ta metoda jest używana pomocniczo, np. przy sortowaniu i kopiowaniu
     bool get(int index, T& value) const {
         const Node* node = getNode(index);
 
@@ -145,12 +148,12 @@ public:
             return false;
         }
 
-        // odczytujemy wartość z wybranego węzła
         value = node->value;
         return true;
     }
 
     // ustawia nową wartość elementu pod podanym indeksem
+    // podobnie jak get, metoda jest pomocnicza
     bool set(int index, const T& value) {
         Node* node = getNode(index);
 
@@ -159,15 +162,14 @@ public:
             return false;
         }
 
-        // zmieniamy wartość w wybranym węźle
         node->value = value;
         return true;
     }
 
     // usuwa wszystkie elementy stosu
     void clear() {
-        // zaczynamy od szczytu
         Node* current = topNode;
+        // zaczynamy od szczytu
 
         // przechodzimy po wszystkich elementach i usuwamy je po kolei
         while (current != nullptr) {

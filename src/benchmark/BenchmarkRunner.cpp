@@ -28,7 +28,7 @@ namespace {
                Parameters::shellParameter != Parameters::ShellParameters::option4;
     }
 
-    // wspólne wypełnianie struktury zależnie od wybranego rozkładu
+    // wypełnia strukturę zgodnie z rozkładem wybranym w parametrach
     template <typename Structure>
     bool fillByDistribution(Structure& source) {
         if (Parameters::distribution == Parameters::Distribution::random) {
@@ -54,6 +54,7 @@ namespace {
 
     template <typename T>
     bool createSource(Array<T>& source) {
+        // tablica ma już ustalony rozmiar po konstruktorze
         return source.getSize() == Parameters::structureSize;
     }
 
@@ -284,46 +285,45 @@ namespace {
         return false;
     }
 
-    // wspólna część benchmarku
+    // ===== wspólna pętla benchmarku =====
+    // każda iteracja:
+    // 1. tworzy kopię danych źródłowych
+    // 2. mierzy czas sortowania
+    // 3. sprawdza poprawność wyniku
+    // 4. aktualizuje min, max i średnią
+
     template <typename Structure>
     bool runBenchmarkLoop(const Structure& source, BenchmarkStats& stats, const std::string& structureName) {
         auto minTime = std::chrono::microseconds::max();
         auto maxTime = std::chrono::microseconds::zero();
         auto sumTime = std::chrono::microseconds::zero();
-        // minTime - najlepszy wynik
-        // maxTime - najgorszy wynik
-        // sumTime - suma czasów potrzebna do wyliczenia średniej
 
         for (int iteration = 0; iteration < Parameters::iterations; ++iteration) {
             Structure* testStructure = copyStructure(source);
-            // każda iteracja sortuje kopię danych źródłowych,
-            // dzięki temu wszystkie pomiary są porównywalne
+            // sortujemy kopię, żeby każda iteracja startowała z tych samych danych
 
             if (testStructure == nullptr) {
                 std::cerr << "ERROR! Failed to copy source " << structureName << ".\n";
                 return false;
             }
 
-            auto start = std::chrono::steady_clock::now();
-            // początek pomiaru - od tego miejsca liczymy tylko czas sortowania
+            const auto start = std::chrono::steady_clock::now();
 
             if (!sortStructure(*testStructure)) {
                 delete testStructure;
                 return false;
             }
 
-            auto end = std::chrono::steady_clock::now();
-            // koniec pomiaru
+            const auto end = std::chrono::steady_clock::now();
 
             if (!SortingCheck::SortedAscend(*testStructure)) {
                 std::cerr << "ERROR! " << structureName << " is not sorted correctly.\n";
                 delete testStructure;
                 return false;
             }
-            // po każdym sortowaniu sprawdzamy poprawność wyniku
 
-            auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-            // zamieniamy różnicę czasu na mikrosekundy
+            const auto elapsed =
+                std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
             if (elapsed < minTime) {
                 minTime = elapsed;
@@ -335,7 +335,8 @@ namespace {
 
             sumTime += elapsed;
 
-            std::cout << "iteration " << (iteration + 1) << " [us] = " << elapsed.count() << "\n";
+            std::cout << "iteration " << (iteration + 1)
+                      << " [us] = " << elapsed.count() << "\n";
 
             delete testStructure;
         }
@@ -353,7 +354,6 @@ namespace {
     template <typename T>
     bool runArrayBenchmark(BenchmarkStats& stats) {
         Array<T> source(Parameters::structureSize);
-        // tworzymy strukturę źródłową o zadanym rozmiarze
 
         if (!createSource(source)) {
             std::cerr << "ERROR! Failed to create source array.\n";
@@ -371,7 +371,6 @@ namespace {
     template <typename T>
     bool runSingleListBenchmark(BenchmarkStats& stats) {
         SingleList<T> source;
-        // tworzymy pustą listę źródłową
 
         if (!createSource(source)) {
             std::cerr << "ERROR! Failed to create source single list.\n";
@@ -389,7 +388,6 @@ namespace {
     template <typename T>
     bool runDoubleListBenchmark(BenchmarkStats& stats) {
         DoubleList<T> source;
-        // tworzymy pustą listę źródłową
 
         if (!createSource(source)) {
             std::cerr << "ERROR! Failed to create source double list.\n";
@@ -407,7 +405,6 @@ namespace {
     template <typename T>
     bool runStackBenchmark(BenchmarkStats& stats) {
         Stack<T> source;
-        // tworzymy pusty stos źródłowy
 
         if (!createSource(source)) {
             std::cerr << "ERROR! Failed to create source stack.\n";
@@ -425,7 +422,6 @@ namespace {
     template <typename T>
     bool runBinaryTreeBenchmark(BenchmarkStats& stats) {
         BinaryTree<T> source;
-        // tworzymy puste drzewo źródłowe
 
         if (!createSource(source)) {
             std::cerr << "ERROR! Failed to create source binary tree.\n";
@@ -443,10 +439,15 @@ namespace {
 } // namespace
 
 bool BenchmarkRunner::run(BenchmarkStats& stats) {
-    // sprawdzamy podstawowe parametry benchmarku
+    // ===== sprawdzanie parametrów =====
 
     if (Parameters::structureSize <= 0) {
         std::cerr << "ERROR! structureSize must be greater than 0.\n";
+        return false;
+    }
+
+    if (Parameters::iterations <= 0) {
+        std::cerr << "ERROR! iterations must be greater than 0.\n";
         return false;
     }
 
@@ -467,201 +468,81 @@ bool BenchmarkRunner::run(BenchmarkStats& stats) {
         return false;
     }
 
-    if (Parameters::iterations <= 0) {
-        std::cerr << "ERROR! iterations must be greater than 0.\n";
-        return false;
-    }
-
-    // ===== tablica =====
+    // ===== array =====
 
     if (Parameters::structure == Parameters::Structures::array) {
-        if (Parameters::dataType == Parameters::DataTypes::typeInt) {
-            return runArrayBenchmark<int>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeFloat) {
-            return runArrayBenchmark<float>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeDouble) {
-            return runArrayBenchmark<double>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeChar) {
-            return runArrayBenchmark<char>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeString) {
-            return runArrayBenchmark<std::string>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
-            return runArrayBenchmark<unsigned int>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedLong) {
-            return runArrayBenchmark<unsigned long>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedChar) {
-            return runArrayBenchmark<unsigned char>(stats);
-        }
+        if (Parameters::dataType == Parameters::DataTypes::typeInt) return runArrayBenchmark<int>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeFloat) return runArrayBenchmark<float>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeDouble) return runArrayBenchmark<double>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeChar) return runArrayBenchmark<char>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeString) return runArrayBenchmark<std::string>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) return runArrayBenchmark<unsigned int>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedLong) return runArrayBenchmark<unsigned long>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedChar) return runArrayBenchmark<unsigned char>(stats);
 
         std::cerr << "ERROR! This data type is not implemented for Array.\n";
         return false;
     }
 
-    // ===== lista jednokierunkowa =====
+    // ===== single list =====
 
     if (Parameters::structure == Parameters::Structures::singleList) {
-        if (Parameters::dataType == Parameters::DataTypes::typeInt) {
-            return runSingleListBenchmark<int>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeFloat) {
-            return runSingleListBenchmark<float>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeDouble) {
-            return runSingleListBenchmark<double>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeChar) {
-            return runSingleListBenchmark<char>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeString) {
-            return runSingleListBenchmark<std::string>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
-            return runSingleListBenchmark<unsigned int>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedLong) {
-            return runSingleListBenchmark<unsigned long>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedChar) {
-            return runSingleListBenchmark<unsigned char>(stats);
-        }
+        if (Parameters::dataType == Parameters::DataTypes::typeInt) return runSingleListBenchmark<int>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeFloat) return runSingleListBenchmark<float>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeDouble) return runSingleListBenchmark<double>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeChar) return runSingleListBenchmark<char>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeString) return runSingleListBenchmark<std::string>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) return runSingleListBenchmark<unsigned int>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedLong) return runSingleListBenchmark<unsigned long>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedChar) return runSingleListBenchmark<unsigned char>(stats);
 
         std::cerr << "ERROR! This data type is not implemented for SingleList.\n";
         return false;
     }
 
-    // ===== lista dwukierunkowa =====
+    // ===== double list =====
 
     if (Parameters::structure == Parameters::Structures::doubleList) {
-        if (Parameters::dataType == Parameters::DataTypes::typeInt) {
-            return runDoubleListBenchmark<int>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeFloat) {
-            return runDoubleListBenchmark<float>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeDouble) {
-            return runDoubleListBenchmark<double>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeChar) {
-            return runDoubleListBenchmark<char>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeString) {
-            return runDoubleListBenchmark<std::string>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
-            return runDoubleListBenchmark<unsigned int>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedLong) {
-            return runDoubleListBenchmark<unsigned long>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedChar) {
-            return runDoubleListBenchmark<unsigned char>(stats);
-        }
+        if (Parameters::dataType == Parameters::DataTypes::typeInt) return runDoubleListBenchmark<int>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeFloat) return runDoubleListBenchmark<float>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeDouble) return runDoubleListBenchmark<double>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeChar) return runDoubleListBenchmark<char>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeString) return runDoubleListBenchmark<std::string>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) return runDoubleListBenchmark<unsigned int>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedLong) return runDoubleListBenchmark<unsigned long>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedChar) return runDoubleListBenchmark<unsigned char>(stats);
 
         std::cerr << "ERROR! This data type is not implemented for DoubleList.\n";
         return false;
     }
 
-    // ===== stos =====
+    // ===== stack =====
 
     if (Parameters::structure == Parameters::Structures::stack) {
-        if (Parameters::dataType == Parameters::DataTypes::typeInt) {
-            return runStackBenchmark<int>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeFloat) {
-            return runStackBenchmark<float>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeDouble) {
-            return runStackBenchmark<double>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeChar) {
-            return runStackBenchmark<char>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeString) {
-            return runStackBenchmark<std::string>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
-            return runStackBenchmark<unsigned int>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedLong) {
-            return runStackBenchmark<unsigned long>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedChar) {
-            return runStackBenchmark<unsigned char>(stats);
-        }
+        if (Parameters::dataType == Parameters::DataTypes::typeInt) return runStackBenchmark<int>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeFloat) return runStackBenchmark<float>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeDouble) return runStackBenchmark<double>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeChar) return runStackBenchmark<char>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeString) return runStackBenchmark<std::string>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) return runStackBenchmark<unsigned int>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedLong) return runStackBenchmark<unsigned long>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedChar) return runStackBenchmark<unsigned char>(stats);
 
         std::cerr << "ERROR! This data type is not implemented for Stack.\n";
         return false;
     }
 
-    // ===== drzewo binarne =====
+    // ===== binary tree =====
 
     if (Parameters::structure == Parameters::Structures::binaryTree) {
-        if (Parameters::dataType == Parameters::DataTypes::typeInt) {
-            return runBinaryTreeBenchmark<int>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeFloat) {
-            return runBinaryTreeBenchmark<float>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeDouble) {
-            return runBinaryTreeBenchmark<double>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeChar) {
-            return runBinaryTreeBenchmark<char>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeString) {
-            return runBinaryTreeBenchmark<std::string>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) {
-            return runBinaryTreeBenchmark<unsigned int>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedLong) {
-            return runBinaryTreeBenchmark<unsigned long>(stats);
-        }
-
-        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedChar) {
-            return runBinaryTreeBenchmark<unsigned char>(stats);
-        }
+        if (Parameters::dataType == Parameters::DataTypes::typeInt) return runBinaryTreeBenchmark<int>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeFloat) return runBinaryTreeBenchmark<float>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeDouble) return runBinaryTreeBenchmark<double>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeChar) return runBinaryTreeBenchmark<char>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeString) return runBinaryTreeBenchmark<std::string>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::tyleUnsignedInt) return runBinaryTreeBenchmark<unsigned int>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedLong) return runBinaryTreeBenchmark<unsigned long>(stats);
+        if (Parameters::dataType == Parameters::DataTypes::typeUnsignedChar) return runBinaryTreeBenchmark<unsigned char>(stats);
 
         std::cerr << "ERROR! This data type is not implemented for BinaryTree.\n";
         return false;

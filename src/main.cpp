@@ -1,30 +1,32 @@
 #include <iostream>
 
 #include "Parameters.h"
-
 #include "benchmark/BenchmarkRunner.h"
 #include "benchmark/BenchmarkStats.h"
-#include "singleFile/SingleFileRunner.h"
 #include "benchmark/BenchmarkCsvWriter.h"
+#include "singleFile/SingleFileRunner.h"
 
 int main(int argc, char** argv) {
-    // argc - ile w sumie przekazano wierszy
-    // char** argv -tablica argumentów (argv[0] = "Project.exe")
+    // argc - liczba wszystkich argumentów programu
+    // argv - tablica argumentów tekstowych
+    // argv[0] to nazwa programu
 
-    // argc - 1 i argv + 1 pomijają nazwę programu - Project.exe
+    // argc - 1 oraz argv + 1 pomijają nazwę programu,
+    // więc funkcja czyta tylko prawdziwe parametry podane przez użytkownika
     if (Parameters::readParameters(argc - 1, argv + 1) != 0) {
         std::cerr << "ERROR! Failed to read parameters :-/ \n";
         Parameters::help();
         return 1;
     }
 
-    // jeśli użytkownik wybrał help
+    // tryb help - wypisujemy pomoc i kończymy program poprawnie
     if (Parameters::runMode == Parameters::RunModes::help) {
         Parameters::help();
         return 0;
     }
 
-    //  singleFile - sortowanie danych z jednego pliku
+    // tryb single file - wczytujemy jedną strukturę z pliku,
+    // sortujemy ją i opcjonalnie zapisujemy wynik do pliku wyjściowego
     if (Parameters::runMode == Parameters::RunModes::singleFile) {
         if (!SingleFileRunner::run()) {
             return 1;
@@ -34,23 +36,29 @@ int main(int argc, char** argv) {
         return 0;
     }
 
+    // tryb benchmark - wykonujemy serię pomiarów czasu sortowania
     if (Parameters::runMode == Parameters::RunModes::benchmark) {
+        // bez nazwy pliku wynikowego nie mamy gdzie zapisać rezultatów
         if (Parameters::resultsFile.empty()) {
             std::cerr << "ERROR! resultsFile must be set in benchmark mode.\n";
             return 1;
         }
 
         BenchmarkStats stats{};
+        // stats będzie przechowywać końcowe wyniki benchmarku:
+        // czas minimalny, maksymalny i średni
 
         if (!BenchmarkRunner::run(stats)) {
             return 1;
         }
 
+        // po wykonaniu benchmarku zapisujemy wyniki do pliku csv
         if (!BenchmarkCsvWriter::appendResult(Parameters::resultsFile, stats)) {
             std::cerr << "ERROR! Failed to save benchmark results to CSV.\n";
             return 1;
         }
 
+        // wypisujemy krótkie podsumowanie na ekran
         std::cout << "\nBenchmark completed :)\n\n";
         std::cout << "min [us] = " << stats.minTimeFinal << "\n";
         std::cout << "max [us] = " << stats.maxTimeFinal << "\n";
@@ -59,8 +67,8 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-        // jeśli nie ustawiono poprawnego trybu, pokazujemy błąd i pomoc
-        std::cerr << "ERROR! Run mode is not set.\n";
-        Parameters::help();
-        return 1;
-    }
+    // jeśli użytkownik nie ustawił poprawnego trybu pracy, pokazujemy błąd i wypisujemy pomoc
+    std::cerr << "ERROR! Run mode is not set.\n";
+    Parameters::help();
+    return 1;
+}

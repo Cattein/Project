@@ -16,7 +16,8 @@
 #include "structures/Stack.h"
 #include "structures/BinaryTree.h"
 
-// sprawdza, czy wybrany wariant shella jest obsługiwany
+// sprawdza, czy wybrany wariant shellsorta jest obsługiwany
+// na razie program wspiera tylko option1 i option2
 static bool isShellParameterSupported() {
     return Parameters::shellParameter != Parameters::ShellParameters::option3 &&
            Parameters::shellParameter != Parameters::ShellParameters::option4;
@@ -26,11 +27,13 @@ static bool isShellParameterSupported() {
 
 template <typename T>
 static bool sortArray(Array<T>& array) {
+    // quicksort dla tablicy
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(array, Parameters::pivot);
         return true;
     }
 
+    // shellsort dla tablicy
     if (Parameters::algorithm == Parameters::Algorithms::shell) {
         if (!isShellParameterSupported()) {
             std::cerr << "ERROR! Only shell parameters option1 and option2 are supported.\n";
@@ -41,10 +44,13 @@ static bool sortArray(Array<T>& array) {
         return true;
     }
 
+    // dla innych algorytmów tego typu tablicy nie obsługujemy tutaj
     std::cerr << "ERROR! Selected algorithm is not implemented for Array.\n";
     return false;
 }
 
+// specjalna wersja dla int,
+// bo bucket sort działa tylko dla liczb całkowitych int
 static bool sortArray(Array<int>& array) {
     if (Parameters::algorithm == Parameters::Algorithms::bucket) {
         if (!BucketSort::sort(array)) {
@@ -62,11 +68,13 @@ static bool sortArray(Array<int>& array) {
 
 template <typename T>
 static bool sortSingleList(SingleList<T>& list) {
+    // quicksort dla listy jednokierunkowej
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(list, Parameters::pivot);
         return true;
     }
 
+    // shellsort dla listy jednokierunkowej
     if (Parameters::algorithm == Parameters::Algorithms::shell) {
         if (!isShellParameterSupported()) {
             std::cerr << "ERROR! Only shell parameters option1 and option2 are supported.\n";
@@ -81,6 +89,8 @@ static bool sortSingleList(SingleList<T>& list) {
     return false;
 }
 
+// specjalna wersja dla int,
+// bo bucket sort działa tylko dla int
 static bool sortSingleList(SingleList<int>& list) {
     if (Parameters::algorithm == Parameters::Algorithms::bucket) {
         if (!BucketSort::sort(list)) {
@@ -98,11 +108,13 @@ static bool sortSingleList(SingleList<int>& list) {
 
 template <typename T>
 static bool sortDoubleList(DoubleList<T>& list) {
+    // quicksort dla listy dwukierunkowej
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(list, Parameters::pivot);
         return true;
     }
 
+    // shellsort dla listy dwukierunkowej
     if (Parameters::algorithm == Parameters::Algorithms::shell) {
         if (!isShellParameterSupported()) {
             std::cerr << "ERROR! Only shell parameters option1 and option2 are supported.\n";
@@ -117,6 +129,8 @@ static bool sortDoubleList(DoubleList<T>& list) {
     return false;
 }
 
+// specjalna wersja dla int,
+// bo bucket sort działa tylko dla int
 static bool sortDoubleList(DoubleList<int>& list) {
     if (Parameters::algorithm == Parameters::Algorithms::bucket) {
         if (!BucketSort::sort(list)) {
@@ -134,11 +148,13 @@ static bool sortDoubleList(DoubleList<int>& list) {
 
 template <typename T>
 static bool sortStack(Stack<T>& stack) {
+    // quicksort dla stosu
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(stack, Parameters::pivot);
         return true;
     }
 
+    // shellsort dla stosu
     if (Parameters::algorithm == Parameters::Algorithms::shell) {
         if (!isShellParameterSupported()) {
             std::cerr << "ERROR! Only shell parameters option1 and option2 are supported.\n";
@@ -149,6 +165,7 @@ static bool sortStack(Stack<T>& stack) {
         return true;
     }
 
+    // bucket sort nie jest zaimplementowany dla stosu
     if (Parameters::algorithm == Parameters::Algorithms::bucket) {
         std::cerr << "ERROR! Bucket sort is not implemented for Stack.\n";
         return false;
@@ -162,11 +179,13 @@ static bool sortStack(Stack<T>& stack) {
 
 template <typename T>
 static bool sortBinaryTree(BinaryTree<T>& tree) {
+    // quicksort dla drzewa binarnego
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(tree, Parameters::pivot);
         return true;
     }
 
+    // shellsort dla drzewa binarnego
     if (Parameters::algorithm == Parameters::Algorithms::shell) {
         if (!isShellParameterSupported()) {
             std::cerr << "ERROR! Only shell parameters option1 and option2 are supported.\n";
@@ -177,6 +196,7 @@ static bool sortBinaryTree(BinaryTree<T>& tree) {
         return true;
     }
 
+    // bucket sort nie jest zaimplementowany dla drzewa
     if (Parameters::algorithm == Parameters::Algorithms::bucket) {
         std::cerr << "ERROR! Bucket sort is not implemented for BinaryTree.\n";
         return false;
@@ -190,6 +210,7 @@ static bool sortBinaryTree(BinaryTree<T>& tree) {
 
 template <typename T>
 static bool runArray() {
+    // wczytujemy tablicę z pliku wejściowego
     Array<T>* array = FileHandler::loadArrayFromFile<T>(Parameters::inputFile);
 
     if (array == nullptr) {
@@ -197,17 +218,20 @@ static bool runArray() {
         return false;
     }
 
+    // uruchamiamy wybrane sortowanie
     if (!sortArray(*array)) {
         delete array;
         return false;
     }
 
+    // sprawdzamy, czy wynik sortowania jest poprawny
     if (!SortingCheck::SortedAscend(*array)) {
         std::cerr << "ERROR! Array is not sorted correctly.\n";
         delete array;
         return false;
     }
 
+    // jeśli podano plik wyjściowy, zapisujemy wynik
     if (!Parameters::outputFile.empty()) {
         if (!FileHandler::saveArrayToFile(*array, Parameters::outputFile)) {
             std::cerr << "ERROR! Failed to save output file.\n";
@@ -216,6 +240,7 @@ static bool runArray() {
         }
     }
 
+    // zwalniamy pamięć po zakończeniu pracy
     delete array;
     return true;
 }
@@ -224,6 +249,7 @@ static bool runArray() {
 
 template <typename T>
 static bool runSingleList() {
+    // wczytujemy listę z pliku
     SingleList<T>* list = FileHandler::loadSingleListFromFile<T>(Parameters::inputFile);
 
     if (list == nullptr) {
@@ -231,17 +257,20 @@ static bool runSingleList() {
         return false;
     }
 
+    // sortujemy listę
     if (!sortSingleList(*list)) {
         delete list;
         return false;
     }
 
+    // sprawdzamy poprawność sortowania
     if (!SortingCheck::SortedAscend(*list)) {
         std::cerr << "ERROR! SingleList is not sorted correctly.\n";
         delete list;
         return false;
     }
 
+    // zapisujemy wynik do pliku, jeśli użytkownik podał nazwę
     if (!Parameters::outputFile.empty()) {
         if (!FileHandler::saveSingleListToFile(*list, Parameters::outputFile)) {
             std::cerr << "ERROR! Failed to save output file.\n";
@@ -258,6 +287,7 @@ static bool runSingleList() {
 
 template <typename T>
 static bool runDoubleList() {
+    // wczytujemy listę dwukierunkową z pliku
     DoubleList<T>* list = FileHandler::loadDoubleListFromFile<T>(Parameters::inputFile);
 
     if (list == nullptr) {
@@ -265,17 +295,20 @@ static bool runDoubleList() {
         return false;
     }
 
+    // sortujemy listę
     if (!sortDoubleList(*list)) {
         delete list;
         return false;
     }
 
+    // sprawdzamy poprawność wyniku
     if (!SortingCheck::SortedAscend(*list)) {
         std::cerr << "ERROR! DoubleList is not sorted correctly.\n";
         delete list;
         return false;
     }
 
+    // zapis wyniku do pliku wyjściowego
     if (!Parameters::outputFile.empty()) {
         if (!FileHandler::saveDoubleListToFile(*list, Parameters::outputFile)) {
             std::cerr << "ERROR! Failed to save output file.\n";
@@ -292,6 +325,7 @@ static bool runDoubleList() {
 
 template <typename T>
 static bool runStack() {
+    // wczytujemy stos z pliku
     Stack<T>* stack = FileHandler::loadStackFromFile<T>(Parameters::inputFile);
 
     if (stack == nullptr) {
@@ -299,17 +333,20 @@ static bool runStack() {
         return false;
     }
 
+    // sortujemy stos
     if (!sortStack(*stack)) {
         delete stack;
         return false;
     }
 
+    // sprawdzamy poprawność wyniku
     if (!SortingCheck::SortedAscend(*stack)) {
         std::cerr << "ERROR! Stack is not sorted correctly.\n";
         delete stack;
         return false;
     }
 
+    // zapisujemy wynik do pliku wyjściowego
     if (!Parameters::outputFile.empty()) {
         if (!FileHandler::saveStackToFile(*stack, Parameters::outputFile)) {
             std::cerr << "ERROR! Failed to save output file.\n";
@@ -326,6 +363,7 @@ static bool runStack() {
 
 template <typename T>
 static bool runBinaryTree() {
+    // wczytujemy drzewo binarne z pliku
     BinaryTree<T>* tree = FileHandler::loadBinaryTreeFromFile<T>(Parameters::inputFile);
 
     if (tree == nullptr) {
@@ -333,17 +371,20 @@ static bool runBinaryTree() {
         return false;
     }
 
+    // sortujemy drzewo
     if (!sortBinaryTree(*tree)) {
         delete tree;
         return false;
     }
 
+    // sprawdzamy poprawność wyniku
     if (!SortingCheck::SortedAscend(*tree)) {
         std::cerr << "ERROR! BinaryTree is not sorted correctly.\n";
         delete tree;
         return false;
     }
 
+    // zapisujemy wynik do pliku wyjściowego
     if (!Parameters::outputFile.empty()) {
         if (!FileHandler::saveBinaryTreeToFile(*tree, Parameters::outputFile)) {
             std::cerr << "ERROR! Failed to save output file.\n";
@@ -357,17 +398,20 @@ static bool runBinaryTree() {
 }
 
 bool SingleFileRunner::run() {
+    // bez pliku wejściowego tryb single file nie może działać
     if (Parameters::inputFile.empty()) {
         std::cerr << "ERROR! Input file is not set.\n";
         return false;
     }
 
+    // quicksort wymaga ustawionego pivota
     if (Parameters::algorithm == Parameters::Algorithms::quick &&
         Parameters::pivot == Parameters::Pivots::undefined) {
         std::cerr << "ERROR! pivot must be set for quick sort.\n";
         return false;
     }
 
+    // shellsort wymaga ustawionego wariantu odstępów
     if (Parameters::algorithm == Parameters::Algorithms::shell &&
         Parameters::shellParameter == Parameters::ShellParameters::undefined) {
         std::cerr << "ERROR! shellParameter must be set for shell sort.\n";
@@ -375,6 +419,7 @@ bool SingleFileRunner::run() {
     }
 
     // ===== array =====
+    // wybieramy odpowiedni typ danych dla tablicy
 
     if (Parameters::structure == Parameters::Structures::array) {
         if (Parameters::dataType == Parameters::DataTypes::typeInt) return runArray<int>();
@@ -391,6 +436,7 @@ bool SingleFileRunner::run() {
     }
 
     // ===== single list =====
+    // wybieramy odpowiedni typ danych dla listy jednokierunkowej
 
     if (Parameters::structure == Parameters::Structures::singleList) {
         if (Parameters::dataType == Parameters::DataTypes::typeInt) return runSingleList<int>();
@@ -407,6 +453,7 @@ bool SingleFileRunner::run() {
     }
 
     // ===== double list =====
+    // wybieramy odpowiedni typ danych dla listy dwukierunkowej
 
     if (Parameters::structure == Parameters::Structures::doubleList) {
         if (Parameters::dataType == Parameters::DataTypes::typeInt) return runDoubleList<int>();
@@ -423,6 +470,7 @@ bool SingleFileRunner::run() {
     }
 
     // ===== stack =====
+    // wybieramy odpowiedni typ danych dla stosu
 
     if (Parameters::structure == Parameters::Structures::stack) {
         if (Parameters::dataType == Parameters::DataTypes::typeInt) return runStack<int>();
@@ -439,6 +487,7 @@ bool SingleFileRunner::run() {
     }
 
     // ===== binary tree =====
+    // wybieramy odpowiedni typ danych dla drzewa binarnego
 
     if (Parameters::structure == Parameters::Structures::binaryTree) {
         if (Parameters::dataType == Parameters::DataTypes::typeInt) return runBinaryTree<int>();

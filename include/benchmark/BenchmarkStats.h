@@ -5,10 +5,11 @@
 #ifndef PROJECT_BENCHMARKSTATS_H
 #define PROJECT_BENCHMARKSTATS_H
 
+// struktura przechowująca końcowe wyniki benchmarku
 struct BenchmarkStats {
-    long long minTimeFinal;
-    long long maxTimeFinal;
-    double averageTimeFinal;
+    long long minTimeFinal;   // najmniejszy zmierzony czas
+    long long maxTimeFinal;   // największy zmierzony czas
+    double averageTimeFinal;  // średni czas ze wszystkich iteracji
 };
 
-#endif //PROJECT_BENCHMARKSTATS_H
+#endif // PROJECT_BENCHMARKSTATS_H

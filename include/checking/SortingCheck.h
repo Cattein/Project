@@ -11,42 +11,46 @@
 #include "structures/Stack.h"
 #include "structures/BinaryTree.h"
 
+// klasa pomocnicza do sprawdzania,
+// czy elementy w strukturze są posortowane rosnąco
 class SortingCheck {
 private:
-    // template pozwala napisać jedną wspólną funkcję dla różnych typów struktur
-    // Structure będzie tutaj zastąpione prawdziwym typem, np Array<int> albo SingleList<double>
+    // wspólna funkcja sprawdzająca sortowanie rosnące
+    // template pozwala użyć tej samej logiki dla różnych typów struktur danych
     template <typename Structure, typename T>
     static bool sortedAscendImpl(const Structure& structure) {
         // const Structure& - struktura jest przekazywana bez kopiowania
-        // const - funkcja tylko sprawdza dane i nie może ich zmieniać
+        // const - funkcja tylko odczytuje dane i nie może ich zmieniać
 
-        // zaczynamy od drugiego elementu
-        // wtedy możemy porównać go z poprzednim
+        // zaczynamy od drugiego elementu, bo każdy element porównujemy z poprzednim
+
         for (int i = 1; i < structure.getSize(); ++i) {
             T last{};      // poprzedni element
             T current{};   // aktualny element
-            // {} oznacza domyślną inicjalizację zmiennej
+            // {} oznacza domyślną inicjalizację zmiennych
 
-            // jeśli odczyt się nie uda, zwracamy false
+            // jeśli nie uda się odczytać któregoś elementu,zwracamy false
             if (!structure.get(i - 1, last) || !structure.get(i, current)) {
                 return false;
             }
 
-            // jeśli aktualny element jest mniejszy od poprzedniego
-            // struktura nie jest posortowana rosnąco
+            // jeśli aktualny element jest mniejszy od poprzedniego, to struktura nie jest posortowana rosnąco
             if (current < last) {
                 return false;
             }
         }
 
+        // jeśli nie znaleziono błędu, struktura jest posortowana rosnąco
         return true;
     }
 
 public:
+    // sprawdza sortowanie dla drzewa binarnego dowolnego typu T
     template <typename T>
     static bool SortedAscend(const BinaryTree<T>& tree) {
         return sortedAscendImpl<BinaryTree<T>, T>(tree);
     }
+
     // sprawdza sortowanie dla tablicy dowolnego typu T
     template <typename T>
     static bool SortedAscend(const Array<T>& array) {

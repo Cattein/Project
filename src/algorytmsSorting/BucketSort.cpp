@@ -10,224 +10,208 @@
 namespace {
 
     // prosty węzeł listy jednokierunkowej
-    // każdy kubełek będzie przechowywany właśnie jako taka lista
+    // każdy kubełek przechowujemy jako osobną listę
     struct Node {
-        int value;    // value przechowuje liczbę z tablicy
-        Node* next;   // next wskazuje na następny element listy
-        // jeśli next == nullptr, to znaczy, że to ostatni element
+        int value;    // wartość zapisana w kubełku
+        Node* next;   // wskaźnik na następny element listy
 
-        // explicit chroni przed przypadkową zamianą int na Node, tworzymy nowy węzeł z podaną wartością
+        // tworzy nowy węzeł z podaną wartością
         explicit Node(int newValue) : value(newValue), next(nullptr) {}
     };
 
-    // dodaje nowy element na koniec listy
-    // Node*& oznacza referencję do wskaźnika
+    // dodaje nowy element na koniec listy kubełka
+    // head - początek listy
+    // tail - koniec listy
     bool pushBack(Node*& head, Node*& tail, int value) {
-        // tworzymy nowy węzeł
-        // std::nothrow - przy braku pamięci dostaniemy nullptr
         Node* newNode = new (std::nothrow) Node(value);
 
-        // jeśli pamięć nie została przydzielona, kończymy błędem
+        // jeśli nie udało się przydzielić pamięci, zwracamy false
         if (newNode == nullptr) {
             return false;
         }
 
-        // jeśli lista była pusta
-        // nowy element staje się jednocześnie początkiem i końcem
+        // jeśli lista była pusta, nowy element jest jednocześnie początkiem i końcem
         if (head == nullptr) {
             head = newNode;
             tail = newNode;
         } else {
-            // jeśli lista nie była pusta - dopinamy nowy element na koniec
+            // w przeciwnym razie dopinamy nowy element na koniec
             tail->next = newNode;
             tail = newNode;
         }
 
-        // element został poprawnie dodany
         return true;
     }
 
-    // sortuje pojedynczą listę za pomocą insertion sorta
-    // każda lista reprezentuje jeden kubełek
+    // sortuje pojedynczy kubełek za pomocą insertion sorta
+    // ponieważ każdy kubełek jest listą jednokierunkową,
+    // taki sposób sortowania jest prosty do zaimplementowania
     void insertionSortList(Node*& head) {
-        // jeśli lista jest pusta albo ma tylko jeden element
-        // to nic nie trzeba sortować
+        // pusta lista albo lista jednoelementowa jest już posortowana
         if (head == nullptr || head->next == nullptr) {
             return;
         }
 
-        Node* sorted = nullptr;    // nową posortowaną listę
+        Node* sorted = nullptr;
+        // tutaj będziemy budować nową, już posortowaną listę
 
-        // bierzemy po kolei elementy ze starej listy
+        // przenosimy po kolei elementy ze starej listy do nowej
         while (head != nullptr) {
-            Node* current = head;    // current - el. który chcemy wstawić do listy sorted
+            Node* current = head;
             head = head->next;
-            // przesuwamy head dalej -  current jest już odłączony od początku starej listy
+            // odłączamy pierwszy element ze starej listy
 
-            // jeśli lista sorted jest pusta or current powinien trafić na sam początek
+            // jeśli lista wynikowa jest pusta albo current powinien być na początku
             if (sorted == nullptr || current->value < sorted->value) {
                 current->next = sorted;
                 sorted = current;
             } else {
-                Node* temp = sorted;   // zaczynamy szukać miejsca w posortowanej liście
+                Node* temp = sorted;
 
-                // idziemy dalej, dopóki następny element jest mniejszy lub równy current
+                // szukamy miejsca, za którym trzeba wstawić current
                 while (temp->next != nullptr && temp->next->value <= current->value) {
                     temp = temp->next;
                 }
 
-                current->next = temp->next;    // wstawiamy current za elementem temp
+                current->next = temp->next;
                 temp->next = current;
             }
         }
 
-        head = sorted;
+
+        head = sorted; // po zakończeniu head ma wskazywać na posortowaną listę
     }
 
-    // usuwa wszystkie listy w kubełkach, a na końcu usuwa tablicę wskaźników
+    // usuwa wszystkie listy w kubełkach
+    // na końcu usuwa też tablicę wskaźników heads
     void clearBuckets(Node** heads, int bucketCount) {
-
-        // przechodzimy po wszystkich kubełkach
+        // przechodzimy po każdym kubełku osobno
         for (int i = 0; i < bucketCount; ++i) {
-            Node* current = heads[i];    // current wskazuje na pierwszy element listy w danym kubełku
+            Node* current = heads[i];
 
-            // usuwamy całą listę element po elemencie
+            // usuwamy całą listę w danym kubełku
             while (current != nullptr) {
-                Node* nextNode = current->next;     // zapamiętujemy kolejny element, zanim usuniemy current
-                delete current;    // zwalniamy pamięć bieżącego węzła
-                current = nextNode;    // przechodzimy do następnego elementu
+                Node* nextNode = current->next;
+                delete current;
+                current = nextNode;
             }
         }
 
-        delete[] heads;    // po usunięciu wszystkich list usuwamy tablicę kubełków
+        delete[] heads;
     }
 
     // ===== odczyt i zapis dla Array =====
 
+    // odczytuje wartość spod indeksu z tablicy
     int readAt(const Array<int>& array, int index) {
-        // const Array& oznacza, że tablica jest przekazywana bez kopiowania
-        // const oznacza, że tej tablicy nie można tutaj zmieniać
         return array.setId(index);
     }
 
+    // zapisuje wartość pod danym indeksem w tablicy
     void writeAt(Array<int>& array, int index, int value) {
-        // Array& - tablica jest przekazywana przez odwołanie
         array.setId(index) = value;
     }
 
     // ===== odczyt i zapis dla SingleList =====
 
+    // odczytuje wartość spod indeksu z listy jednokierunkowej
     int readAt(const SingleList<int>& list, int index) {
         int value = 0;
-        // value chwilowo przechowuje odczytaną liczbę
-
         list.get(index, value);
-        // get wpisuje wartość spod danego indeksu do zmiennej value
-
         return value;
     }
 
+    // zapisuje wartość pod danym indeksem w liście jednokierunkowej
     void writeAt(SingleList<int>& list, int index, int value) {
         list.set(index, value);
-        // set podmienia wartość na wskazanej pozycji
     }
 
     // ===== odczyt i zapis dla DoubleList =====
 
+    // odczytuje wartość spod indeksu z listy dwukierunkowej
     int readAt(const DoubleList<int>& list, int index) {
         int value = 0;
-        // value chwilowo przechowuje odczytaną liczbę
-
         list.get(index, value);
-        // get wpisuje wartość spod danego indeksu do zmiennej value
-
         return value;
     }
 
+    // zapisuje wartość pod danym indeksem w liście dwukierunkowej
     void writeAt(DoubleList<int>& list, int index, int value) {
         list.set(index, value);
-        // set podmienia wartość na wskazanej pozycji
     }
 
     // ===== wspólna implementacja BucketSort =====
+    // działa dla struktur:
+    // - Array<int>
+    // - SingleList<int>
+    // - DoubleList<int>
 
-    // template pozwala napisać jedną wspólną funkcję dla różnych struktur
-    // Structure będzie tutaj zastąpione prawdziwym typem
-    // może to być Array, SingleList albo DoubleList
     template <typename Structure>
     bool bucketSortImpl(Structure& structure) {
-        const int size = structure.getSize();    // rozmiar struktury
-        // const oznacza, że tej wartości nie zmieniamy po utworzeniu
+        const int size = structure.getSize();
 
-        // jeśli struktura jest pusta albo ma jeden element - posortowana
+        // jeśli struktura jest pusta albo ma jeden element, jest już posortowana
         if (size <= 1) {
             return true;
         }
 
-        // na początku zakładamy, że pierwszy element jest jednocześnie najmniejszy i największy
+        // na początku zakładamy, że pierwszy element jest jednocześnie min i max
         int minValue = readAt(structure, 0);
         int maxValue = readAt(structure, 0);
 
-        // szukamy prawdziwej wartości minimalnej i maksymalnej
+        // szukamy prawdziwego minimum i maksimum
         for (int i = 1; i < size; ++i) {
-            const int value = readAt(structure, i);   // pobieramy aktualną wartość ze struktury
+            const int value = readAt(structure, i);
 
-            // jeśli aktualny element jest mniejszy od minValue - aktualizujemy minimum
             if (value < minValue) {
                 minValue = value;
             }
 
-            // jeśli aktualny element jest większy od maxValue - aktualizujemy maksimum
             if (value > maxValue) {
                 maxValue = value;
             }
         }
 
-        // jeśli min i max są równe - wszystkie liczby są takie same
+        // jeśli wszystkie wartości są takie same, struktura jest już posortowana
         if (minValue == maxValue) {
             return true;
         }
 
-        // ustalamy liczbę kubełków ( kubełków - ile jest elementów)
+        // liczba kubełków jest równa liczbie elementów
         const int bucketCount = size;
 
-        // bucketHeads początek każdej listy
+        // bucketHeads - początki list w kubełkach
         Node** bucketHeads = new (std::nothrow) Node*[bucketCount];
 
-        // bucketTails koniec każdej listy
+        // bucketTails - końce list w kubełkach
         Node** bucketTails = new (std::nothrow) Node*[bucketCount];
 
-        // jeśli nie udało się utworzyć jednej z tablic
-        // trzeba posprzątać to, co udało się już zaalokować
+        // jeśli nie udało się utworzyć tablic kubełków, kończymy błędem
         if (bucketHeads == nullptr || bucketTails == nullptr) {
             delete[] bucketHeads;
             delete[] bucketTails;
             return false;
         }
 
-        // na początku każdy kubełek jest pusty
+        // na początku wszystkie kubełki są puste
         for (int i = 0; i < bucketCount; ++i) {
             bucketHeads[i] = nullptr;
             bucketTails[i] = nullptr;
         }
 
-        // rozdzielamy elementy struktury do kubełków
+        // rozdzielamy elementy do kubełków
         for (int i = 0; i < size; ++i) {
-            const int value = readAt(structure, i);   // pobieramy aktualną wartość ze struktury
+            const int value = readAt(structure, i);
 
-            // normalized przelicza wartość do zakresu od 0 do 1
-            // minValue daje 0
-            // maxValue daje 1
+            // przeliczamy wartość do zakresu 0..1
             const double normalized =
                 (static_cast<double>(value) - static_cast<double>(minValue)) /
                 (static_cast<double>(maxValue) - static_cast<double>(minValue));
-            // static_cast<double> zamienia liczbę na double
-            // dzięki temu nie stracimy części ułamkowej przy dzieleniu
 
-            // na podstawie normalized obliczamy numer kubełka
+            // wyznaczamy numer kubełka
             int bucketIndex = static_cast<int>(normalized * (bucketCount - 1));
 
-            // dodatkowe zabezpieczenie na wypadek problemów z obliczeniami
+            // zabezpieczenie dolnej granicy
             if (bucketIndex < 0) {
                 bucketIndex = 0;
             }
@@ -238,7 +222,6 @@ namespace {
             }
 
             // dodajemy wartość do odpowiedniego kubełka
-            // jeśli się nie uda, trzeba zwolnić pamięć i zakończyć działanie
             if (!pushBack(bucketHeads[bucketIndex], bucketTails[bucketIndex], value)) {
                 clearBuckets(bucketHeads, bucketCount);
                 delete[] bucketTails;
@@ -251,40 +234,40 @@ namespace {
             insertionSortList(bucketHeads[i]);
         }
 
-        int index = 0;    // index - gdzie wpisujemy kolejne elementy do struktury wynikowej
+        int index = 0;
+        // index wskazuje miejsce zapisu w strukturze wynikowej
 
-        // przepisujemy elementy z kubełków z powrotem do struktury
+        // przepisujemy dane z kubełków z powrotem do struktury
         for (int i = 0; i < bucketCount; ++i) {
-            Node* current = bucketHeads[i];    // zaczynamy od początku listy w danym kubełku
+            Node* current = bucketHeads[i];
 
             while (current != nullptr) {
-                writeAt(structure, index, current->value);    // wpisujemy wartość z listy do struktury
+                writeAt(structure, index, current->value);
                 ++index;
-                current = current->next;    // przechodzimy do następnego elementu listy
+                current = current->next;
             }
         }
 
-        // sprzątamy pamięć
+        // zwalniamy pamięć po kubełkach
         clearBuckets(bucketHeads, bucketCount);
         delete[] bucketTails;
 
-        // jeśli doszliśmy tutaj, sortowanie się udało
         return true;
     }
 
 } // namespace
 
-// uruchamia bucketsort dla tablicy
+// uruchamia bucket sort dla tablicy
 bool BucketSort::sort(Array<int>& array) {
     return bucketSortImpl(array);
 }
 
-// uruchamia bucketsort dla listy jednokierunkowej
+// uruchamia bucket sort dla listy jednokierunkowej
 bool BucketSort::sort(SingleList<int>& list) {
     return bucketSortImpl(list);
 }
 
-// uruchamia bucketsort dla listy dwukierunkowej
+// uruchamia bucket sort dla listy dwukierunkowej
 bool BucketSort::sort(DoubleList<int>& list) {
     return bucketSortImpl(list);
 }
