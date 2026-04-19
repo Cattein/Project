@@ -311,36 +311,6 @@ private:
         return makeFirstHalfAscendingImpl<Structure, T>(structure);
     }
 
-    // wspólna funkcja kopiowania dla struktur,
-    // które można budować przez pushBack
-    // działa dla: SingleList, DoubleList, BinaryTree
-    template <typename Structure, typename T>
-    static Structure* copyPushBackStructureImpl(const Structure& source) {
-        Structure* copy = new (std::nothrow) Structure();
-        // wskaźnik na nowy obiekt struktury
-
-        if (copy == nullptr) {
-            return nullptr;
-        }
-
-        for (int i = 0; i < source.getSize(); ++i) {
-            T value{};
-            // {} - domyślna inicjalizacja zmiennej typu T
-
-            if (!source.get(i, value)) {
-                delete copy;
-                return nullptr;
-            }
-
-            if (!copy->pushBack(value)) {
-                delete copy;
-                return nullptr;
-            }
-        }
-
-        return copy;
-    }
-
 public:
     // ===== fillRandom =====
 
@@ -470,89 +440,7 @@ public:
         return fillAscending50PerImpl<BinaryTree<T>, T>(tree);
     }
 
-    // ===== copyArray =====
 
-    // tworzy kopię tablicy
-    template <typename T>
-    static Array<T>* copyArray(const Array<T>& source) {
-        Array<T>* copy = new (std::nothrow) Array<T>(source.getSize());
-        // Array<T>* - wskaźnik na nową tablicę
-
-        if (copy == nullptr) {
-            return nullptr;
-        }
-
-        for (int i = 0; i < source.getSize(); ++i) {
-            T value{};
-
-            if (!source.get(i, value)) {
-                delete copy;
-                return nullptr;
-            }
-
-            if (!copy->set(i, value)) {
-                delete copy;
-                return nullptr;
-            }
-        }
-
-        return copy;
-    }
-
-    // ===== copySingleList =====
-
-    // tworzy kopię listy jednokierunkowej
-    template <typename T>
-    static SingleList<T>* copySingleList(const SingleList<T>& source) {
-        return copyPushBackStructureImpl<SingleList<T>, T>(source);
-    }
-
-    // ===== copyDoubleList =====
-
-    // tworzy kopię listy dwukierunkowej
-    template <typename T>
-    static DoubleList<T>* copyDoubleList(const DoubleList<T>& source) {
-        return copyPushBackStructureImpl<DoubleList<T>, T>(source);
-    }
-
-    // ===== copyBinaryTree =====
-
-    // tworzy kopię drzewa binarnego
-    template <typename T>
-    static BinaryTree<T>* copyBinaryTree(const BinaryTree<T>& source) {
-        return copyPushBackStructureImpl<BinaryTree<T>, T>(source);
-    }
-
-    // ===== copyStack =====
-
-    // tworzy kopię stosu
-    template <typename T>
-    static Stack<T>* copyStack(const Stack<T>& source) {
-        Stack<T>* copy = new (std::nothrow) Stack<T>();
-        // Stack<T>* - wskaźnik na nowy obiekt stosu
-
-        if (copy == nullptr) {
-            return nullptr;
-        }
-
-        // kopiujemy od najniższego elementu do szczytu,
-        // żeby zachować tę samą kolejność w nowym stosie
-        for (int i = source.getSize() - 1; i >= 0; --i) {
-            T value{};
-
-            if (!source.get(i, value)) {
-                delete copy;
-                return nullptr;
-            }
-
-            if (!copy->push(value)) {
-                delete copy;
-                return nullptr;
-            }
-        }
-
-        return copy;
-    }
 };
 
 #endif // PROJECT_RANDOMARRAYGENERATOR_H
