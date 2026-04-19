@@ -5,6 +5,8 @@
 #ifndef PROJECT_QUICKSORT_H
 #define PROJECT_QUICKSORT_H
 
+#include <random>
+
 #include "structures/Array.h"
 #include "structures/SingleList.h"
 #include "structures/DoubleList.h"
@@ -29,11 +31,13 @@ private:
 
         // pivot losowy z zakresu <left, right>
         if (pivotType == Parameters::Pivots::random) {
-            return left + std::rand() % (right - left + 1);
+            static std::mt19937 gen(std::random_device{}());
+            std::uniform_int_distribution<int> dist(left, right);
+            return dist(gen);
         }
 
         // domyślnie pivot ze środka
-        return (left + right) / 2;
+        return left + (left - right) / 2;
     }
 
     // wspólny odczyt wartości spod danego indeksu

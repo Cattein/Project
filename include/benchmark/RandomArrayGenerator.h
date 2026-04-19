@@ -6,9 +6,9 @@
 #define PROJECT_RANDOMARRAYGENERATOR_H
 
 #include <new>
-#include <cstdlib>
-#include <ctime>
+#include <random>
 #include <string>
+#include <limits>
 
 #include "structures/Array.h"
 #include "structures/SingleList.h"
@@ -21,70 +21,102 @@
 // - kopiowania struktur danych
 class RandomArrayGenerator {
 private:
+    // wspólny generator liczb losowych
+    // tworzy się tylko raz i potem jest używany przy każdym losowaniu
+    static std::mt19937& generator() {
+        static std::mt19937 gen(std::random_device{}());
+        return gen;
+    }
+
     // ===== wybór losowej wartości zależnie od typu =====
     // poniższe przeciążone funkcje wybierają właściwy generator
     // na podstawie typu przekazanego argumentu
 
     static int randomValueByType(int) {
-        // std::rand zwraca liczbę pseudolosową z zakresu od 0 do RAND_MAX
-        // odejmujemy połowę RAND_MAX, żeby otrzymać także liczby ujemne
-        return std::rand() - (RAND_MAX / 2);
+        // losujemy liczbę int z pełnego zakresu typu
+        std::uniform_int_distribution<int> dist(
+            std::numeric_limits<int>::min(),
+            std::numeric_limits<int>::max()
+        );
+
+        return dist(generator());
     }
 
     static float randomValueByType(float) {
-        // zamieniamy wynik rand na liczbę z zakresu 0..1
-        const float zeroToOne =
-            static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
+        // losujemy liczbę float z pełnego zakresu typu
+        std::uniform_real_distribution<float> dist(
+            std::numeric_limits<float>::lowest(),
+            std::numeric_limits<float>::max()
+        );
 
-        // potem przesuwamy zakres do -1000000 .. 1000000
-        return -1000000.0f + zeroToOne * 2000000.0f;
+        return dist(generator());
     }
 
     static double randomValueByType(double) {
-        // zamieniamy wynik rand na liczbę z zakresu 0..1
-        const double zeroToOne =
-            static_cast<double>(std::rand()) / static_cast<double>(RAND_MAX);
+        // losujemy liczbę double z pełnego zakresu typu
+        std::uniform_real_distribution<double> dist(
+            std::numeric_limits<double>::lowest(),
+            std::numeric_limits<double>::max()
+        );
 
-        // potem przesuwamy zakres do -1000000 .. 1000000
-        return -1000000.0 + zeroToOne * 2000000.0;
+        return dist(generator());
     }
 
     static unsigned int randomValueByType(unsigned int) {
-        // liczby bez znaku są zawsze dodatnie albo równe 0
-        return static_cast<unsigned int>(std::rand());
+        // liczby bez znaku losujemy od 0 do maksymalnej wartości typu
+        std::uniform_int_distribution<unsigned int> dist(
+            std::numeric_limits<unsigned int>::min(),
+            std::numeric_limits<unsigned int>::max()
+        );
+
+        return dist(generator());
     }
 
     static unsigned long randomValueByType(unsigned long) {
-        return static_cast<unsigned long>(std::rand());
+        std::uniform_int_distribution<unsigned long> dist(
+            std::numeric_limits<unsigned long>::min(),
+            std::numeric_limits<unsigned long>::max()
+        );
+
+        return dist(generator());
     }
 
     static unsigned char randomValueByType(unsigned char) {
-        // % 256 daje zakres od 0 do 255
-        return static_cast<unsigned char>(std::rand() % 256);
+        // dla unsigned char używamy int jako typu pomocniczego do losowania,
+        // a potem wynik zamieniamy na unsigned char
+        std::uniform_int_distribution<int> dist(
+            static_cast<int>(std::numeric_limits<unsigned char>::min()),
+            static_cast<int>(std::numeric_limits<unsigned char>::max())
+        );
+
+        return static_cast<unsigned char>(dist(generator()));
     }
 
     static char randomValueByType(char) {
-        // zakres printable ascii: 32..126
-        return static_cast<char>(32 + (std::rand() % 95));
+        // dla char losujemy tylko znaki printable ascii: 32..126
+        // dzięki temu znak można bezpiecznie zapisać do pliku tekstowego
+        std::uniform_int_distribution<int> dist(32, 126);
+        return static_cast<char>(dist(generator()));
     }
 
-    static std::string randomValueByType(std::string) {
+    static std::string randomValueByType(const std::string&) {
+        // zbiór znaków printable, z których budujemy losowy napis
         const std::string characters =
-                    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        // characters zawiera wszystkie znaki, z których będziemy budować losowy napis
+            " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
-        const int length = (std::rand() % 20) + 1;
         // długość napisu od 1 do 20 znaków
+        std::uniform_int_distribution<int> lengthDist(1, 20);
+
+        // losowanie indeksu znaku z napisu characters
+        std::uniform_int_distribution<int> charDist(0, static_cast<int>(characters.size()) - 1);
+
+        const int length = lengthDist(generator());
 
         std::string randomStringValue;
         // pusty napis, do którego będziemy dopisywać kolejne znaki
 
         for (int i = 0; i < length; ++i) {
-            const int index = std::rand() % static_cast<int>(characters.size());
-            // losujemy indeks znaku z napisu characters
-
-            randomStringValue += characters[index];
-            // dopisujemy wylosowany znak do napisu
+            randomStringValue += characters[charDist(generator())];
         }
 
         return randomStringValue;
@@ -128,7 +160,7 @@ private:
         return static_cast<char>(32 + (index % 95));
     }
 
-    static std::string makeAscendingValueByType(int index, std::string) {
+    static std::string makeAscendingValueByType(int index, const std::string&) {
         // dla string tworzymy napisy str_0, str_1, str_2...
         return "str_" + std::to_string(index);
     }
@@ -171,7 +203,7 @@ private:
         return static_cast<char>(32 + ((size - index) % 95));
     }
 
-    static std::string makeDescendingValueByType(int size, int index, std::string) {
+    static std::string makeDescendingValueByType(int size, int index, const std::string&) {
         // dla string tworzymy napisy malejąco według numeru
         return "str_" + std::to_string(size - index);
     }
@@ -185,16 +217,9 @@ private:
     // ===== wspólne funkcje wypełniania =====
 
     // wspólna funkcja do wypełniania struktury losowo
+    // korzysta z funkcji randomValue<T>(), która dobiera właściwy zakres dla danego typu
     template <typename Structure, typename T>
     static bool fillRandomImpl(Structure& structure) {
-        // ustawiamy ziarno generatora tylko raz
-        static bool seeded = false;
-
-        if (!seeded) {
-            std::srand(static_cast<unsigned int>(std::time(nullptr)));
-            seeded = true;
-        }
-
         for (int i = 0; i < structure.getSize(); ++i) {
             if (!structure.set(i, randomValue<T>())) {
                 return false;

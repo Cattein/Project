@@ -33,7 +33,7 @@ private:
     static void writeAt(Structure& structure, int index, const T& value) {
         // Structure& - pracujemy na oryginalnej strukturze
         // const T& - wartość przekazujemy bez kopiowania
-\
+
         structure.set(index, value);
         // set podmienia wartość na wskazanej pozycji
     }
