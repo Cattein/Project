@@ -102,7 +102,7 @@ private:
     static std::string randomValueByType(const std::string&) {
         // zbiór znaków printable, z których budujemy losowy napis
         const std::string characters =
-            " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+            "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
         // długość napisu od 1 do 20 znaków
         std::uniform_int_distribution<int> lengthDist(1, 20);
@@ -152,12 +152,21 @@ private:
     }
 
     static unsigned char makeAscendingValueByType(int index, unsigned char) {
-        return static_cast<unsigned char>(index % 256);
+        if (index > 255) {
+            index = 255;
+        }
+
+        return static_cast<unsigned char>(index);
     }
 
     static char makeAscendingValueByType(int index, char) {
-        // dla char używamy znaków printable
-        return static_cast<char>(32 + (index % 95));
+        int value = 32 + index;
+
+        if (value > 126) {
+            value = 126;
+        }
+
+        return static_cast<char>(value);
     }
 
     static std::string makeAscendingValueByType(int index, const std::string&) {
@@ -195,12 +204,31 @@ private:
     }
 
     static unsigned char makeDescendingValueByType(int size, int index, unsigned char) {
-        return static_cast<unsigned char>((size - index) % 256);
+        int value = size - index;
+
+        if (value < 0) {
+            value = 0;
+        }
+
+        if (value > 255) {
+            value = 255;
+        }
+
+        return static_cast<unsigned char>(value);
     }
 
     static char makeDescendingValueByType(int size, int index, char) {
-        // dla char używamy znaków printable
-        return static_cast<char>(32 + ((size - index) % 95));
+        int value = 32 + (size - index);
+
+        if (value > 126) {
+            value = 126;
+        }
+
+        if (value < 32) {
+            value = 32;
+        }
+
+        return static_cast<char>(value);
     }
 
     static std::string makeDescendingValueByType(int size, int index, const std::string&) {
