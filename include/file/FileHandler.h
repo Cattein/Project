@@ -180,7 +180,7 @@ namespace FileHandler {
 
         // zapisujemy elementy od dołu do góry,
         // żeby loadStackFromFile mogło poprawnie odtworzyć stos przez push
-        for (int i = stack.getSize() - 1; i >= 0; --i) {
+        for (int i = 0; i < stack.getSize(); ++i) {
             T value{};
 
             if (!stack.get(i, value)) {
