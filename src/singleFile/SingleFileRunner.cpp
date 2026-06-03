@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <string>
+#include <type_traits>
 
 #include "Parameters.h"
 #include "file/FileHandler.h"
@@ -27,6 +28,21 @@ static bool isShellParameterSupported() {
 
 template <typename T>
 static bool sortArray(Array<T>& array) {
+    // bucket sort dla tablicy
+    if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+        if constexpr ((std::is_arithmetic<T>::value || std::is_same<T, std::string>::value)) {
+            if (!BucketSort::sort(array)) {
+                std::cerr << "ERROR! Bucket sort failed.\n";
+                return false;
+            }
+
+            return true;
+        } else {
+            std::cerr << "ERROR! Bucket sort works only for arithmetic data types and std::string.\n";
+            return false;
+        }
+    }
+
     // quicksort dla tablicy
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(array, Parameters::pivot);
@@ -49,25 +65,25 @@ static bool sortArray(Array<T>& array) {
     return false;
 }
 
-// specjalna wersja dla int,
-// bo bucket sort działa tylko dla liczb całkowitych int
-static bool sortArray(Array<int>& array) {
-    if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-        if (!BucketSort::sort(array)) {
-            std::cerr << "ERROR! Bucket sort failed.\n";
-            return false;
-        }
-
-        return true;
-    }
-
-    return sortArray<int>(array);
-}
-
 // ===== wybór algorytmu dla listy jednokierunkowej =====
 
 template <typename T>
 static bool sortSingleList(SingleList<T>& list) {
+    // bucket sort dla listy jednokierunkowej
+    if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+        if constexpr ((std::is_arithmetic<T>::value || std::is_same<T, std::string>::value)) {
+            if (!BucketSort::sort(list)) {
+                std::cerr << "ERROR! Bucket sort failed.\n";
+                return false;
+            }
+
+            return true;
+        } else {
+            std::cerr << "ERROR! Bucket sort works only for arithmetic data types and std::string.\n";
+            return false;
+        }
+    }
+
     // quicksort dla listy jednokierunkowej
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(list, Parameters::pivot);
@@ -89,25 +105,25 @@ static bool sortSingleList(SingleList<T>& list) {
     return false;
 }
 
-// specjalna wersja dla int,
-// bo bucket sort działa tylko dla int
-static bool sortSingleList(SingleList<int>& list) {
-    if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-        if (!BucketSort::sort(list)) {
-            std::cerr << "ERROR! Bucket sort failed.\n";
-            return false;
-        }
-
-        return true;
-    }
-
-    return sortSingleList<int>(list);
-}
-
 // ===== wybór algorytmu dla listy dwukierunkowej =====
 
 template <typename T>
 static bool sortDoubleList(DoubleList<T>& list) {
+    // bucket sort dla listy dwukierunkowej
+    if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+        if constexpr ((std::is_arithmetic<T>::value || std::is_same<T, std::string>::value)) {
+            if (!BucketSort::sort(list)) {
+                std::cerr << "ERROR! Bucket sort failed.\n";
+                return false;
+            }
+
+            return true;
+        } else {
+            std::cerr << "ERROR! Bucket sort works only for arithmetic data types and std::string.\n";
+            return false;
+        }
+    }
+
     // quicksort dla listy dwukierunkowej
     if (Parameters::algorithm == Parameters::Algorithms::quick) {
         QuickSort::sort(list, Parameters::pivot);
@@ -127,21 +143,6 @@ static bool sortDoubleList(DoubleList<T>& list) {
 
     std::cerr << "ERROR! Selected algorithm is not implemented for DoubleList.\n";
     return false;
-}
-
-// specjalna wersja dla int,
-// bo bucket sort działa tylko dla int
-static bool sortDoubleList(DoubleList<int>& list) {
-    if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-        if (!BucketSort::sort(list)) {
-            std::cerr << "ERROR! Bucket sort failed.\n";
-            return false;
-        }
-
-        return true;
-    }
-
-    return sortDoubleList<int>(list);
 }
 
 // ===== wybór algorytmu dla stosu =====

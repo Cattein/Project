@@ -18,7 +18,7 @@ add_executable(Project
         lib/parameters/Parameters.cpp
         include/file/FileHandler.h
         include/checking/SortingCheck.h
-        src/algorytmsSorting/BucketSort.cpp
+        include/algorytmsSorting/BucketSort.h
         src/singleFile/SingleFileRunner.cpp
         include/benchmark/RandomArrayGenerator.h
         src/benchmark/BenchmarkRunner.cpp

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <chrono>
 #include <string>
+#include <type_traits>
 
 #include "Parameters.h"
 #include "structures/Array.h"
@@ -120,6 +121,20 @@ namespace {
 
     template <typename T>
     bool sortStructure(Array<T>& array) {
+        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+            if constexpr ((std::is_arithmetic<T>::value || std::is_same<T, std::string>::value)) {
+                if (!BucketSort::sort(array)) {
+                    std::cerr << "ERROR! Bucket sort failed.\n";
+                    return false;
+                }
+
+                return true;
+            } else {
+                std::cerr << "ERROR! Bucket sort works only for arithmetic data types and std::string.\n";
+                return false;
+            }
+        }
+
         if (Parameters::algorithm == Parameters::Algorithms::quick) {
             // uruchamiamy quicksort z wybranym sposobem wyboru pivota
             QuickSort::sort(array, Parameters::pivot);
@@ -143,24 +158,22 @@ namespace {
         return false;
     }
 
-    // specjalizacja dla Array<int>, bo tylko tutaj może pojawić się Bucket Sort
-    bool sortStructure(Array<int>& array) {
-        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-            // bucket sort działa bezpośrednio tylko dla typu int
-            if (!BucketSort::sort(array)) {
-                std::cerr << "ERROR! Bucket sort failed.\n";
-                return false;
-            }
-
-            return true;
-        }
-
-        // dla quicksorta i shellsorta przechodzimy do wersji szablonowej
-        return sortStructure<int>(array);
-    }
-
     template <typename T>
     bool sortStructure(SingleList<T>& list) {
+        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+            if constexpr ((std::is_arithmetic<T>::value || std::is_same<T, std::string>::value)) {
+                if (!BucketSort::sort(list)) {
+                    std::cerr << "ERROR! Bucket sort failed.\n";
+                    return false;
+                }
+
+                return true;
+            } else {
+                std::cerr << "ERROR! Bucket sort works only for arithmetic data types and std::string.\n";
+                return false;
+            }
+        }
+
         if (Parameters::algorithm == Parameters::Algorithms::quick) {
             // uruchamiamy quicksort dla listy jednokierunkowej
             QuickSort::sort(list, Parameters::pivot);
@@ -184,24 +197,22 @@ namespace {
         return false;
     }
 
-    // specjalizacja dla SingleList<int>, bo Bucket Sort działa tylko dla int
-    bool sortStructure(SingleList<int>& list) {
-        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-            // bucket sort działa bezpośrednio tylko dla typu int
-            if (!BucketSort::sort(list)) {
-                std::cerr << "ERROR! Bucket sort failed.\n";
-                return false;
-            }
-
-            return true;
-        }
-
-        // dla quicksorta i shellsorta przechodzimy do wersji szablonowej
-        return sortStructure<int>(list);
-    }
-
     template <typename T>
     bool sortStructure(DoubleList<T>& list) {
+        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
+            if constexpr ((std::is_arithmetic<T>::value || std::is_same<T, std::string>::value)) {
+                if (!BucketSort::sort(list)) {
+                    std::cerr << "ERROR! Bucket sort failed.\n";
+                    return false;
+                }
+
+                return true;
+            } else {
+                std::cerr << "ERROR! Bucket sort works only for arithmetic data types and std::string.\n";
+                return false;
+            }
+        }
+
         if (Parameters::algorithm == Parameters::Algorithms::quick) {
             // uruchamiamy quicksort dla listy dwukierunkowej
             QuickSort::sort(list, Parameters::pivot);
@@ -223,22 +234,6 @@ namespace {
         // jeśli program trafił tutaj, to dla tej struktury algorytm nie jest obsługiwany
         std::cerr << "ERROR! Selected algorithm is not implemented for DoubleList.\n";
         return false;
-    }
-
-    // specjalizacja dla DoubleList<int>, bo Bucket Sort działa tylko dla int
-    bool sortStructure(DoubleList<int>& list) {
-        if (Parameters::algorithm == Parameters::Algorithms::bucket) {
-            // bucket sort działa bezpośrednio tylko dla typu int
-            if (!BucketSort::sort(list)) {
-                std::cerr << "ERROR! Bucket sort failed.\n";
-                return false;
-            }
-
-            return true;
-        }
-
-        // dla quicksorta i shellsorta przechodzimy do wersji szablonowej
-        return sortStructure<int>(list);
     }
 
     template <typename T>
