@@ -20,11 +20,10 @@ BinaryTree
 ======================================
 
 Przykład uruchomienia singleFile
-./Project --type singleFile -a 5 -s 1 -d 1 -i in.txt -o out.txt
-
+./Project --singleFile -i ../analysis/data/input/typeInt.txt -o ../analysis/data/output/out_bucket_int_array.txt -a 4 -s 0 -t 0
 
 Przykład uruchomienia benchmark
-./Project --type benchmark -a 5 -p 1 -d 1 -t 1 -n 10000 -r 50 -o results.csv
+/Project --benchmark -a 5 -p 0 -s 0 -t 0 -d 0 -l 5000 -n 30 -r ../analysis/data/results/alpha_quick.csv
 
 =======================================
 
