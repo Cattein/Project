@@ -1,0 +1,11 @@
+10
+banana
+Apple
+cat
+Dog
+apple
+AAA
+Zebra
+abc
+A
+az

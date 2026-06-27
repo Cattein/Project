@@ -1,0 +1,5 @@
+timestamp,algorithm,structure,dataType,distribution,size,iterations,pivot,shellParameter,min_us,max_us,avg_us
+2026-04-19 22:31:19,quick,array,int,random,5000,30,middle,undefined,808,15921,2910.03
+2026-04-19 22:31:20,quick,array,double,random,5000,30,middle,undefined,35439,123611,46019.17
+2026-04-19 22:31:20,quick,array,unsignedInt,random,5000,30,middle,undefined,760,6662,1923.57
+2026-04-19 22:31:21,quick,array,string,random,5000,30,middle,undefined,5132,23523,11591.53

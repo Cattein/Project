@@ -1,0 +1,16 @@
+timestamp,algorithm,structure,dataType,distribution,size,iterations,pivot,shellParameter,min_us,max_us,avg_us
+2026-06-03 20:42:00,bucket,array,int,random,1000,30,undefined,undefined,84,2609,468.90
+2026-06-03 20:42:00,bucket,array,int,random,2500,30,undefined,undefined,221,1923,530.47
+2026-06-03 20:42:00,bucket,array,int,random,5000,30,undefined,undefined,469,9358,1797.37
+2026-06-03 20:42:01,bucket,array,int,random,7500,30,undefined,undefined,711,11471,2447.10
+2026-06-03 20:42:01,bucket,array,int,random,10000,30,undefined,undefined,1120,9540,2482.57
+2026-06-03 20:42:01,bucket,singleList,int,random,1000,30,undefined,undefined,2206,12908,3816.13
+2026-06-03 20:42:04,bucket,singleList,int,random,2500,30,undefined,undefined,28414,140495,57756.13
+2026-06-03 20:42:11,bucket,singleList,int,random,5000,30,undefined,undefined,65120,234720,118354.73
+2026-06-03 20:42:27,bucket,singleList,int,random,7500,30,undefined,undefined,122059,474859,247805.53
+2026-06-03 20:42:50,bucket,singleList,int,random,10000,30,undefined,undefined,204308,1273305,364215.53
+2026-06-03 20:42:51,bucket,doubleList,int,random,1000,30,undefined,undefined,2084,12031,3486.37
+2026-06-03 20:42:54,bucket,doubleList,int,random,2500,30,undefined,undefined,19375,76525,46595.33
+2026-06-03 20:43:00,bucket,doubleList,int,random,5000,30,undefined,undefined,77546,133837,109396.87
+2026-06-03 20:43:13,bucket,doubleList,int,random,7500,30,undefined,undefined,124038,546429,213164.23
+2026-06-03 20:43:32,bucket,doubleList,int,random,10000,30,undefined,undefined,206582,381706,288694.53

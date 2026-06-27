@@ -1,0 +1,16 @@
+timestamp,algorithm,structure,dataType,distribution,size,iterations,pivot,shellParameter,min_us,max_us,avg_us
+2026-04-19 21:46:52,quick,array,int,random,1000,30,middle,undefined,102,212,124.93
+2026-04-19 21:46:52,quick,array,int,random,2500,30,middle,undefined,365,3416,788.93
+2026-04-19 21:46:52,quick,array,int,random,5000,30,middle,undefined,828,5333,1669.50
+2026-04-19 21:46:52,quick,array,int,random,7500,30,middle,undefined,1337,6806,2401.63
+2026-04-19 21:46:52,quick,array,int,random,10000,30,middle,undefined,1964,9659,3517.47
+2026-04-19 21:46:56,quick,singleList,int,random,1000,30,middle,undefined,21443,64634,27995.03
+2026-04-19 21:47:04,quick,singleList,int,random,2500,30,middle,undefined,179894,323992,247976.33
+2026-04-19 21:47:37,quick,singleList,int,random,5000,30,middle,undefined,642977,1631156,999787.77
+2026-04-19 21:49:09,quick,singleList,int,random,7500,30,middle,undefined,2145138,3552521,2896449.77
+2026-04-19 21:51:32,quick,singleList,int,random,10000,30,middle,undefined,2835089,5806782,4450523.13
+2026-04-19 21:51:59,quick,doubleList,int,random,1000,30,middle,undefined,16147,36847,26280.67
+2026-04-19 21:52:07,quick,doubleList,int,random,2500,30,middle,undefined,173261,322485,237755.77
+2026-04-19 21:52:40,quick,doubleList,int,random,5000,30,middle,undefined,647059,1607597,1001803.30
+2026-04-19 21:54:14,quick,doubleList,int,random,7500,30,middle,undefined,2413231,3270575,2939838.27
+2026-04-19 21:56:30,quick,doubleList,int,random,10000,30,middle,undefined,2773511,5870025,4234025.40
