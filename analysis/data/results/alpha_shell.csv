@@ -1,0 +1,3 @@
+timestamp,algorithm,structure,dataType,distribution,size,iterations,pivot,shellParameter,min_us,max_us,avg_us
+19/04/2026 21:46,shell,array,int,random,5000,30,undefined,option1,1604,7941,2629.6
+19/04/2026 21:46,shell,array,int,random,5000,30,undefined,option2,1373,7177,2239.47
